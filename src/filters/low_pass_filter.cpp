@@ -50,7 +50,7 @@ void LowPassFilter::SetSmoothingFactor(float newSF)
 
 
 // ----------------------------------------------------------------------------
-// FilterWithSF(float rawPoint)
+// Filter(float rawPoint)
 // ----------------------------------------------------------------------------
 /**
  * Apply the LFP (defined by the smoothing factor) to a new point and output 
@@ -59,7 +59,7 @@ void LowPassFilter::SetSmoothingFactor(float newSF)
  * @param rawPoint  Raw data point to filter
  * @return          Filtered measurement
  */
-float LowPassFilter::FilterWithSF(float rawPoint)
+float LowPassFilter::Filter(float rawPoint)
 {
     if (this->_setsf == false)  // Just return unfiltered measurement
     {

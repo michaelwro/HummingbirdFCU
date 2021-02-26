@@ -60,7 +60,7 @@
 // BaroAltimeter Altimeter;
 // Adafruit_BMP3XX BaroTemp;
 // FXOS8700AccelMag AccelMag(&Wire2);
-// GyroSensorFXAS21002C Gyro(&Wire2);
+// FXAS21002Gyro Gyro(&Wire2);
 // Conversions Convert;
 
 // #define GPSSerial Serial7

@@ -31,19 +31,20 @@
 // ------------------------------------
 
 // ----------------------------------------------------------------------------
-// GyroSensorFXAS21002C(TwoWire *wireInput)
+// FXAS21002Gyro(TwoWire *wireInput)
 // ----------------------------------------------------------------------------
 /**
  * Constructor for FXAS21002C gyro sensor.
  * 
  * @param gyroID  ID for sensor, 0x0021002C
  */
-GyroSensorFXAS21002C::GyroSensorFXAS21002C(TwoWire *wireInput)
+FXAS21002Gyro::FXAS21002Gyro(TwoWire *wireInput)
 {
     // Clear raw data
     this->gx = 0.0f;
     this->gy = 0.0f;
     this->gz = 0.0f;
+    this->prevMeasMicros = micros();
     this->sensorI2C = wireInput;
 }
 
@@ -58,7 +59,7 @@ GyroSensorFXAS21002C::GyroSensorFXAS21002C(TwoWire *wireInput)
  * 
  * @return  True if successful, false if failed.
  */
-bool GyroSensorFXAS21002C::InitializeSensor(GyroRanges_t rng)
+bool FXAS21002Gyro::Initialize(GyroRanges_t rng)
 {
     uint8_t ctrlReg0;
     uint8_t connectedSensorID;
@@ -114,7 +115,7 @@ bool GyroSensorFXAS21002C::InitializeSensor(GyroRanges_t rng)
  * 
  * @return  True if successful, false if failed.
  */
-bool GyroSensorFXAS21002C::ReadSensor()
+bool FXAS21002Gyro::ReadSensor()
 {
     // Read 7 bytes from sensor
     this->sensorI2C->beginTransmission((uint8_t)FXAS21002C_ADDRESS);
@@ -134,6 +135,8 @@ bool GyroSensorFXAS21002C::ReadSensor()
     this->gx = (int16_t)((xhi << 8) | xlo);
     this->gy = (int16_t)((yhi << 8) | ylo);
     this->gz = (int16_t)((zhi << 8) | zlo);
+
+    this->prevMeasMicros = micros();
 
     // Convert int readings to floats [dps] depending on sensitivity
     switch (this->gyroRange)
@@ -164,9 +167,9 @@ bool GyroSensorFXAS21002C::ReadSensor()
     }
 
    // Convert [dps] to [rad/s]
-   this->gx *= CONSTS_DEG2RAD;
-   this->gy *= CONSTS_DEG2RAD;
-   this->gz *= CONSTS_DEG2RAD;
+   this->gx *= DEG2RAD;
+   this->gy *= DEG2RAD;
+   this->gz *= DEG2RAD;
 
     return true;
 }
@@ -185,7 +188,7 @@ bool GyroSensorFXAS21002C::ReadSensor()
  * @param regOfInterest  Register address on device.
  * @param valToWrite     Value to write to register.
  */
-void GyroSensorFXAS21002C::I2Cwrite8(uint8_t regOfInterest, uint8_t valToWrite)
+void FXAS21002Gyro::I2Cwrite8(uint8_t regOfInterest, uint8_t valToWrite)
 {
     // Init. communication
     this->sensorI2C->beginTransmission(FXAS21002C_ADDRESS);
@@ -204,7 +207,7 @@ void GyroSensorFXAS21002C::I2Cwrite8(uint8_t regOfInterest, uint8_t valToWrite)
  * @param regOfInterest  Register address on device.
  * @return               Value/data in register.
  */
-uint8_t GyroSensorFXAS21002C::I2Cread8(uint8_t regOfInterest)
+uint8_t FXAS21002Gyro::I2Cread8(uint8_t regOfInterest)
 {
     uint8_t val;
 

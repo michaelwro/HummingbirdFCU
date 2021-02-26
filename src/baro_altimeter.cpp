@@ -268,8 +268,8 @@ bool BaroAltimeter::ReadSensor()
 
     // Filter pressure and temperature measurements
     // pfast = this->_PresFastFilter.Update(this->_pRaw);
-    this->_t = this->_TempSlowFilter.FilterWithSF(this->_tRaw);
-    this->_p = this->_PresSlowFilter.FilterWithSF(this->_pRaw);; //->_PresSlowFilter.FilterWithSF(pfast);
+    this->_t = this->_TempSlowFilter.Filter(this->_tRaw);
+    this->_p = this->_PresSlowFilter.Filter(this->_pRaw);; //->_PresSlowFilter.FilterWithSF(pfast);
 
     // Depending on pressure change, select the "slow reacting" pressure for when the drone is "stationary"
     // or the "fast reacting" pressure when the drone changes altitude

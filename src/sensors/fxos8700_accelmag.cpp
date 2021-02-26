@@ -36,12 +36,13 @@ FXOS8700AccelMag::FXOS8700AccelMag(TwoWire *wireInput)
 {
     this->ax = 0.0f;  // Zero out variables
     this->ay = 0.0f;
-    this->az = 0.0f;
+    this->az = -CONSTS_GRAV;
     this->mx = 0.0f;
     this->my = 0.0f;
     this->mz = 0.0f;
     // this->accelRangeCheck = 0.0f;
     // this->magRangeCheck = 1200.0f;  // 1200uT from datasheet
+    this->prevMeasMicros = micros();
     this->_sensorI2C = wireInput;
 }
 
@@ -149,6 +150,8 @@ bool FXOS8700AccelMag::ReadSensor()
     this->mx = (int16_t)((mxhi << 8) | mxlo);
     this->my = (int16_t)((myhi << 8) | mylo);
     this->mz = (int16_t)((mzhi << 8) | mzlo);
+
+    this->prevMeasMicros = micros();
 
     // Convert acceleration from int16_t to float in units of [m/s/s]
     switch (this->accelRange)

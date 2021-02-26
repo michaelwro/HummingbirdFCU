@@ -11,6 +11,7 @@
  * learn more.
  * 
  * https://www.techiedelight.com/dynamic-memory-allocation-in-c-for-2d-3d-array/
+ * https://dev.to/drakargx/c-contiguous-allocation-of-2-d-arrays-446m
  */
 
 #pragma once
@@ -43,6 +44,7 @@
  * the C++ 'new' keyword as an array of pointers. See the following resource to 
  * learn more: 
  * https://www.techiedelight.com/dynamic-memory-allocation-in-c-for-2d-3d-array/
+ * https://dev.to/drakargx/c-contiguous-allocation-of-2-d-arrays-446m
  * 
  * @param rows  Matrix rows. Default = 3
  * @param cols  Matrix columns. Default = 3
@@ -79,10 +81,10 @@ public:
         for (i = 0; i < rc; i++)
             this->mat[i] = initVal;
 
-        #if defined(DebugPort) && defined(MATRIX_OBJ_DEBUG)
-            DebugPort.print("Created "); DebugPort.print(this->rows); DebugPort.print("x");
-            DebugPort.print(this->cols); DebugPort.println(" matrix");
-        #endif
+    #if defined(DebugPort) && defined(MATRIX_OBJ_DEBUG)
+        DebugPort.print("Created "); DebugPort.print(this->rows); DebugPort.print("x");
+        DebugPort.print(this->cols); DebugPort.println(" matrix");
+    #endif
     }
 
 
@@ -125,10 +127,10 @@ public:
     {
         delete[] this->mat;
 
-        #if defined(DebugPort) && defined(MATRIX_OBJ_DEBUG)
-            DebugPort.print("Deallocated "); DebugPort.print(this->rows); DebugPort.print("x");
-            DebugPort.print(this->cols); DebugPort.println(" matrix");
-        #endif
+    #if defined(DebugPort) && defined(MATRIX_OBJ_DEBUG)
+        DebugPort.print("Deallocated "); DebugPort.print(this->rows); DebugPort.print("x");
+        DebugPort.print(this->cols); DebugPort.println(" matrix");
+    #endif
     }
 protected:
 private:

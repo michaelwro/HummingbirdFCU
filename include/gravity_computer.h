@@ -20,6 +20,7 @@
 
 #include <math.h>
 #include "hummingbird_config.h"
+#include "conversions.h"
 #include "constants.h"
 
 
@@ -68,7 +69,7 @@ public:
             altRecomputeThres *= -1.0f;
         
         // Convert units and assign values
-        this->_latThres = latRecomputeThres * CONSTS_DEG2RAD;  // degrees to radians
+        this->_latThres = latRecomputeThres * DEG2RAD;  // degrees to radians
         this->_altThres = altRecomputeThres;
     }
 

@@ -27,7 +27,7 @@ public:
     LowPassFilter();
     ~LowPassFilter();
     void SetSmoothingFactor(float newSF = 1.0f);
-    float FilterWithSF(float rawPoint);
+    float Filter(float rawPoint);
     float dt;
 protected:
 private:

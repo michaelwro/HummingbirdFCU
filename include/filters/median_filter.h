@@ -13,7 +13,7 @@
 #include <Arduino.h>
 #include "hummingbird_config.h"
 
-constexpr size_t MEDAINFILT_MAX_POINTS = 10;  // Max. number of points to store for filter
+constexpr size_t MEDAINFILT_MAX_POINTS = 20;  // Max. number of points to store for filter
 
 class MedianFilter
 {

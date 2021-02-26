@@ -25,6 +25,7 @@
 #include <Wire.h>
 #include <limits.h>
 #include "constants.h"
+#include "conversions.h"
 #include "hummingbird_config.h"
 
 
@@ -83,13 +84,14 @@ typedef enum
 // ----------------------------------------------------------------------------
 // Gyro sensor class
 // ----------------------------------------------------------------------------
-class GyroSensorFXAS21002C
+class FXAS21002Gyro
 {
 public:
-    GyroSensorFXAS21002C(TwoWire *wireInput = &SensorI2C);
-//        ~GyroSensorFXAS21002C();
-    bool InitializeSensor(GyroRanges_t rng = GYRO_RNG_1000DPS);
+    FXAS21002Gyro(TwoWire *wireInput = &SensorI2C);
+//        ~FXAS21002Gyro();
+    bool Initialize(GyroRanges_t rng = GYRO_RNG_1000DPS);
     bool ReadSensor();
+    uint32_t prevMeasMicros;  // [us] Previous measurement micros()
     float gx;  // Gyro x reading, [rad/s]
     float gy;  // Gyro y reading, [rad/s]
     float gz;  // Gyro z reading, [rad/s]

@@ -12,9 +12,7 @@
  *     https://www.ngdc.noaa.gov/geomag/calculators/magcalc.shtml#declination
  */
 
-
-#ifndef __GLOBALCONSTS_H__
-#define __GLOBALCONSTS_H__
+#pragma once
 
 
 #include "hummingbird_config.h"
@@ -23,13 +21,10 @@
 // ----------------------------------------------------------------------------
 // Trigonometric constants
 // ----------------------------------------------------------------------------
-constexpr float CONSTS_PIDIV2   = 1.5707963268f;  // PI / 2
 constexpr float CONSTS_PIDIV4   = 0.7853981634f;  // PI / 4
+constexpr float CONSTS_PIDIV2   = 1.5707963268f;  // PI / 2
 constexpr float CONSTS_PI       = 3.14159265359f;  // PI
 constexpr float CONSTS_2PI      = 6.28318530718f;  // 2 * PI
-constexpr float CONSTS_DEG2RAD  = 0.0174532925f;  // PI / 180, convert degrees to radians
-constexpr float CONSTS_RAD2DEG  = 57.29577951f;  // 180 / PI, convert radians to degrees
-
 
 
 // ----------------------------------------------------------------------------
@@ -55,6 +50,3 @@ constexpr float CONSTS_ENV_SLTEMP   = 288.15f;  // Standard atmospheric air temp
 constexpr float CONSTS_ENV_R        = 287.26f;  // Gas constant for air [J/kg.K]
 constexpr float CONSTS_ENV_MAGDECL  = -0.000602662f;  // Local magnetic field declination [rad] (in degrees: -0.03453deg)
 constexpr float CONSTS_ENV_MAGINCL  = 1.24428537f;  // Local magnetic field inclnation [rad] (in degrees: 71.2923deg)
-
-
-#endif  // __GLOBALCONSTS_H__

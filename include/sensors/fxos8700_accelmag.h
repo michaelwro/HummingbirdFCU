@@ -13,6 +13,7 @@
 #include <Wire.h>
 #include <Arduino.h>
 #include "hummingbird_config.h"
+#include "constants.h"
 
 // #define FX0S8700_ACCEL_RANGE_CHECK  // Enable if range checks for the accelerometer measurements should be performed
 // #define FXOS8700_MAG_RANGE_CHECK  // Enable if range checks for the magnetometer measurements should be performed
@@ -76,6 +77,7 @@ public:
     FXOS8700AccelMag(TwoWire *wireInput = &SensorI2C);
     bool Initialize(AccelRanges_t accRange = ACCEL_RNG_4G);
     bool ReadSensor();
+    uint32_t prevMeasMicros;  // [us] Previous measurement micros()
     float ax;  // X-acceleration [G's]
     float ay;  // Y-acceleration [G's]
     float az;  // Z-acceleration [G's]

@@ -8,58 +8,47 @@
  * Define conversion factors 'n stuff.
  */
 
-
-
-#ifndef __CONVERSIONS_H__
-#define __CONVERSIONS_H__
+#pragma once
 
 
 #include "hummingbird_config.h"
 
 
-// ----------------------------------------------------------------------------
+constexpr float DEG2RAD  = 0.0174532925f;  // PI / 180, convert degrees to radians
+constexpr float RAD2DEG  = 57.29577951f;  // 180 / PI, convert radians to degrees
+
+// --------------------------------------
 // Conversion factors and equations
-//
-// RAD_TO_DEG defined in Arduino.h, pi/180
-// DEG_TO_RAD defined in Arduino.h, 180/pi
-// ----------------------------------------------------------------------------
+// --------------------------------------
 class Conversions
 {
-    public:
-        Conversions(){}  // Constructor
+public:
+    // --------------------------------------
+    // Conversion factors and equations
+    // --------------------------------------
+    Conversions(){}  // Constructor
+    
+    /* Convert celsius to kelvin */
+    float C2K(float inC) { return (inC + 273.15f); }
 
-        // /* Convert radians to degrees. */
-        // float Rad2Deg(float inRad) { return inRad * (180.0f / CONSTS_PI); }
+    /* Convert kelvin to celsius */
+    float K2C(float inK) { return (inK - 273.15f); }
 
-        // /* Convert degrees to radians. */
-        // float Deg2Rad(float inDeg) { return inDeg * (CONSTS_PI / 180.0f); }
-        
-        /* Convert celsius to kelvin */
-        float C2K(float inC) { return (inC + 273.15f); }
+    /* Convert celsius to fahrenheit. */
+    float C2F(float inC) { return ((inC * (9.0f / 5.0f)) + 32.0f); }
 
-        /* Convert kelvin to celsius */
-        float K2C(float inK) { return (inK - 273.15f); }
+    /* Convert fahrenheit to celsius. */
+    float F2C(float inF) { return ((inF - 32.0f) * (5.0f / 9.0f)); }
 
-        /* Convert celsius to fahrenheit. */
-        float C2F(float inC) { return ((inC * (9.0f / 5.0f)) + 32.0f); }
+    /* Convert meters to feet */
+    float Meters2Feet(float meters) { return (meters * 3.28084f); }
+    
+    /* Convert feet to meters */
+    float Feet2Meters(float feet) { return (feet / 3.28084f); }
 
-        /* Convert fahrenheit to celsius. */
-        float F2C(float inF) { return ((inF - 32.0f) * (5.0f / 9.0f)); }
+    /* Convert pressure in Pa to in.Hg */
+    float Pascals2InHg(float pa) { return (pa * 0.0002953f); }
 
-        /* Convert meters to feet */
-        float Meters2Feet(float meters) { return (meters * 3.28084f); }
-        
-        /* Convert feet to meters */
-        float Feet2Meters(float feet) { return (feet / 3.28084f); }
-
-        /* Convert pressure in Pa to in.Hg */
-        float Pascals2InHg(float pa) { return (pa * 0.0002953f); }
-
-        /* Convert pressure in in.Hg to Pa */
-        float InHg2Pascals(float inhg) { return (inhg * 3386.38673f); }
+    /* Convert pressure in in.Hg to Pa */
+    float InHg2Pascals(float inhg) { return (inhg * 3386.38673f); }
 };
-
-// Conversions Convert = Conversions();  // Create 'global' instance
-
-#endif  // __CONVERSIONS_H__
-

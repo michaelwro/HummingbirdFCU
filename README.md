@@ -19,10 +19,6 @@ This project is very much a work in progress. Stop by every so often to see my p
 - Radio Transmitter: [Spektrum DX6i 6-Channel](https://www.spektrumrc.com/Products/Default.aspx?ProdId=SPM6600)
 - Radio Receiver: [Spektrum DSMX Remote Receiver](https://www.spektrumrc.com/Products/Default.aspx?ProdID=SPM9645)
 
-## PCB Design
-
-![PCB Image](images/hummingbird-pcb.png)
-
 ## Circuit Schematic
 
 ![Schematic Image](images/hummingbird-sch.png)

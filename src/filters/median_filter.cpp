@@ -40,7 +40,7 @@ MedianFilter::MedianFilter(size_t windowWidth)
 
 
 // ----------------------------------------------------------------------------
-// Update(float newPoint)
+// Filter(float newPoint)
 // ----------------------------------------------------------------------------
 /**
  * Add point to median filter and return filtered value.
@@ -48,7 +48,7 @@ MedianFilter::MedianFilter(size_t windowWidth)
  * @param newPoint  Noisy point to filter.
  * @return          Median-filtered value.
  */
-float MedianFilter::Update(float newPoint)
+float MedianFilter::Filter(float newPoint)
 {
     float filtValue;  // Filtered/smoothed value to output
     

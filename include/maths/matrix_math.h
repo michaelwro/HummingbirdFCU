@@ -72,11 +72,10 @@
 #include "maths/vectors.h"
 
 
-/**
- * Enable/disable printing debug messages to DebugPort (defined in 
- * "hummingbird_config.h").
- */
-#define MATRIX_MATH_DEBUG
+#if defined(DEBUG) && defined(DebugPort)
+    /* Enable/disable printing debug messages to DebugPort */
+    #define MATRIX_MATH_DEBUG
+#endif
 
 
 /* VECTOR FUNCTIONS */

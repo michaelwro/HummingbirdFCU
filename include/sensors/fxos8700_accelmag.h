@@ -78,18 +78,25 @@ public:
     bool Initialize(AccelRanges_t accRange = ACCEL_RNG_4G);
     bool ReadSensor();
     uint32_t prevMeasMicros;  // [us] Previous measurement micros()
-    float ax;  // X-acceleration [G's]
-    float ay;  // Y-acceleration [G's]
-    float az;  // Z-acceleration [G's]
-    float mx;  // X-magnetometer reading [uT]
-    float my;  // Y-magnetometer reading [uT]
-    float mz;  // Z-magnetometer reading [uT]
+    float GetAx();
+    float GetAy();
+    float GetAz();
+    float GetMx();
+    float GetMy();
+    float GetMz();
+
     // float accelRangeCheck;  // For checking the measrement range. Should fall within configured range.
     // float magRangeCheck;
     AccelRanges_t accelRange;
 protected:
 private:
-    TwoWire *_sensorI2C;  // I2C bus that the sensor is on
+    float _ax;  // X-acceleration [G's]
+    float _ay;  // Y-acceleration [G's]
+    float _az;  // Z-acceleration [G's]
+    float _mx;  // X-magnetometer reading [uT]
+    float _my;  // Y-magnetometer reading [uT]
+    float _mz;  // Z-magnetometer reading [uT]
+    TwoWire *_SensorWire;  // I2C bus that the sensor is on
     uint8_t I2Cread8(uint8_t regOfInterest);
     void I2Cwrite8(uint8_t regOfInterest, uint8_t valToWrite);
 

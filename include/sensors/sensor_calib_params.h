@@ -28,6 +28,18 @@ constexpr float SENSCALIB_MAG_BY    = 0.0f;  // Y magn. bias
 constexpr float SENSCALIB_MAG_BZ    = 0.0f;  // Z magn. bias
 
 
+// ----------------------------------------------------------------------------
+// Accelerometer calibration coefficients (data in [m/s/s])
+// | AX_CAL |    | AX - BX |
+// | AY_CAL | =  | AY - BY |
+// | AZ_CAL |    | AZ - BZ |
+// ----------------------------------------------------------------------------
+constexpr float SENSCALIB_ACCEL_BX = 0.0f;
+constexpr float SENSCALIB_ACCEL_BY = 0.0f;
+constexpr float SENSCALIB_ACCEL_BZ = 0.0f;
+
+
+
 
 // constexpr float SENSCALIB_MAG_SX = 0.973355689960329f;    // Soft iron X
 // constexpr float SENSCALIB_MAG_SY = 1.005511516783f;   // Soft iron Y

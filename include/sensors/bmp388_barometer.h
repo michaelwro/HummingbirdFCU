@@ -18,8 +18,10 @@
 #include "constants.h"
 #include "Adafruit_BMP3XX.h"
 
-/* Enable/disable debug print messages */
-#define BMP388_DEBUG
+#if defined(DEBUG) && defined(DebugPort)
+    /* Enable/disable debug print messages */
+    #define BMP388_DEBUG
+#endif
 
 
 class BMP388BaroTemp:

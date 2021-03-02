@@ -91,15 +91,19 @@ public:
 //        ~FXAS21002Gyro();
     bool Initialize(GyroRanges_t rng = GYRO_RNG_1000DPS);
     bool ReadSensor();
+    float GetGx();
+    float GetGy();
+    float GetGz();  
     uint32_t prevMeasMicros;  // [us] Previous measurement micros()
-    float gx;  // Gyro x reading, [rad/s]
-    float gy;  // Gyro y reading, [rad/s]
-    float gz;  // Gyro z reading, [rad/s]
+
 
 protected:
 private:
     void I2Cwrite8(uint8_t regOfInterest, uint8_t valToWrite);
     uint8_t I2Cread8(uint8_t regOfInterest);
+    float _gx;  // Gyro x reading, [rad/s]
+    float _gy;  // Gyro y reading, [rad/s]
+    float _gz;  // Gyro z reading, [rad/s]
     GyroRanges_t gyroRange;
-    TwoWire *sensorI2C;
+    TwoWire *_SensorWire;
 };

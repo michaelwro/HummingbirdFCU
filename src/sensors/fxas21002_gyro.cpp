@@ -41,11 +41,11 @@
 FXAS21002Gyro::FXAS21002Gyro(TwoWire *wireInput)
 {
     // Clear raw data
-    this->gx = 0.0f;
-    this->gy = 0.0f;
-    this->gz = 0.0f;
+    this->_gx = 0.0f;
+    this->_gy = 0.0f;
+    this->_gz = 0.0f;
     this->prevMeasMicros = micros();
-    this->sensorI2C = wireInput;
+    this->_SensorWire = wireInput;
 }
 
 
@@ -64,7 +64,7 @@ bool FXAS21002Gyro::Initialize(GyroRanges_t rng)
     uint8_t ctrlReg0;
     uint8_t connectedSensorID;
 
-    this->sensorI2C->begin();
+    this->_SensorWire->begin();
     this->gyroRange = rng;  // Set range
     
 
@@ -99,8 +99,8 @@ bool FXAS21002Gyro::Initialize(GyroRanges_t rng)
     this->I2Cwrite8(GYRO_REG_CTRL1, 0x00);  // Stby
     this->I2Cwrite8(GYRO_REG_CTRL1, (1 << 6));  // Reset
     this->I2Cwrite8(GYRO_REG_CTRL0, ctrlReg0);  // Set sensitivity
-    // this->I2Cwrite8(GYRO_REG_CTRL1, 0x0E);  // Active, ODR = 400Hz
-    this->I2Cwrite8(GYRO_REG_CTRL1, 0x0C);  // Active, ODR = 800Hz
+    this->I2Cwrite8(GYRO_REG_CTRL1, 0x0E);  // Active, ODR = 400Hz
+    // this->I2Cwrite8(GYRO_REG_CTRL1, 0x0C);  // Active, ODR = 800Hz
     delay(100);  // Short delay
 
     return true;
@@ -118,23 +118,23 @@ bool FXAS21002Gyro::Initialize(GyroRanges_t rng)
 bool FXAS21002Gyro::ReadSensor()
 {
     // Read 7 bytes from sensor
-    this->sensorI2C->beginTransmission((uint8_t)FXAS21002C_ADDRESS);
-    this->sensorI2C->write(GYRO_REG_STATUS | 0x80);
-    this->sensorI2C->endTransmission();
-    this->sensorI2C->requestFrom((uint8_t)FXAS21002C_ADDRESS, (uint8_t)7);
+    this->_SensorWire->beginTransmission((uint8_t)FXAS21002C_ADDRESS);
+    this->_SensorWire->write(GYRO_REG_STATUS | 0x80);
+    this->_SensorWire->endTransmission();
+    this->_SensorWire->requestFrom((uint8_t)FXAS21002C_ADDRESS, (uint8_t)7);
 
-    uint8_t status = this->sensorI2C->read();
-    uint8_t xhi = this->sensorI2C->read();
-    uint8_t xlo = this->sensorI2C->read();
-    uint8_t yhi = this->sensorI2C->read();
-    uint8_t ylo = this->sensorI2C->read();
-    uint8_t zhi = this->sensorI2C->read();
-    uint8_t zlo = this->sensorI2C->read();
+    uint8_t status = this->_SensorWire->read();
+    uint8_t xhi = this->_SensorWire->read();
+    uint8_t xlo = this->_SensorWire->read();
+    uint8_t yhi = this->_SensorWire->read();
+    uint8_t ylo = this->_SensorWire->read();
+    uint8_t zhi = this->_SensorWire->read();
+    uint8_t zlo = this->_SensorWire->read();
 
     // Shift values to make proper integer
-    this->gx = (int16_t)((xhi << 8) | xlo);
-    this->gy = (int16_t)((yhi << 8) | ylo);
-    this->gz = (int16_t)((zhi << 8) | zlo);
+    this->_gx = (int16_t)((xhi << 8) | xlo);
+    this->_gy = (int16_t)((yhi << 8) | ylo);
+    this->_gz = (int16_t)((zhi << 8) | zlo);
 
     this->prevMeasMicros = micros();
 
@@ -142,24 +142,24 @@ bool FXAS21002Gyro::ReadSensor()
     switch (this->gyroRange)
     {
         case GYRO_RNG_250DPS:
-            this->gx *= GYRO_SENS_250;
-            this->gy *= GYRO_SENS_250;
-            this->gz *= GYRO_SENS_250;
+            this->_gx *= GYRO_SENS_250;
+            this->_gy *= GYRO_SENS_250;
+            this->_gz *= GYRO_SENS_250;
             break;
         case GYRO_RNG_500DPS:
-            this->gx *= GYRO_SENS_500;
-            this->gy *= GYRO_SENS_500;
-            this->gz *= GYRO_SENS_500;
+            this->_gx *= GYRO_SENS_500;
+            this->_gy *= GYRO_SENS_500;
+            this->_gz *= GYRO_SENS_500;
             break;
         case GYRO_RNG_1000DPS:
-            this->gx *= GYRO_SENS_1000;
-            this->gy *= GYRO_SENS_1000;
-            this->gz *= GYRO_SENS_1000;
+            this->_gx *= GYRO_SENS_1000;
+            this->_gy *= GYRO_SENS_1000;
+            this->_gz *= GYRO_SENS_1000;
             break;
         case GYRO_RNG_2000DPS:
-            this->gx *= GYRO_SENS_2000;
-            this->gy *= GYRO_SENS_2000;
-            this->gz *= GYRO_SENS_2000;
+            this->_gx *= GYRO_SENS_2000;
+            this->_gy *= GYRO_SENS_2000;
+            this->_gz *= GYRO_SENS_2000;
             break;
         default:
             return false;  // TODO: Raise error?
@@ -167,11 +167,32 @@ bool FXAS21002Gyro::ReadSensor()
     }
 
    // Convert [dps] to [rad/s]
-   this->gx *= DEG2RAD;
-   this->gy *= DEG2RAD;
-   this->gz *= DEG2RAD;
+   this->_gx *= DEG2RAD;
+   this->_gy *= DEG2RAD;
+   this->_gz *= DEG2RAD;
 
     return true;
+}
+
+
+/* Return gyro x-measurement in [rad/s] */
+float FXAS21002Gyro::GetGx()
+{
+    return this->_gx;
+}
+
+
+/* Return gyro y-measurement in [rad/s] */
+float FXAS21002Gyro::GetGy()
+{
+    return this->_gy;
+}
+
+
+/* Return gyro z-measurement in [rad/s] */
+float FXAS21002Gyro::GetGz()
+{
+    return this->_gz;
 }
 
 
@@ -191,10 +212,10 @@ bool FXAS21002Gyro::ReadSensor()
 void FXAS21002Gyro::I2Cwrite8(uint8_t regOfInterest, uint8_t valToWrite)
 {
     // Init. communication
-    this->sensorI2C->beginTransmission(FXAS21002C_ADDRESS);
-    this->sensorI2C->write((uint8_t)regOfInterest);
-    this->sensorI2C->write((uint8_t)valToWrite);
-    this->sensorI2C->endTransmission();
+    this->_SensorWire->beginTransmission(FXAS21002C_ADDRESS);
+    this->_SensorWire->write((uint8_t)regOfInterest);
+    this->_SensorWire->write((uint8_t)valToWrite);
+    this->_SensorWire->endTransmission();
 }
 
 
@@ -212,16 +233,16 @@ uint8_t FXAS21002Gyro::I2Cread8(uint8_t regOfInterest)
     uint8_t val;
 
     // Init. communication
-    this->sensorI2C->beginTransmission((uint8_t)FXAS21002C_ADDRESS);
-    this->sensorI2C->write((uint8_t)regOfInterest);
+    this->_SensorWire->beginTransmission((uint8_t)FXAS21002C_ADDRESS);
+    this->_SensorWire->write((uint8_t)regOfInterest);
 
     // Check for failure
-    if (this->sensorI2C->endTransmission(false) != 0)
+    if (this->_SensorWire->endTransmission(false) != 0)
         return 0;
     
     // Read register
-    this->sensorI2C->requestFrom((uint8_t)FXAS21002C_ADDRESS, (uint8_t)1);
-    val = this->sensorI2C->read();
+    this->_SensorWire->requestFrom((uint8_t)FXAS21002C_ADDRESS, (uint8_t)1);
+    val = this->_SensorWire->read();
 
     return val;
 }

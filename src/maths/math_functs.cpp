@@ -57,13 +57,13 @@ T RangeConstrain(const T val, const T lower, const T upper) {
     // Check if input is NaN
     // From ardupilot firmware:
     // https://github.com/ArduPilot/ardupilot/blob/00cfc1932fe98452ede016ea9f9f799d10ea9fb8/libraries/AP_Math/AP_Math.cpp#L287
-    if (std::is_floating_point<T>::value)
-    {
-        if (isnan(val))
-        {
-            return ((lower + upper) / 2);  // TODO: Throw error
-        }
-    }
+    // if (std::is_floating_point<T>::value)
+    // {
+    //     if (isnan(val))
+    //     {
+    //         return ((lower + upper) / 2);  // TODO: Throw error
+    //     }
+    // }
 
     if (val <= lower)
         return lower;

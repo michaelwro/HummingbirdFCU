@@ -506,7 +506,7 @@ bool MatrixInverseCholesky(float *A, size_t n)
     // Note that this will overwrite the original matrix!
     if (_MatrixCholeskyDecomp(A, n) == false)
     {
-        #if defined(MATRIX_MATH_DEBUG) && defined(DebugPort)
+        #ifdef MATRIX_MATH_DEBUG
             DebugPort.println("MATRIX_MATH:MatrixInverseCholesky WARNING: Matrix is not SPD.");
         #endif
         // return false;  // TODO: raise error state?
@@ -515,7 +515,7 @@ bool MatrixInverseCholesky(float *A, size_t n)
     // Invert the lower triangular matrix
     if (_MatrixLowerTriangularInverse(A, n) == false)
     {
-        #if defined(MATRIX_MATH_DEBUG) && defined(DebugPort)
+        #ifdef MATRIX_MATH_DEBUG
             DebugPort.println("MATRIX_MATH:MatrixInverseCholesky WARNING: Zero element on the diagonal.");
         #endif
         // return false;  // TOD: raise error state?
@@ -570,7 +570,7 @@ bool _MatrixCholeskyDecomp(float *A, size_t n)
         // the matrix is not positive definite symmetric.
         if (*p_Lkk <= FLOAT_PREC_ZERO)
         {
-            #if defined(MATRIX_MATH_DEBUG) && defined(DebugPort)
+            #ifdef MATRIX_MATH_DEBUG
                 DebugPort.println("MATRIX_MATH:MatrixCholeskyDecomp WARNING: Matrix is not SPD.");
             #endif
             return false;
@@ -616,7 +616,7 @@ bool _MatrixLowerTriangularInverse(float *A, size_t n)
     for (k = 0, pk = A; k < n; pk += (n + 1), k++){
         if (fabsf(*pk) <= FLOAT_PREC_ZERO)
         {
-            #if defined(MATRIX_MATH_DEBUG) && defined(DebugPort)
+            #ifdef MATRIX_MATH_DEBUG
                 DebugPort.println("MATRIX_MATH:_MatrixLowerTriangularInverse WARNING: Zero element on the diagonal.");
             #endif
             return false;

@@ -16,9 +16,10 @@
 #include <Arduino.h>
 #include "hummingbird_config.h"
 
-
-/* Enable a message to signal when a vector was created and destroyed */
-#define VECTOR_OBJ_DEBUG
+#if defined(DEBUG) && defined(DebugPort)
+    /* Enable a message to signal when a vector was created and destroyed */
+    // #define VECTOR_OBJ_DEBUG
+#endif
 
 /**
  * Macro to extract the value in vector "VEC" at "VEC(i)" with length "len." 
@@ -67,14 +68,36 @@ public:
             this->vec[i] = initVal;
 
 
-        #if defined(DebugPort) && defined(VECTOR_OBJ_DEBUG)
+        #ifdef VECTOR_OBJ_DEBUG
             DebugPort.print("Created "); DebugPort.print(this->len);
             DebugPort.print("x1"); DebugPort.println(" vector");
         #endif
     }
 
+    // --------------------------------------------------------------------
+    // GetNorm()
+    // --------------------------------------------------------------------
+    /**
+     * Compute the 2-norm (magnitude) of the vector.
+     * 
+     * @returns     Norm of the vector
+     */
+    float GetNorm()
+    {
+        size_t i;
+        float sumsq;
+        float vecNorm;
 
-    #if defined(DebugPort) && defined(VECTOR_OBJ_DEBUG)
+        for (i = 0; i < this->len; i++)
+            sumsq += (this->vec[i] * this->vec[i]);
+        
+        vecNorm = sqrtf(sumsq);
+        
+        return vecNorm;
+    }
+
+
+    #ifdef VECTOR_OBJ_DEBUG
     /**
      * Print vector to the debug port. Can only be used if DebugPort and
      * VECTOR_OBJ_DEBUG are defined.
@@ -109,7 +132,7 @@ public:
     {
         delete[] this->vec;
 
-        #if defined(DebugPort) && defined(VECTOR_OBJ_DEBUG)
+        #ifdef VECTOR_OBJ_DEBUG
             DebugPort.print("Deallocated "); DebugPort.print(this->len);
             DebugPort.print("x1"); DebugPort.println(" vector");
         #endif

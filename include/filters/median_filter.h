@@ -21,7 +21,7 @@ public:
     MedianFilter(size_t windowWidth = 3);
     ~MedianFilter();
     size_t GetWindowWidth();
-    float Update(float newPoint);
+    float Filter(float newPoint);
     // float* GetWindow();
     
 private:

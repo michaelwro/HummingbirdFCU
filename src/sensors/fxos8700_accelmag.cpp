@@ -34,16 +34,16 @@
  */
 FXOS8700AccelMag::FXOS8700AccelMag(TwoWire *wireInput)
 {
-    this->ax = 0.0f;  // Zero out variables
-    this->ay = 0.0f;
-    this->az = -CONSTS_GRAV;
-    this->mx = 0.0f;
-    this->my = 0.0f;
-    this->mz = 0.0f;
+    this->_ax = 0.0f;  // Zero out variables
+    this->_ay = 0.0f;
+    this->_az = -CONSTS_GRAV;
+    this->_mx = 0.0f;
+    this->_my = 0.0f;
+    this->_mz = 0.0f;
     // this->accelRangeCheck = 0.0f;
     // this->magRangeCheck = 1200.0f;  // 1200uT from datasheet
     this->prevMeasMicros = micros();
-    this->_sensorI2C = wireInput;
+    this->_SensorWire = wireInput;
 }
 
 
@@ -62,7 +62,7 @@ bool FXOS8700AccelMag::Initialize(AccelRanges_t accRange)
 {
     uint8_t connectedSensorID;
 
-    this->_sensorI2C->begin();  // Init. communication
+    this->_SensorWire->begin();  // Init. communication
     this->accelRange = accRange; // Set accelerometer range
     
     /* Check to make sure the ID register on the sensor matches the
@@ -120,56 +120,56 @@ bool FXOS8700AccelMag::Initialize(AccelRanges_t accRange)
 bool FXOS8700AccelMag::ReadSensor()
 {
     // Read 13 bytes from sensor
-    this->_sensorI2C->beginTransmission((uint8_t)FXOS8700_ADDRESS);
-    this->_sensorI2C->write(ACCELMAG_REG_STATUS | 0x80);
-    this->_sensorI2C->endTransmission();
-    this->_sensorI2C->requestFrom((uint8_t)FXOS8700_ADDRESS, (uint8_t)13);
+    this->_SensorWire->beginTransmission((uint8_t)FXOS8700_ADDRESS);
+    this->_SensorWire->write(ACCELMAG_REG_STATUS | 0x80);
+    this->_SensorWire->endTransmission();
+    this->_SensorWire->requestFrom((uint8_t)FXOS8700_ADDRESS, (uint8_t)13);
 
     
-    uint8_t status = this->_sensorI2C->read();
-    uint8_t axhi = this->_sensorI2C->read();
-    uint8_t axlo = this->_sensorI2C->read();
-    uint8_t ayhi = this->_sensorI2C->read();
-    uint8_t aylo = this->_sensorI2C->read();
-    uint8_t azhi = this->_sensorI2C->read();
-    uint8_t azlo = this->_sensorI2C->read();
-    uint8_t mxhi = this->_sensorI2C->read();
-    uint8_t mxlo = this->_sensorI2C->read();
-    uint8_t myhi = this->_sensorI2C->read();
-    uint8_t mylo = this->_sensorI2C->read();
-    uint8_t mzhi = this->_sensorI2C->read();
-    uint8_t mzlo = this->_sensorI2C->read();
+    uint8_t status = this->_SensorWire->read();
+    uint8_t axhi = this->_SensorWire->read();
+    uint8_t axlo = this->_SensorWire->read();
+    uint8_t ayhi = this->_SensorWire->read();
+    uint8_t aylo = this->_SensorWire->read();
+    uint8_t azhi = this->_SensorWire->read();
+    uint8_t azlo = this->_SensorWire->read();
+    uint8_t mxhi = this->_SensorWire->read();
+    uint8_t mxlo = this->_SensorWire->read();
+    uint8_t myhi = this->_SensorWire->read();
+    uint8_t mylo = this->_SensorWire->read();
+    uint8_t mzhi = this->_SensorWire->read();
+    uint8_t mzlo = this->_SensorWire->read();
 
 
     /* Read and shift values from registers into integers.
     Accelerometer data is 14-bit and left-aligned. Shift two bits right. */
-    this->ax = (int16_t)((axhi << 8) | axlo) >> 2;
-    this->ay = (int16_t)((ayhi << 8) | aylo) >> 2;
-    this->az = (int16_t)((azhi << 8) | azlo) >> 2;
+    this->_ax = (int16_t)((axhi << 8) | axlo) >> 2;
+    this->_ay = (int16_t)((ayhi << 8) | aylo) >> 2;
+    this->_az = (int16_t)((azhi << 8) | azlo) >> 2;
 
-    this->mx = (int16_t)((mxhi << 8) | mxlo);
-    this->my = (int16_t)((myhi << 8) | mylo);
-    this->mz = (int16_t)((mzhi << 8) | mzlo);
+    this->_mx = (int16_t)((mxhi << 8) | mxlo);
+    this->_my = (int16_t)((myhi << 8) | mylo);
+    this->_mz = (int16_t)((mzhi << 8) | mzlo);
 
     this->prevMeasMicros = micros();
 
-    // Convert acceleration from int16_t to float in units of [m/s/s]
+    // Convert acceleration from int16_t to float in units of [G's]
     switch (this->accelRange)
     {
         case (ACCEL_RNG_2G):
-            this->ax *= ACCEL_MSS_LSB_2G;
-            this->ay *= ACCEL_MSS_LSB_2G;
-            this->az *= ACCEL_MSS_LSB_2G;
+            this->_ax *= ACCEL_MSS_LSB_2G;
+            this->_ay *= ACCEL_MSS_LSB_2G;
+            this->_az *= ACCEL_MSS_LSB_2G;
             break;
         case (ACCEL_RNG_4G):
-            this->ax *= ACCEL_MSS_LSB_4G;
-            this->ay *= ACCEL_MSS_LSB_4G;
-            this->az *= ACCEL_MSS_LSB_4G;
+            this->_ax *= ACCEL_MSS_LSB_4G;
+            this->_ay *= ACCEL_MSS_LSB_4G;
+            this->_az *= ACCEL_MSS_LSB_4G;
             break;
         case (ACCEL_RNG_8G):
-            this->ax *= ACCEL_MSS_LSB_8G;
-            this->ay *= ACCEL_MSS_LSB_8G;
-            this->az *= ACCEL_MSS_LSB_8G;
+            this->_ax *= ACCEL_MSS_LSB_8G;
+            this->_ay *= ACCEL_MSS_LSB_8G;
+            this->_az *= ACCEL_MSS_LSB_8G;
             break;
         default:
             return false;
@@ -196,9 +196,9 @@ bool FXOS8700AccelMag::ReadSensor()
 
 
     // Convert magnetometer to uT
-    this->mx *= MAG_UT_LSB;
-    this->my *= MAG_UT_LSB;
-    this->mz *= MAG_UT_LSB;
+    this->_mx *= MAG_UT_LSB;
+    this->_my *= MAG_UT_LSB;
+    this->_mz *= MAG_UT_LSB;
 
     // #ifdef FXOS8700_MAG_RANGE_CHECK
     //     if (this->mx > this->magRangeCheck || this->mx < (-1.0f * this->magRangeCheck))
@@ -212,6 +212,46 @@ bool FXOS8700AccelMag::ReadSensor()
     return true;
 }
 
+
+/* Return x-acceleromter measurement in [G's] */
+float FXOS8700AccelMag::GetAx()
+{
+    return this->_ax;
+}
+
+
+/* Return y-acceleromter measurement in [G's] */
+float FXOS8700AccelMag::GetAy()
+{
+    return this->_ay;
+}
+
+
+/* Return z-acceleromter measurement in [G's] */
+float FXOS8700AccelMag::GetAz()
+{
+    return this->_az;
+}
+
+
+/* Return x-magnetometer measurement in [uT] */
+float FXOS8700AccelMag::GetMx()
+{
+    return this->_mx;
+}
+
+
+/* Return y-magnetometer measurement in [uT] */
+float FXOS8700AccelMag::GetMy()
+{
+    return this->_my;
+}
+
+/* Return z-magnetometer measurement in [uT] */
+float FXOS8700AccelMag::GetMz()
+{
+    return this->_mz;
+}
 
 
 // ------------------------------------
@@ -231,10 +271,10 @@ bool FXOS8700AccelMag::ReadSensor()
 void FXOS8700AccelMag::I2Cwrite8(uint8_t regOfInterest, uint8_t valToWrite)
 {
     // Init. communication
-    this->_sensorI2C->beginTransmission(FXOS8700_ADDRESS);
-    this->_sensorI2C->write((uint8_t)regOfInterest);
-    this->_sensorI2C->write((uint8_t)valToWrite);
-    this->_sensorI2C->endTransmission();
+    this->_SensorWire->beginTransmission(FXOS8700_ADDRESS);
+    this->_SensorWire->write((uint8_t)regOfInterest);
+    this->_SensorWire->write((uint8_t)valToWrite);
+    this->_SensorWire->endTransmission();
 }
 
 
@@ -252,15 +292,15 @@ uint8_t FXOS8700AccelMag::I2Cread8(uint8_t regOfInterest)
     uint8_t val;
 
     // Init. communication
-    this->_sensorI2C->beginTransmission((uint8_t)FXOS8700_ADDRESS);
-    this->_sensorI2C->write((uint8_t)regOfInterest);
+    this->_SensorWire->beginTransmission((uint8_t)FXOS8700_ADDRESS);
+    this->_SensorWire->write((uint8_t)regOfInterest);
 
     // Check for failure
-    if (this->_sensorI2C->endTransmission(false) != 0) return 0;
+    if (this->_SensorWire->endTransmission(false) != 0) return 0;
     
     // Read register
-    this->_sensorI2C->requestFrom((uint8_t)FXOS8700_ADDRESS, (uint8_t)1);
-    val = this->_sensorI2C->read();
+    this->_SensorWire->requestFrom((uint8_t)FXOS8700_ADDRESS, (uint8_t)1);
+    val = this->_SensorWire->read();
 
     return val;
 }

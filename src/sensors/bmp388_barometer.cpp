@@ -19,7 +19,7 @@ BMP388BaroTemp::BMP388BaroTemp(TwoWire *wireInput)
     // Connect to the sensor with Adafruit's code
     if (!this->begin((uint8_t)0x77, wireInput))
     {
-        #if defined(DEBUG) && defined(BMP388_DEBUG)
+        #ifdef BMP388_DEBUG
         DebugPort.println("BMP388BAROTEMP:BMP388BaroTemp ERROR: Cound not connect to BMP388. Check wiring and settings.");
         #endif
         this->connected = false;
@@ -41,7 +41,7 @@ bool BMP388BaroTemp::Initialize(uint8_t presOS, uint8_t tempOS,
     // If NOT connected, return false
     if (!this->connected)
     {
-        #if defined(DEBUG) && defined(BMP388_DEBUG)
+        #ifdef BMP388_DEBUG
         DebugPort.println("BMP388BAROTEMP:Initialize ERROR: Cound not connect to BMP388. Check wiring and settings.");
         #endif
         return false;
@@ -50,7 +50,7 @@ bool BMP388BaroTemp::Initialize(uint8_t presOS, uint8_t tempOS,
     // Set oversampling
     if (!this->setTemperatureOversampling(tempOS))
     {
-        #if defined(DEBUG) && defined(BMP388_DEBUG)
+        #ifdef BMP388_DEBUG
         DebugPort.println("BMP388BAROTEMP:Initialize ERROR: Could not set temp OS. Check settings.");
         #endif
         return false;
@@ -58,7 +58,7 @@ bool BMP388BaroTemp::Initialize(uint8_t presOS, uint8_t tempOS,
 
     if (!this->setPressureOversampling(presOS))
     {
-        #if defined(DEBUG) && defined(BMP388_DEBUG)
+        #ifdef BMP388_DEBUG
         DebugPort.println("BMP388BAROTEMP:Initialize ERROR: Could not set pres OS. Check settings.");
         #endif
         return false;
@@ -67,7 +67,7 @@ bool BMP388BaroTemp::Initialize(uint8_t presOS, uint8_t tempOS,
     // Set IIR coef.
     if (!this->setIIRFilterCoeff(iirCoef))
     {
-        #if defined(DEBUG) && defined(BMP388_DEBUG)
+        #ifdef BMP388_DEBUG
         DebugPort.println("BMP388BAROTEMP:Initialize ERROR: Could not set IIR filter coef. Check settings.");
         #endif
         return false;
@@ -76,7 +76,7 @@ bool BMP388BaroTemp::Initialize(uint8_t presOS, uint8_t tempOS,
     // Set data rate
     if (!this->setOutputDataRate(sensODR))
     {
-        #if defined(DEBUG) && defined(BMP388_DEBUG)
+        #ifdef BMP388_DEBUG
         DebugPort.println("BMP388BAROTEMP:Initialize ERROR: Could not set ODR. Check settings.");
         #endif
         return false;
@@ -99,7 +99,7 @@ bool BMP388BaroTemp::ReadSensor()
 {
     if (!this->performReading())
     {
-        #if defined(DEBUG) && defined(BMP388_DEBUG)
+        #ifdef BMP388_DEBUG
         DebugPort.println("BMP388BAROTEMP:ReadSensor ERROR: Error reading sensor data.");
         #endif
         return false;

@@ -20,8 +20,10 @@
 #include "hummingbird_config.h"
 
 
-/* Enable a message to signal when a matrix was created and destroyed */
-#define MATRIX_OBJ_DEBUG
+#if defined(DEBUG) && defined(DebugPort)
+    /* Enable a message to signal when a matrix was created and destroyed */
+    #define MATRIX_OBJ_DEBUG
+#endif
 
 /**
  * Macro to extract the value in matrix "MAT" at "MAT(i, j)" with dims. 
@@ -81,14 +83,14 @@ public:
         for (i = 0; i < rc; i++)
             this->mat[i] = initVal;
 
-    #if defined(DebugPort) && defined(MATRIX_OBJ_DEBUG)
+    #ifdef MATRIX_OBJ_DEBUG
         DebugPort.print("Created "); DebugPort.print(this->rows); DebugPort.print("x");
         DebugPort.print(this->cols); DebugPort.println(" matrix");
     #endif
     }
 
 
-    #if defined(DebugPort) && defined(MATRIX_OBJ_DEBUG)
+    #ifdef MATRIX_OBJ_DEBUG
     /**
      * Print matrix to the debug port. Can only be used if DebugPort and
      * MATRIX_OBJ_DEBUG are defined.
@@ -127,7 +129,7 @@ public:
     {
         delete[] this->mat;
 
-    #if defined(DebugPort) && defined(MATRIX_OBJ_DEBUG)
+    #ifdef MATRIX_OBJ_DEBUG
         DebugPort.print("Deallocated "); DebugPort.print(this->rows); DebugPort.print("x");
         DebugPort.print(this->cols); DebugPort.println(" matrix");
     #endif

@@ -29,17 +29,15 @@ GravityComputer::GravityComputer()
 
 
 // --------------------------------------------------------------
-// UpdateGravity(float lat_rad, float alt_msl)
+// UpdatePosition(float lat_rad, float alt_msl)
 // --------------------------------------------------------------
 /**
- * Compute gravitational acceleration at a given latitude in 
- * [rad] and altitude above mean sea level in [m]. Down is 
- * positive.
+ * Recompute gravity with updated latitude and altitude.
  * 
  * @param lat_rad   [rad] Latitude, default 45deg = PI/4
  * @param alt_msl   [m] Altitude above MSL, default 200m.
  */
-void GravityComputer::UpdateGravity(float lat_rad, float alt_msl)
+void GravityComputer::UpdatePosition(float lat_rad, float alt_msl)
 {
     this->_ComputeGravity(lat_rad, alt_msl);
 }

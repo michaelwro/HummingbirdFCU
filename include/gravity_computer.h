@@ -38,9 +38,8 @@ public:
     GravityComputer(const GravityComputer &) = delete;
     GravityComputer &operator=(const GravityComputer &) = delete;
 
-    void UpdateGravity(float lat_rad = CONSTS_PIDIV4, float alt_msl = 200.0f);
+    void UpdatePosition(float lat_rad = CONSTS_PIDIV4, float alt_msl = 200.0f);
     float GetGravity();
-
 
 private:
     void _ComputeGravity(float lat, float alt);
@@ -51,4 +50,3 @@ private:
 
 // Only one instance of InertialNavSystem
 extern GravityComputer &GravComputer;
-

@@ -67,10 +67,6 @@ void InertialNavSystem::SetSampleRate(float fs_hz)
  */
 bool InertialNavSystem::Initialize()
 {
-    // connect/config gyro
-    // connect/config accel
-    // get init gyro biases
-    // get init accel biases
     size_t n;
 
     #ifdef INS_DEBUG
@@ -250,10 +246,12 @@ float InertialNavSystem::GetAccelRoll()
  */
 void InertialNavSystem::UpdateAccelAngles()
 {
-    float ax = Accel.vec[0];
-    float ay = Accel.vec[1];
-    float az = Accel.vec[2];
-    pitch = asinf_safe(ax / sqrtf((ax * ax) + (ay * ay) + (az * az)));
+    float ax = Accel.vec[0] - 0.1511f;
+    float ay = Accel.vec[1] + 0.0161f;
+    float az = Accel.vec[2] - 0.2685f;
+    float magn = Accel.GetNorm();
+    
+    pitch = asinf_safe(ax / magn);
     // pitch = asinf_safe(ax / GravComputer.GetGravity());
     roll = atan2f(ay, az);
 }

@@ -53,6 +53,15 @@
 
 /**
  * ====================================
+ * TELEMETRY SERIAL/UART BUS
+ * ====================================
+ * UART/serial port that the XBee radio is connected to. Found in 
+ * hummingbird_config.h
+ */
+#define TelemUart Serial8
+
+/**
+ * ====================================
  * AUXILLIARY I2C BUS
  * ====================================
  * Extra I2C bus on the top of the Hummingbird FCU. Used to connect extra I2C 

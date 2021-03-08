@@ -54,18 +54,15 @@ bool LIS3MDL_Mag::Initialize(LIS3MDL_MeasRange_t measRange)
 
     this->_SensorWire->begin();
 
-    if (measRange != LIS3MDL_RANGE_4G || measRange != LIS3MDL_RANGE_8G ||
-        measRange != LIS3MDL_RANGE_12G || measRange != LIS3MDL_RANGE_16G)
+    if (measRange > LIS3MDL_RANGE_16G)
     {
         #if defined(LIS3MDL_DEBUG)
         DebugPort.println("LIS3MDL:Initialize ERROR: Unfamiliar measurement range specified. Check code.");
         #endif
         return false;
     }
-    else
-    {
-        this->_range = measRange;
-    }
+
+    this->_range = measRange;
 
     // Read the device ID to ensure we're connected and it matches
     connSensorID = this->I2Cread8(LIS3MDL_WHOAMI);

@@ -17,15 +17,15 @@
 // | HY_CAL | = | S12 S22 S23 | | HY - BY|
 // | HZ_CAL |   | S13 S23 S33 | | HZ - BZ|
 // ----------------------------------------------------------------------------
-constexpr float SENSCALIB_MAG_S11   = 1.0f;  // S11 magn. calib. coef.
-constexpr float SENSCALIB_MAG_S12   = 1.0f;  // S12 magn. calib. coef.
-constexpr float SENSCALIB_MAG_S13   = 1.0f;  // S13 magn. calib. coef.
-constexpr float SENSCALIB_MAG_S22   = 1.0f;  // S22 magn. calib. coef.
-constexpr float SENSCALIB_MAG_S23   = 1.0f;  // S23 magn. calib. coef.
-constexpr float SENSCALIB_MAG_S33   = 1.0f;  // S33 magn. calib. coef.
-constexpr float SENSCALIB_MAG_BX    = 0.0f;  // X magn. bias
-constexpr float SENSCALIB_MAG_BY    = 0.0f;  // Y magn. bias
-constexpr float SENSCALIB_MAG_BZ    = 0.0f;  // Z magn. bias
+constexpr float SENSCALIB_MAG_S11   = 1.025278f;  // S11 magn. calib. coef.
+constexpr float SENSCALIB_MAG_S12   = 0.047183f;  // S12 magn. calib. coef.
+constexpr float SENSCALIB_MAG_S13   = -0.004394f;  // S13 magn. calib. coef.
+constexpr float SENSCALIB_MAG_S22   = 0.991938f;  // S22 magn. calib. coef.
+constexpr float SENSCALIB_MAG_S23   = 0.011496f;  // S23 magn. calib. coef.
+constexpr float SENSCALIB_MAG_S33   = 1.106796f;  // S33 magn. calib. coef.
+constexpr float SENSCALIB_MAG_BX    = 15.606863f;  // X magn. bias
+constexpr float SENSCALIB_MAG_BY    = 38.011123f;  // Y magn. bias
+constexpr float SENSCALIB_MAG_BZ    = 41.207505f;  // Z magn. bias
 
 
 // ----------------------------------------------------------------------------

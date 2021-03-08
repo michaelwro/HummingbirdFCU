@@ -78,7 +78,7 @@ public:
     // GetNorm()
     // --------------------------------------------------------------------
     /**
-     * Compute the 2-norm (magnitude) of the vector.
+     * Return the 2-norm (magnitude) of the vector.
      * 
      * @returns     Norm of the vector
      */

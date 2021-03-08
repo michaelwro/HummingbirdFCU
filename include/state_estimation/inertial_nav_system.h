@@ -75,13 +75,13 @@ public:
     Vector Accel;       // [m/s/s], [ax, ay, az] Accelerometer measurements (filtered)
     Vector AccelRaw;    // [m/s/s], [ax, ay, az] Raw accelerometer measurements
     Vector AccelTOBias; // [m/s/s], [bax, bay, baz] Measured accelerometer turn-on biases
+    uint32_t prevUpdateMicros;  // [us] Previous INS update micros()
 protected:
 private:
     void UpdateAccelAngles();
     bool ComputeInitGyroBiases(size_t n);
     bool ComputeInitAccelBiases(size_t n);
 
-    uint32_t prevUpdateMicros;  // [us] Previous INS update micros()
     uint32_t tsMillis;          // [ms] INS sample period
     float roll;     // [rad] Accelerometer roll angle (NED)
     float pitch;    // [rad] Accelerometer pitch angle (NED)

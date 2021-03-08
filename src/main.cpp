@@ -40,6 +40,7 @@
 #include "filters/median_filter.h"  // [] COMPLETED
 #include "filters/low_pass_filter.h"  // [] COMPLETED
 #include "state_estimation/inertial_nav_system.h"
+#include "state_estimation/compass.h"
 
 
 
@@ -103,6 +104,12 @@ void setup()
     }
 
 
+    if (!Compass.Initialize())
+    {
+        DebugPort.println("Could not init. compass...");
+    }
+
+
     #ifdef DEBUG
         DebugPort.println("DONE!");
     #endif
@@ -115,33 +122,12 @@ void setup()
 void loop()
 {
     now = millis();
-    if (now - prev > 250)
+    if (now - prev > 100)
     {
-        float bx, by, bz;
-        float gx, gy, gz;
         INS.Update();
-
-        gx = INS.Gyro.vec[0];
-        gy = INS.Gyro.vec[1];
-        gz = INS.Gyro.vec[2];
-
-        DebugPort.print("GX: "); DebugPort.print(gx, 4); DebugPort.print("  ");
-        DebugPort.print("GY: "); DebugPort.print(gy, 4); DebugPort.print("  ");
-        DebugPort.print("GZ: "); DebugPort.print(gz, 4); DebugPort.print("  ");
-        DebugPort.print("Norm: "); DebugPort.println(INS.Gyro.GetNorm(), 4);
-
-        bx = INS.GyroTOBias.vec[0];
-        by = INS.GyroTOBias.vec[1];
-        bz = INS.GyroTOBias.vec[2];
-
-        DebugPort.print("GX`: "); DebugPort.print(gx - bx, 4); DebugPort.print("  ");
-        DebugPort.print("GY`: "); DebugPort.print(gy - by, 4); DebugPort.print("  ");
-        DebugPort.print("GZ`: "); DebugPort.print(gz - bz, 4); DebugPort.print("  ");
-        DebugPort.print("Norm`: "); DebugPort.println(sqrtf(powf(gx - bx, 2.0f) + powf(gy - by, 2.0f) + powf(gz - bz, 2.0f)), 4);
-        DebugPort.println("--------------------------------------");
-
-        // DebugPort.print("Roll: "); DebugPort.print(INS.GetAccelRoll() * RAD2DEG, 3); DebugPort.print("  ");
-        // DebugPort.print("Pitch: "); DebugPort.println(INS.GetAccelPitch() * RAD2DEG, 3);
+        Compass.Update();
+        float h = Compass.GetHeading(INS.Accel);
+        DebugPort.print("Heading: "); DebugPort.print(h*RAD2DEG, 2); DebugPort.println(" deg.");
         prev = now;
     }
 

@@ -16,34 +16,14 @@
 
 
 // --------------------------------------------------------------
-// GravityComputer(float latRecomputeThres, 
-//                float altRecomputeThres)
+// GravityComputer()
 // --------------------------------------------------------------
 /**
  * Compute gravitational acceleration as a function of latitude 
- * and altitude above mean sea level. Incorporates thresholding to 
- * save on computations. Gravity is recomputed only if a change 
- * in latitude OR altitude exceeds a threshold set by the user. 
- * Down is positive!
- * 
- * @param latRecomputeThres [deg] Latitude change threshold. 
- *                          Default is 0.0005 deg. (~50m).
- * @param altRecomputeThres [meters] Altitude change threshold. 
- *                          Default is 5 meters.
+ * and altitude above mean sea level. Down is positive!
  */
-GravityComputer::GravityComputer(float latRecomputeThres, float altRecomputeThres)
+GravityComputer::GravityComputer()
 {
-    // Check that inputs are positive
-    if (latRecomputeThres <= 0.0f)
-        latRecomputeThres *= -1.0f;
-    
-    if (altRecomputeThres <= 0.0f)
-        altRecomputeThres *= -1.0f;
-    
-    // Convert units and assign values
-    this->_latThres = latRecomputeThres * DEG2RAD;  // degrees to radians
-    this->_altThres = altRecomputeThres;
-
     this->_grav = CONSTS_GRAV;
 }
 
@@ -56,24 +36,12 @@ GravityComputer::GravityComputer(float latRecomputeThres, float altRecomputeThre
  * [rad] and altitude above mean sea level in [m]. Down is 
  * positive.
  * 
- * @param lat_rad   Latitude in radians. Default 45deg = PI/4
- * @param alt_msl   Altitude above MSL in meters. Default 200m.
+ * @param lat_rad   [rad] Latitude, default 45deg = PI/4
+ * @param alt_msl   [m] Altitude above MSL, default 200m.
  */
 void GravityComputer::UpdateGravity(float lat_rad, float alt_msl)
 {
-    bool recompute = false;
-    
-    if (fabsf(lat_rad - this->_prevLat) >= this->_latThres ||   // If latitude change is greater than the threshold _latThres
-        fabsf(alt_msl - this->_prevAlt) >= this->_altThres      // If altitude change is greater than the threshold _altThres
-        ) recompute = true;
-    
-    // Update gravity, if required
-    if (recompute == true)
-    {
-        this->_ComputeGravity(lat_rad, alt_msl);
-        this->_prevLat = lat_rad;  // Replace old with new
-        this->_prevAlt = alt_msl;
-    }
+    this->_ComputeGravity(lat_rad, alt_msl);
 }
 
 
@@ -95,9 +63,15 @@ float GravityComputer::GetGravity()
 /* Compute gravitational acceleration in [m/s/s] */
 void GravityComputer::_ComputeGravity(float lat, float alt)
 {
-    float term1, term2, g0, denom;
-    float sinLat = sinf(lat);
-    float sin2Lat = sinf(2.0f * lat);
+    float term1;
+    float term2;
+    float g0;
+    float denom;
+    float sinLat;
+    float sin2Lat;
+
+    sinLat = sinf(lat);
+    sin2Lat = sinf(2.0f * lat);
     
     // Compute sea-level gravity
     term1 = 0.0053024f * sinLat * sinLat;

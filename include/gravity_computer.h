@@ -22,41 +22,16 @@
 
 
 // --------------------------------------------------------------
-// GravityComputer(float latRecomputeThres = 0.0005f, 
-//                float altRecomputeThres = 5.0f)
+// GravityComputer()
 // --------------------------------------------------------------
 /**
- * Compute gravitational acceleration as a function of latitude
- * and altitude above mean sea level. Incorporates thresholding to 
- * save on computations. Gravity is recomputed only if a change 
- * in latitude OR altitude exceeds a threshold set by the user. 
- * Down is positive!
- * 
- * @param latRecomputeThres [deg] Latitude change threshold. 
- *                          Default is 0.0005 deg. (~50m).
- * @param altRecomputeThres [meters] Altitude change threshold. 
- *                          Default is 5 meters.
+ * Compute gravitational acceleration as a function of latitude 
+ * and altitude above mean sea level. Down is positive!
  */
 class GravityComputer
 {
 public:
-    // --------------------------------------------------------------
-    // GravityComputer(float latRecomputeThres, 
-    //                float altRecomputeThres)
-    // --------------------------------------------------------------
-    /**
-     * Compute gravitational acceleration as a function of latitude 
-     * and altitude above mean sea level. Incorporates thresholding to 
-     * save on computations. Gravity is recomputed only if a change 
-     * in latitude OR altitude exceeds a threshold set by the user. 
-     * Down is positive!
-     * 
-     * @param latRecomputeThres [deg] Latitude change threshold. 
-     *                          Default is 0.0005 deg. (~50m).
-     * @param altRecomputeThres [meters] Altitude change threshold. 
-     *                          Default is 5 meters.
-     */
-    GravityComputer(float latRecomputeThres = 0.0005f, float altRecomputeThres = 5.0f);
+    GravityComputer();
     ~GravityComputer();
     // Do not allow copies (singleton)
     static GravityComputer &GetInstance();  // Accessor
@@ -71,11 +46,7 @@ private:
     void _ComputeGravity(float lat, float alt);
 
     /* Private Variables */
-    float _altThres;  // [m] If altitude change is greater than this, recompute.
-    float _latThres;  // [rad] If latitude change is greater than this, recompute.
     float _grav;  // Computed gravitational acceleration in [m/s/s]
-    float _prevLat;  // Previously used latitude [rad]
-    float _prevAlt;  // Previously used altitude msl [m]
 };
 
 // Only one instance of InertialNavSystem

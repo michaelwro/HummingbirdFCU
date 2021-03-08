@@ -13,6 +13,16 @@
 #include "state_estimation/compass.h"
 
 
+// ----------------------------------------------------------------------------
+// MagCompass(TwoWire *userWire)
+// : Mag(3), MagRaw(3), MagSensor(&SensorI2C)
+// ----------------------------------------------------------------------------
+/**
+ * Constructor for the compass class. Be sure to specify the I2C bus that the 
+ * sensor is connected to.
+ * 
+ * @param userWire   I2C bus the compass is connected to. Default Wire2
+ */
 MagCompass::MagCompass(TwoWire *userWire)
 : Mag(3), MagRaw(3), MagSensor(&SensorI2C)
 {
@@ -21,6 +31,14 @@ MagCompass::MagCompass(TwoWire *userWire)
 }
 
 
+// ----------------------------------------------------------------------------
+// Initialize()
+// ----------------------------------------------------------------------------
+/**
+ * Initialize the compass. Configures magnetometer sensor.
+ * 
+ * @returns True is success, false if not.
+ */
 bool MagCompass::Initialize()
 {
     #ifdef MAGCOMPASS_DEBUG
@@ -42,6 +60,15 @@ bool MagCompass::Initialize()
 }
 
 
+// ----------------------------------------------------------------------------
+// Update()
+// ----------------------------------------------------------------------------
+/**
+ * Update the compass. Record magnetometer data, rotate sensor data to the body 
+ * frame, and apply calibration.
+ * 
+ * @returns True if successful, false if not.
+ */
 bool MagCompass::Update()
 {
     float mx, my, mz;
@@ -86,6 +113,17 @@ bool MagCompass::Update()
 }
 
 
+// ----------------------------------------------------------------------------
+// GetHeading(Vector AccelMeas)
+// ----------------------------------------------------------------------------
+/**
+ * Compute and return tilt-compensated magnetic heading based on accelerometer 
+ * data. Tilt-compensation equations can be found in: 
+ * https://www.cypress.com/file/130456/download
+ * 
+ * @param AccelMeas [m/s/s] Vector of accelerometer measurements
+ * @returns [rad] Tilt-compensated heading
+ */
 float MagCompass::GetHeading(Vector AccelMeas)
 {
     float ax, ay, az;  // Normalized

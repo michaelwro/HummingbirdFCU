@@ -14,6 +14,7 @@
 
 #include <Arduino.h>
 #include <Wire.h>
+#include <math.h>
 #include "hummingbird_config.h"
 #include "sensors/lis3mdl_magnetometer.h"
 #include "maths/vectors.h"

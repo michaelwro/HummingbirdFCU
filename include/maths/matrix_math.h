@@ -17,7 +17,7 @@
  * http://www.mymathlib.com/matrices/
  * 
  *
- * Vector operations include:
+ * Vectorf operations include:
  * - Fill
  * - Addition
  * - Accumulate (in-place)
@@ -72,17 +72,17 @@
 #include "maths/vectors.h"
 
 
-#if defined(DEBUG) && defined(DebugPort)
-    /* Enable/disable printing debug messages to DebugPort */
+#if defined(DEBUG) && defined(DEBUG_PORT)
+    /* Enable/disable printing debug messages to DEBUG_PORT */
     #define MATRIX_MATH_DEBUG
 #endif
 
 
 /* VECTOR FUNCTIONS */
-void VectorFill(float *vec, float fill, size_t n);
-void VectorAdd(float *c, float *a, float *b, size_t n);
-void VectorAccumulate(float *a, float *b, size_t n);
-void VectorSubtract(float *c, float *a, float *b, size_t n);
+void VectorfFill(float *vec, float fill, size_t n);
+void VectorfAdd(float *c, float *a, float *b, size_t n);
+void VectorfAccumulate(float *a, float *b, size_t n);
+void VectorfSubtract(float *c, float *a, float *b, size_t n);
 
 /* MATRIX FUNCTIONS */
 void MatrixFill(float fill, float *A, size_t rows, size_t cols);
@@ -101,7 +101,7 @@ void MatrixSubAccumulate(float *A, float *B, size_t rows, size_t cols);
 void MatrixNegate(float *A, size_t rows, size_t cols);
 
 // Multiplication
-void MatrixVectorMult(float *outVec, float *A, float *b, size_t rows, size_t cols);
+void MatrixVectorfMult(float *outVec, float *A, float *b, size_t rows, size_t cols);
 void MatrixMultiply(float *C, float *A, float *B, size_t aRows, size_t aCols, size_t bRows, size_t bCols);
 void MatrixMultiply_ABt(float *C, float *A, float *B, size_t arows, size_t acols, size_t brows);
 
@@ -112,6 +112,6 @@ bool _MatrixLowerTriangularInverse(float *A, size_t n);
 // bool MatrixIsPosDef(float *A, size_t rows, size_t cols);
 
 // #ifdef MATRIX_MATH_DEBUG
-    // void PrintVector(float *a, size_t n);
+    // void PrintVectorf(float *a, size_t n);
     // void PrintMatrix(float *A, size_t r, size_t c);
 // #endif

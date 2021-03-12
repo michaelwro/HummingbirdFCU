@@ -57,7 +57,7 @@ bool LIS3MDL_Mag::Initialize(LIS3MDL_MeasRange_t measRange)
     if (measRange > LIS3MDL_RANGE_16G)
     {
         #if defined(LIS3MDL_DEBUG)
-        DebugPort.println("LIS3MDL:Initialize ERROR: Unfamiliar measurement range specified. Check code.");
+        DEBUG_PORT.println("LIS3MDL:Initialize ERROR: Unfamiliar measurement range specified. Check code.");
         #endif
         return false;
     }
@@ -69,7 +69,7 @@ bool LIS3MDL_Mag::Initialize(LIS3MDL_MeasRange_t measRange)
     if (connSensorID != 0x3D)
     {
         #if defined(LIS3MDL_DEBUG)
-        DebugPort.println("LIS3MDL:Initialize ERROR: Sensor ID mismatch. Check connection.");
+        DEBUG_PORT.println("LIS3MDL:Initialize ERROR: Sensor ID mismatch. Check connection.");
         #endif
         return false;
     }
@@ -117,7 +117,7 @@ bool LIS3MDL_Mag::Initialize(LIS3MDL_MeasRange_t measRange)
         default:
             ctrlReg2Config = 0b00000000;
             #if defined(LIS3MDL_DEBUG)
-            DebugPort.println("LIS3MDL:Initialize WARNING: Invalid measurement range. Check code.");
+            DEBUG_PORT.println("LIS3MDL:Initialize WARNING: Invalid measurement range. Check code.");
             #endif
             return false;
             break;
@@ -227,7 +227,7 @@ bool LIS3MDL_Mag::ReadSensor()
             break;
         default:
             #if defined(LIS3MDL_DEBUG)
-            DebugPort.println("LIS3MDL:ReadSensor ERROR: Invalid range specified. Check code.");
+            DEBUG_PORT.println("LIS3MDL:ReadSensor ERROR: Invalid range specified. Check code.");
             #endif
             return false;
             break;

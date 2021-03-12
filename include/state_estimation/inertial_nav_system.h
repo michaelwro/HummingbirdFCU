@@ -27,8 +27,8 @@
 #include "filters/low_pass_filter.h"
 
 
-#if defined(DEBUG) && defined(DebugPort)
-    /* Print INS debug messages to the debug port. Both DEBUG and DebugPort in hummingbird_config.h must be defined. */
+#if defined(DEBUG) && defined(DEBUG_PORT)
+    /* Print INS debug messages to the debug port. Both DEBUG and DEBUG_PORT in hummingbird_config.h must be defined. */
     #define INS_DEBUG
 #endif
 
@@ -69,12 +69,12 @@ public:
     float GetAccelPitch();
     float GetAccelRoll();
     
-    Vector Gyro;        // [rad/s], [gx, gy, gz] Gyro measurements (filtered) 
-    Vector GyroRaw;     // [rad/s], [gx, gy, gz] Raw gyro measurements
-    Vector GyroTOBias;  // [rad/s], [bgx, bgy, bgz] Measured gyro turn-on biases
-    Vector Accel;       // [m/s/s], [ax, ay, az] Accelerometer measurements (filtered)
-    Vector AccelRaw;    // [m/s/s], [ax, ay, az] Raw accelerometer measurements
-    Vector AccelTOBias; // [m/s/s], [bax, bay, baz] Measured accelerometer turn-on biases
+    Vectorf Gyro;        // [rad/s], [gx, gy, gz] Gyro measurements (filtered) 
+    Vectorf GyroRaw;     // [rad/s], [gx, gy, gz] Raw gyro measurements
+    Vectorf GyroTOBias;  // [rad/s], [bgx, bgy, bgz] Measured gyro turn-on biases
+    Vectorf Accel;       // [m/s/s], [ax, ay, az] Accelerometer measurements (filtered)
+    Vectorf AccelRaw;    // [m/s/s], [ax, ay, az] Raw accelerometer measurements
+    Vectorf AccelTOBias; // [m/s/s], [bax, bay, baz] Measured accelerometer turn-on biases
     uint32_t prevUpdateMicros;  // [us] Previous INS update micros()
 protected:
 private:

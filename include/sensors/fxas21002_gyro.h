@@ -87,7 +87,7 @@ typedef enum
 class FXAS21002Gyro
 {
 public:
-    FXAS21002Gyro(TwoWire *wireInput = &SensorI2C);
+    FXAS21002Gyro(TwoWire *wireInput = &SENSOR_I2C);
 //        ~FXAS21002Gyro();
     bool Initialize(GyroRanges_t rng = GYRO_RNG_1000DPS);
     bool ReadSensor();

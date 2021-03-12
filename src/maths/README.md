@@ -23,7 +23,7 @@ I give the following site credit for the matrix math algorithms. It was a signif
 
 [http://www.mymathlib.com/matrices/](http://www.mymathlib.com/matrices/)
 
-Vector operations include:
+Vectorf operations include:
 
 * Fill
 * Addition

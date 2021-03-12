@@ -20,7 +20,7 @@
 #include "hummingbird_config.h"
 
 
-#if defined(DEBUG) && defined(DebugPort)
+#if defined(DEBUG) && defined(DEBUG_PORT)
     /* Enable a message to signal when a matrix was created and destroyed */
     #define MATRIX_OBJ_DEBUG
 #endif
@@ -84,15 +84,15 @@ public:
             this->mat[i] = initVal;
 
     #ifdef MATRIX_OBJ_DEBUG
-        DebugPort.print("Created "); DebugPort.print(this->rows); DebugPort.print("x");
-        DebugPort.print(this->cols); DebugPort.println(" matrix");
+        DEBUG_PORT.print("Created "); DEBUG_PORT.print(this->rows); DEBUG_PORT.print("x");
+        DEBUG_PORT.print(this->cols); DEBUG_PORT.println(" matrix");
     #endif
     }
 
 
     #ifdef MATRIX_OBJ_DEBUG
     /**
-     * Print matrix to the debug port. Can only be used if DebugPort and
+     * Print matrix to the debug port. Can only be used if DEBUG_PORT and
      * MATRIX_OBJ_DEBUG are defined.
      */
     void PrintToDebug(size_t decimals = 2)
@@ -105,15 +105,15 @@ public:
         
         for (i = 0; i < this->rows; i++)
         {
-            DebugPort.print("[[ ");
+            DEBUG_PORT.print("[[ ");
             for (j = 0; j < this->cols; j++)
             {
-                DebugPort.print(MATRIX_ELEMENT(this->mat, i, j, this->rows, this->cols), decimals);
-                DebugPort.print((j != this->cols - 1) ? ", " : "");
+                DEBUG_PORT.print(MATRIX_ELEMENT(this->mat, i, j, this->rows, this->cols), decimals);
+                DEBUG_PORT.print((j != this->cols - 1) ? ", " : "");
             }
-            DebugPort.println(" ]]");
+            DEBUG_PORT.println(" ]]");
         }
-        DebugPort.println("");  // Newline to help separate matrices
+        DEBUG_PORT.println("");  // Newline to help separate matrices
     }
     #endif
 
@@ -130,8 +130,8 @@ public:
         delete[] this->mat;
 
     #ifdef MATRIX_OBJ_DEBUG
-        DebugPort.print("Deallocated "); DebugPort.print(this->rows); DebugPort.print("x");
-        DebugPort.print(this->cols); DebugPort.println(" matrix");
+        DEBUG_PORT.print("Deallocated "); DEBUG_PORT.print(this->rows); DEBUG_PORT.print("x");
+        DEBUG_PORT.print(this->cols); DEBUG_PORT.println(" matrix");
     #endif
     }
 protected:

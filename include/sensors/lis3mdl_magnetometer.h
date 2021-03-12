@@ -20,7 +20,7 @@
 #include "hummingbird_config.h"
 
 
-#if defined(DEBUG) && defined(DebugPort)
+#if defined(DEBUG) && defined(DEBUG_PORT)
     #define LIS3MDL_DEBUG  // For printing magnetometer debug messages
 #endif
 
@@ -71,7 +71,7 @@ typedef enum {
 class LIS3MDL_Mag
 {
 public:
-    LIS3MDL_Mag(TwoWire *userWire = &SensorI2C);
+    LIS3MDL_Mag(TwoWire *userWire = &SENSOR_I2C);
     bool Initialize(LIS3MDL_MeasRange_t measRange = LIS3MDL_RANGE_4G);
     bool ReadSensor();
     float GetMx();

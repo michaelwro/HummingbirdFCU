@@ -26,12 +26,12 @@
 
 /**
  * ====================================
- * DEBUG INTERFACE
+ * DEBUG SERIAL/UART INTERFACE
  * ====================================
  * Use the Teensy 4.1's primary serial interface for printing debug messages. 
  * Found in hummingbird_config.h
  */
-#define DebugPort Serial
+#define DEBUG_PORT Serial
 
 /**
  * ====================================
@@ -41,7 +41,7 @@
  * FXAS21002 gyro, GPS compass, and BMP388 barometer/temperature sensor are 
  * connected to. Found in hummingbird_config.h
  */
-#define SensorI2C Wire2
+#define SENSOR_I2C Wire2
 
 /**
  * ====================================
@@ -49,7 +49,7 @@
  * ====================================
  * UART/serial port that the GPS is connected to. Found in hummingbird_config.h
  */
-#define GPSUart Serial7
+#define GPS_PORT Serial7
 
 /**
  * ====================================
@@ -58,7 +58,7 @@
  * UART/serial port that the XBee radio is connected to. Found in 
  * hummingbird_config.h
  */
-#define TelemUart Serial8
+#define TELEM_PORT Serial8
 
 /**
  * ====================================
@@ -67,7 +67,7 @@
  * Extra I2C bus on the top of the Hummingbird FCU. Used to connect extra I2C 
  * devices to the board. Found in hummingbird_config.h
  */
-#define AuxI2C Wire
+#define AUX_I2C Wire
 
 /**
  * ====================================
@@ -76,7 +76,7 @@
  * UART/serial port used to connect an additional serial device. Found in 
  * hummingbird_config.h
  */
-#define AuxUart Serial4
+#define AUX_SERIAL Serial4
 
 /**
  * ====================================

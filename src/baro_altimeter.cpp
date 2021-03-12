@@ -66,7 +66,7 @@ bool BaroAltimeter::ConnectToSensor(TwoWire *userWire)
     {
         // Sensor could not be initialized correctly
         #ifdef DEBUG
-            DebugPort.println("BARO_ALTIMETER ERROR: Cound not connect to BMP388. Check wiring and settings.");
+            DEBUG_PORT.println("BARO_ALTIMETER ERROR: Cound not connect to BMP388. Check wiring and settings.");
         #endif
         return false;
     }
@@ -102,7 +102,7 @@ bool BaroAltimeter::ConfigureSensorParams(
     if (!this->setTemperatureOversampling(tempOS))
     {
         #ifdef DEBUG
-            DebugPort.println("BARO_ALTIMETER ERROR: Could not set temp OS. Check settings.");
+            DEBUG_PORT.println("BARO_ALTIMETER ERROR: Could not set temp OS. Check settings.");
         #endif
         return false;
     }
@@ -110,7 +110,7 @@ bool BaroAltimeter::ConfigureSensorParams(
     if (!this->setPressureOversampling(presOS))
     {
         #ifdef DEBUG
-            DebugPort.println("BARO_ALTIMETER ERROR: Could not set pres OS. Check settings.");
+            DEBUG_PORT.println("BARO_ALTIMETER ERROR: Could not set pres OS. Check settings.");
         #endif
         return false;
     }
@@ -118,7 +118,7 @@ bool BaroAltimeter::ConfigureSensorParams(
     if (!this->setIIRFilterCoeff(iirCoef))
     {
         #ifdef DEBUG
-            DebugPort.println("BARO_ALTIMETER ERROR: Could not set IIR filter coef. Check settings.");
+            DEBUG_PORT.println("BARO_ALTIMETER ERROR: Could not set IIR filter coef. Check settings.");
         #endif
         return false;
     }
@@ -126,7 +126,7 @@ bool BaroAltimeter::ConfigureSensorParams(
     if (!this->setOutputDataRate(sensODR))
     {
         #ifdef DEBUG
-            DebugPort.println("BARO_ALTIMETER ERROR: Could not set ODR. Check settings.");
+            DEBUG_PORT.println("BARO_ALTIMETER ERROR: Could not set ODR. Check settings.");
         #endif
         return false;
     }
@@ -142,7 +142,7 @@ bool BaroAltimeter::SetMSLPres(float presMSL_Pa)
     if (presMSL_Pa >= BARO_ALTIMETER_PRES_MAX || presMSL_Pa <= BARO_ALTIMETER_PRES_MIN)
     {
         #ifdef DEBUG
-            DebugPort.println("BARO_ALTIMETER ERROR: Specified MSL pressure out of bounds. Check value.");
+            DEBUG_PORT.println("BARO_ALTIMETER ERROR: Specified MSL pressure out of bounds. Check value.");
         #endif
         return false;
     }
@@ -169,7 +169,7 @@ bool BaroAltimeter::Initialize()
     if (this->isConnected == false)
     {
         #ifdef DEBUG
-            DebugPort.println("BARO_ALTIMETER ERROR: Call ConnectToSensor() method before intializing. Using default Wire2...");
+            DEBUG_PORT.println("BARO_ALTIMETER ERROR: Call ConnectToSensor() method before intializing. Using default Wire2...");
         #endif
         if (!this->ConnectToSensor())  // Use defaults in baro_altimeter.h
             return false;
@@ -179,7 +179,7 @@ bool BaroAltimeter::Initialize()
     if (this->isConfigured == false)
     {
         #ifdef DEBUG
-            DebugPort.println("BARO_ALTIMETER ERROR: Call ConfigureSensorParams() method before intializing. Using default params...");
+            DEBUG_PORT.println("BARO_ALTIMETER ERROR: Call ConfigureSensorParams() method before intializing. Using default params...");
         #endif
         if (!this->ConfigureSensorParams())  // Use defaults in baro_altimeter.h
             return false;
@@ -189,7 +189,7 @@ bool BaroAltimeter::Initialize()
     if (this->isMSLPSet == false)
     {
         #ifdef DEBUG
-            DebugPort.println("BARO_ALTIMETER ERROR: Call SetMSLPres() method before initializing. Using default value...");
+            DEBUG_PORT.println("BARO_ALTIMETER ERROR: Call SetMSLPres() method before initializing. Using default value...");
         #endif
         if (!this->SetMSLPres())  // Use defaults in baro_altimeter.h
             return false;
@@ -199,7 +199,7 @@ bool BaroAltimeter::Initialize()
     if (!this->_ReadGroundPresTemp(50, 50))  // 50 readings * 50ms delay = 1.5 seconds
     {
         #ifdef DEBUG
-            DebugPort.println("BARO_ALTIMETER ERROR: Error reading ground pres and temp.");
+            DEBUG_PORT.println("BARO_ALTIMETER ERROR: Error reading ground pres and temp.");
         #endif
         return false;
     }
@@ -208,10 +208,10 @@ bool BaroAltimeter::Initialize()
     this->_SetTakeoffAltitude();
 
     #ifdef DEBUG
-        DebugPort.println("BARO_ALTIMETER INITIALIZED:");
-        DebugPort.print("    "); DebugPort.print(this->_groundPres, 2); DebugPort.println(" Pa  ");
-        DebugPort.print("    "); DebugPort.print(this->_groundTemp, 2); DebugPort.println(" C");
-        DebugPort.print("    "); DebugPort.print(this->_groundAltMSL, 2); DebugPort.println(" m");
+        DEBUG_PORT.println("BARO_ALTIMETER INITIALIZED:");
+        DEBUG_PORT.print("    "); DEBUG_PORT.print(this->_groundPres, 2); DEBUG_PORT.println(" Pa  ");
+        DEBUG_PORT.print("    "); DEBUG_PORT.print(this->_groundTemp, 2); DEBUG_PORT.println(" C");
+        DEBUG_PORT.print("    "); DEBUG_PORT.print(this->_groundAltMSL, 2); DEBUG_PORT.println(" m");
     #endif
 
     this->isReady = true;
@@ -237,7 +237,7 @@ bool BaroAltimeter::ReadSensor()
     if (!this->performReading())
     {
         #ifdef DEBUG
-            DebugPort.println("BARO_ALTIMETER ERROR: Error reading sensor data.");
+            DEBUG_PORT.println("BARO_ALTIMETER ERROR: Error reading sensor data.");
         #endif
         return false;
     }
@@ -251,7 +251,7 @@ bool BaroAltimeter::ReadSensor()
     {
         this->_pRaw = 101325.0f;
         #ifdef DEBUG
-            DebugPort.println("BARO_ALTIMETER ERROR: Pressure reading out of allowable bounds.");
+            DEBUG_PORT.println("BARO_ALTIMETER ERROR: Pressure reading out of allowable bounds.");
         #endif
     }
 
@@ -259,7 +259,7 @@ bool BaroAltimeter::ReadSensor()
     {
         this->_tRaw = 15.0f;
         #ifdef DEBUG
-            DebugPort.println("BARO_ALTIMETER ERROR: Temperature reading out of allowable bounds.");
+            DEBUG_PORT.println("BARO_ALTIMETER ERROR: Temperature reading out of allowable bounds.");
         #endif
     }
 
@@ -293,10 +293,10 @@ bool BaroAltimeter::ReadSensor()
 
 
     #ifdef BARO_ALTIMETER_DEBUG
-        DebugPort.print("P: "); DebugPort.print(this->_p, 2);
-        DebugPort.print("  T: "); DebugPort.print(this->_t, 2);
-        DebugPort.print("  ALT: "); DebugPort.print(this->_alt, 2);
-        DebugPort.print("  VS: "); DebugPort.println(this->_vertSpeed * 100.0f, 2);
+        DEBUG_PORT.print("P: "); DEBUG_PORT.print(this->_p, 2);
+        DEBUG_PORT.print("  T: "); DEBUG_PORT.print(this->_t, 2);
+        DEBUG_PORT.print("  ALT: "); DEBUG_PORT.print(this->_alt, 2);
+        DEBUG_PORT.print("  VS: "); DEBUG_PORT.println(this->_vertSpeed * 100.0f, 2);
     #endif
 
     return true;

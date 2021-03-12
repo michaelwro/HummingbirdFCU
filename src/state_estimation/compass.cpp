@@ -15,7 +15,7 @@
 
 // ----------------------------------------------------------------------------
 // MagCompass(TwoWire *userWire)
-// : Mag(3), MagRaw(3), MagSensor(&SensorI2C)
+// : Mag(3), MagRaw(3), MagSensor(&SENSOR_I2C)
 // ----------------------------------------------------------------------------
 /**
  * Constructor for the compass class. Be sure to specify the I2C bus that the 
@@ -24,7 +24,7 @@
  * @param userWire   I2C bus the compass is connected to. Default Wire2
  */
 MagCompass::MagCompass(TwoWire *userWire)
-: Mag(3), MagRaw(3), MagSensor(&SensorI2C)
+: Mag(3), MagRaw(3), MagSensor(&SENSOR_I2C)
 {
     heading = 0.0f;
     prevUpdateMicros = micros();
@@ -42,20 +42,20 @@ MagCompass::MagCompass(TwoWire *userWire)
 bool MagCompass::Initialize()
 {
     #ifdef MAGCOMPASS_DEBUG
-    DebugPort.print("MAGCOMPASS:Initialize: Connecting to sensor... ");
+    DEBUG_PORT.print("MAGCOMPASS:Initialize: Connecting to sensor... ");
     #endif
 
     /* Connect to and init. the magnetometer */
     if (!MagSensor.Initialize(MAGCOMPASS_RANGE))
     {
         #ifdef MAGCOMPASS_DEBUG
-        DebugPort.println("MAGCOMPASS:Initialize ERROR: Could not initialize/connect to LIS3MDL compass. Check settings.");
+        DEBUG_PORT.println("MAGCOMPASS:Initialize ERROR: Could not initialize/connect to LIS3MDL compass. Check settings.");
         #endif
         return false;
     }
 
     #ifdef MAGCOMPASS_DEBUG
-    DebugPort.println("Done!");
+    DEBUG_PORT.println("Done!");
     #endif
 }
 
@@ -78,7 +78,7 @@ bool MagCompass::Update()
     if (!MagSensor.ReadSensor())
     {
         #ifdef MAGCOMPASS_DEBUG
-        DebugPort.println("MAGCOMPASS:Update ERROR: Could not read magnetometer sensor.");
+        DEBUG_PORT.println("MAGCOMPASS:Update ERROR: Could not read magnetometer sensor.");
         #endif
         // return false;
     }
@@ -114,17 +114,17 @@ bool MagCompass::Update()
 
 
 // ----------------------------------------------------------------------------
-// GetHeading(Vector AccelMeas)
+// GetHeading(Vectorf AccelMeas)
 // ----------------------------------------------------------------------------
 /**
  * Compute and return tilt-compensated magnetic heading based on accelerometer 
  * data. Tilt-compensation equations can be found in: 
  * https://www.cypress.com/file/130456/download
  * 
- * @param AccelMeas [m/s/s] Vector of accelerometer measurements
+ * @param AccelMeas [m/s/s] Vectorf of accelerometer measurements
  * @returns [rad] Tilt-compensated heading
  */
-float MagCompass::GetHeading(Vector AccelMeas)
+float MagCompass::GetHeading(Vectorf AccelMeas)
 {
     float ax, ay, az;  // Normalized
     float axsq, aysq, sqrtTerm;

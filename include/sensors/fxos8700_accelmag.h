@@ -74,7 +74,7 @@ typedef enum
 class FXOS8700AccelMag
 {
 public:
-    FXOS8700AccelMag(TwoWire *wireInput = &SensorI2C);
+    FXOS8700AccelMag(TwoWire *wireInput = &SENSOR_I2C);
     bool Initialize(AccelRanges_t accRange = ACCEL_RNG_4G);
     bool ReadSensor();
     uint32_t prevMeasMicros;  // [us] Previous measurement micros()

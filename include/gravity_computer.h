@@ -38,7 +38,7 @@ public:
     GravityComputer(const GravityComputer &) = delete;
     GravityComputer &operator=(const GravityComputer &) = delete;
 
-    void UpdatePosition(float lat_rad = CONSTS_PIDIV4, float alt_msl = 200.0f);
+    void UpdatePosition(float lat_rad = CONSTS_PIDIV4, float alt_msl = 280.0f);
     float GetGravity();
 
 private:

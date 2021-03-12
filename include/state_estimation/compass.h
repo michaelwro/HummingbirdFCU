@@ -23,8 +23,8 @@
 #include "sensors/sensor_calib_params.h"
 
 
-#if defined(DEBUG) && defined(DebugPort)
-    /* Print compass debug messages to the debug port. Both DEBUG and DebugPort in hummingbird_config.h must be defined. */
+#if defined(DEBUG) && defined(DEBUG_PORT)
+    /* Print compass debug messages to the debug port. Both DEBUG and DEBUG_PORT in hummingbird_config.h must be defined. */
     #define MAGCOMPASS_DEBUG
 #endif
 
@@ -43,7 +43,7 @@ constexpr LIS3MDL_MeasRange_t MAGCOMPASS_RANGE  = LIS3MDL_RANGE_4G;  // Magnetom
 class MagCompass
 {
 public:
-    MagCompass(TwoWire *userWire = &SensorI2C);
+    MagCompass(TwoWire *userWire = &SENSOR_I2C);
     ~MagCompass();
     
     // Do not allow copies
@@ -53,11 +53,11 @@ public:
 
     bool Initialize();
     bool Update();
-    float GetHeading(Vector AccelMeas);
+    float GetHeading(Vectorf AccelMeas);
 
     uint32_t prevUpdateMicros;  // [us] Previous update micros()
-    Vector Mag;     // [mx, my, mz], [uT] Magnetometer readings (calibrated)
-    Vector MagRaw;  // [mx, my, mz], [uT] Raw, uncalibrated readings
+    Vectorf Mag;     // [mx, my, mz], [uT] Magnetometer readings (calibrated)
+    Vectorf MagRaw;  // [mx, my, mz], [uT] Raw, uncalibrated readings
 
 protected:
 private:

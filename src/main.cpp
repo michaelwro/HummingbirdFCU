@@ -84,11 +84,11 @@ void setup()
     // Initialize serial ports
     // GPSSerial.begin(9600);
 
-    DebugPort.begin(115200);
+    DEBUG_PORT.begin(115200);
     delay(1000);
 
     #ifdef DEBUG
-        while (!DebugPort);  // Wait for console to open
+        while (!DEBUG_PORT);  // Wait for console to open
     #endif
 
     
@@ -100,18 +100,18 @@ void setup()
 
     if (!INS.Initialize())
     {
-        DebugPort.println("Could not init. INS...");
+        DEBUG_PORT.println("Could not init. INS...");
     }
 
 
     if (!Compass.Initialize())
     {
-        DebugPort.println("Could not init. compass...");
+        DEBUG_PORT.println("Could not init. compass...");
     }
 
 
     #ifdef DEBUG
-        DebugPort.println("DONE!");
+        DEBUG_PORT.println("DONE!");
     #endif
 
     digitalWrite(RED_LED, LOW);
@@ -127,7 +127,7 @@ void loop()
         INS.Update();
         Compass.Update();
         float h = Compass.GetHeading(INS.Accel);
-        DebugPort.print("Heading: "); DebugPort.print(h*RAD2DEG, 2); DebugPort.println(" deg.");
+        DEBUG_PORT.print("Heading: "); DEBUG_PORT.print(h*RAD2DEG, 2); DEBUG_PORT.println(" deg.");
         prev = now;
     }
 

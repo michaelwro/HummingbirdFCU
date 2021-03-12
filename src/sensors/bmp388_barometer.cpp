@@ -20,7 +20,7 @@ BMP388BaroTemp::BMP388BaroTemp(TwoWire *wireInput)
     if (!this->begin((uint8_t)0x77, wireInput))
     {
         #ifdef BMP388_DEBUG
-        DebugPort.println("BMP388BAROTEMP:BMP388BaroTemp ERROR: Cound not connect to BMP388. Check wiring and settings.");
+        DEBUG_PORT.println("BMP388BAROTEMP:BMP388BaroTemp ERROR: Cound not connect to BMP388. Check wiring and settings.");
         #endif
         this->connected = false;
     }
@@ -42,7 +42,7 @@ bool BMP388BaroTemp::Initialize(uint8_t presOS, uint8_t tempOS,
     if (!this->connected)
     {
         #ifdef BMP388_DEBUG
-        DebugPort.println("BMP388BAROTEMP:Initialize ERROR: Cound not connect to BMP388. Check wiring and settings.");
+        DEBUG_PORT.println("BMP388BAROTEMP:Initialize ERROR: Cound not connect to BMP388. Check wiring and settings.");
         #endif
         return false;
     }
@@ -51,7 +51,7 @@ bool BMP388BaroTemp::Initialize(uint8_t presOS, uint8_t tempOS,
     if (!this->setTemperatureOversampling(tempOS))
     {
         #ifdef BMP388_DEBUG
-        DebugPort.println("BMP388BAROTEMP:Initialize ERROR: Could not set temp OS. Check settings.");
+        DEBUG_PORT.println("BMP388BAROTEMP:Initialize ERROR: Could not set temp OS. Check settings.");
         #endif
         return false;
     }
@@ -59,7 +59,7 @@ bool BMP388BaroTemp::Initialize(uint8_t presOS, uint8_t tempOS,
     if (!this->setPressureOversampling(presOS))
     {
         #ifdef BMP388_DEBUG
-        DebugPort.println("BMP388BAROTEMP:Initialize ERROR: Could not set pres OS. Check settings.");
+        DEBUG_PORT.println("BMP388BAROTEMP:Initialize ERROR: Could not set pres OS. Check settings.");
         #endif
         return false;
     }
@@ -68,7 +68,7 @@ bool BMP388BaroTemp::Initialize(uint8_t presOS, uint8_t tempOS,
     if (!this->setIIRFilterCoeff(iirCoef))
     {
         #ifdef BMP388_DEBUG
-        DebugPort.println("BMP388BAROTEMP:Initialize ERROR: Could not set IIR filter coef. Check settings.");
+        DEBUG_PORT.println("BMP388BAROTEMP:Initialize ERROR: Could not set IIR filter coef. Check settings.");
         #endif
         return false;
     }
@@ -77,7 +77,7 @@ bool BMP388BaroTemp::Initialize(uint8_t presOS, uint8_t tempOS,
     if (!this->setOutputDataRate(sensODR))
     {
         #ifdef BMP388_DEBUG
-        DebugPort.println("BMP388BAROTEMP:Initialize ERROR: Could not set ODR. Check settings.");
+        DEBUG_PORT.println("BMP388BAROTEMP:Initialize ERROR: Could not set ODR. Check settings.");
         #endif
         return false;
     }
@@ -100,7 +100,7 @@ bool BMP388BaroTemp::ReadSensor()
     if (!this->performReading())
     {
         #ifdef BMP388_DEBUG
-        DebugPort.println("BMP388BAROTEMP:ReadSensor ERROR: Error reading sensor data.");
+        DEBUG_PORT.println("BMP388BAROTEMP:ReadSensor ERROR: Error reading sensor data.");
         #endif
         return false;
     }

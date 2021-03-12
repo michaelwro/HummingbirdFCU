@@ -18,7 +18,7 @@
 #include "constants.h"
 #include "Adafruit_BMP3XX.h"
 
-#if defined(DEBUG) && defined(DebugPort)
+#if defined(DEBUG) && defined(DEBUG_PORT)
     /* Enable/disable debug print messages */
     #define BMP388_DEBUG
 #endif
@@ -28,7 +28,7 @@ class BMP388BaroTemp:
 public Adafruit_BMP3XX
 {
 public:
-    BMP388BaroTemp(TwoWire *wireInput = &SensorI2C);
+    BMP388BaroTemp(TwoWire *wireInput = &SENSOR_I2C);
     bool Initialize(uint8_t presOS=BMP3_NO_OVERSAMPLING, uint8_t tempOS=BMP3_NO_OVERSAMPLING, 
                     uint8_t iirCoef=BMP3_IIR_FILTER_COEFF_3, uint8_t sensODR=BMP3_ODR_50_HZ);
     bool ReadSensor();

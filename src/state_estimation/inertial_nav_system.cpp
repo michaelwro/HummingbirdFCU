@@ -27,7 +27,7 @@
 InertialNavSystem::InertialNavSystem()
 : Gyro(3), GyroRaw(3), GyroTOBias(3),
 Accel(3), AccelRaw(3), AccelTOBias(3), 
-AccelMagSensor(&SensorI2C), GyroSensor(&SensorI2C), 
+AccelMagSensor(&SENSOR_I2C), GyroSensor(&SENSOR_I2C), 
 AxMFilt(INS_ACCEL_MFILT_LEN), AyMFilt(INS_ACCEL_MFILT_LEN),
 AzMFilt(INS_ACCEL_MFILT_LEN)
 {
@@ -70,7 +70,7 @@ bool InertialNavSystem::Initialize()
     size_t n;
 
     #ifdef INS_DEBUG
-    DebugPort.print("INERTIALNAVSYSTEM:Initialize: Connecting to sensors... ");
+    DEBUG_PORT.print("INERTIALNAVSYSTEM:Initialize: Connecting to sensors... ");
     #endif
 
 
@@ -78,7 +78,7 @@ bool InertialNavSystem::Initialize()
     if (!GyroSensor.Initialize(INS_GYRO_RANGE))
     {
         #ifdef INS_DEBUG
-            DebugPort.println("INERTIALNAVSYSTEM:Initialize ERROR: Could not initialize/connect to FXAS21002 gyro. Check settings.");
+            DEBUG_PORT.println("INERTIALNAVSYSTEM:Initialize ERROR: Could not initialize/connect to FXAS21002 gyro. Check settings.");
         #endif
         return false;
     }
@@ -88,56 +88,56 @@ bool InertialNavSystem::Initialize()
     if (!AccelMagSensor.Initialize(INS_ACCEL_RANGE))
     {
         #ifdef INS_DEBUG
-            DebugPort.println("INERTIALNAVSYSTEM:Initialize ERROR: Could not initialize/connect to FXOS8700 accelerometer. Check settings.");
+            DEBUG_PORT.println("INERTIALNAVSYSTEM:Initialize ERROR: Could not initialize/connect to FXOS8700 accelerometer. Check settings.");
         #endif
         return false;
     }
 
     #ifdef INS_DEBUG
-    DebugPort.println("Done!");
+    DEBUG_PORT.println("Done!");
     #endif
 
 
     /* Compute initial gyro turn-on biases */
     #ifdef INS_DEBUG
-    DebugPort.print("INERTIALNAVSYSTEM:Initialize: Measuring gyro turn-on biases... ");
+    DEBUG_PORT.print("INERTIALNAVSYSTEM:Initialize: Measuring gyro turn-on biases... ");
     #endif
 
     n = (size_t)(fs * INS_BIAS_INIT_TIME);  // Number of readings
     if (!ComputeInitGyroBiases(n))
     {
         #ifdef INS_DEBUG
-        DebugPort.println("INERTIALNAVSYSTEM:Initialize ERROR: Error computing gyro turn-on biases.");
+        DEBUG_PORT.println("INERTIALNAVSYSTEM:Initialize ERROR: Error computing gyro turn-on biases.");
         #endif
         return false;
     }
 
     #ifdef INS_DEBUG
-    DebugPort.println("Done!");
-    DebugPort.print("    BGX: "); DebugPort.println(GyroTOBias.vec[0], 4);
-    DebugPort.print("    BGY: "); DebugPort.println(GyroTOBias.vec[1], 4);
-    DebugPort.print("    BGZ: "); DebugPort.println(GyroTOBias.vec[2], 4);
+    DEBUG_PORT.println("Done!");
+    DEBUG_PORT.print("    BGX: "); DEBUG_PORT.println(GyroTOBias.vec[0], 4);
+    DEBUG_PORT.print("    BGY: "); DEBUG_PORT.println(GyroTOBias.vec[1], 4);
+    DEBUG_PORT.print("    BGZ: "); DEBUG_PORT.println(GyroTOBias.vec[2], 4);
     #endif
 
 
     /* Compute initial accelerometer turn-on biases */
     #ifdef INS_DEBUG
-    DebugPort.print("INERTIALNAVSYSTEM:Initialize: Measuring accelerometer turn-on biases... ");
+    DEBUG_PORT.print("INERTIALNAVSYSTEM:Initialize: Measuring accelerometer turn-on biases... ");
     #endif
 
     if (!ComputeInitAccelBiases(n))
     {
         #ifdef INS_DEBUG
-        DebugPort.println("INERTIALNAVSYSTEM:Initialize ERROR: Error computing accelerometer turn-on biases.");
+        DEBUG_PORT.println("INERTIALNAVSYSTEM:Initialize ERROR: Error computing accelerometer turn-on biases.");
         #endif
         return false;
     }
 
     #ifdef INS_DEBUG
-    DebugPort.println("Done!");
-    DebugPort.print("    BAX: "); DebugPort.println(AccelTOBias.vec[0], 4);
-    DebugPort.print("    BAY: "); DebugPort.println(AccelTOBias.vec[1], 4);
-    DebugPort.print("    BAZ: "); DebugPort.println(AccelTOBias.vec[2], 4);
+    DEBUG_PORT.println("Done!");
+    DEBUG_PORT.print("    BAX: "); DEBUG_PORT.println(AccelTOBias.vec[0], 4);
+    DEBUG_PORT.print("    BAY: "); DEBUG_PORT.println(AccelTOBias.vec[1], 4);
+    DEBUG_PORT.print("    BAZ: "); DEBUG_PORT.println(AccelTOBias.vec[2], 4);
     #endif
 
     return true;
@@ -165,7 +165,7 @@ bool InertialNavSystem::Update()
     if (!GyroSensor.ReadSensor())
     {
         #ifdef INS_DEBUG
-        DebugPort.println("INERTIALNAVSYSTEM:Update ERROR: Could not read gyro sensor.");
+        DEBUG_PORT.println("INERTIALNAVSYSTEM:Update ERROR: Could not read gyro sensor.");
         #endif
         // return false;
     }
@@ -182,7 +182,7 @@ bool InertialNavSystem::Update()
     if (!AccelMagSensor.ReadSensor())
     {
         #ifdef INS_DEBUG
-        DebugPort.println("INERTIALNAVSYSTEM:Update ERROR: Could not read accelerometer sensor.");
+        DEBUG_PORT.println("INERTIALNAVSYSTEM:Update ERROR: Could not read accelerometer sensor.");
         #endif
         // return false;
     }
@@ -278,7 +278,7 @@ bool InertialNavSystem::ComputeInitGyroBiases(size_t n)
         if (!Update())
         {
             #ifdef INS_DEBUG
-            DebugPort.println("INERTIALNAVSYSTEM:ComputeInitGyroBiases ERROR: Could not read sensors.");
+            DEBUG_PORT.println("INERTIALNAVSYSTEM:ComputeInitGyroBiases ERROR: Could not read sensors.");
             #endif
             return false;
         }
@@ -323,7 +323,7 @@ bool InertialNavSystem::ComputeInitAccelBiases(size_t n)
         if (!Update())
         {
             #ifdef INS_DEBUG
-            DebugPort.println("INERTIALNAVSYSTEM:ComputeInitAccelBiases ERROR: Could not read sensors.");
+            DEBUG_PORT.println("INERTIALNAVSYSTEM:ComputeInitAccelBiases ERROR: Could not read sensors.");
             #endif
             return false;
         }

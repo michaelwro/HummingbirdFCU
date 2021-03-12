@@ -11,7 +11,7 @@
  * http://www.mymathlib.com/matrices/
  * 
  *
- * Vector operations include:
+ * Vectorf operations include:
  * - Fill
  * - Addition
  * - Accumulate (in-place)
@@ -61,17 +61,17 @@
 
 
 // ----------------------------------------------------------------------------
-// VectorFill(float *vec, float fill, size_t n)
+// VectorfFill(float *vec, float fill, size_t n)
 // ----------------------------------------------------------------------------
 /**
  * Fill a vector with a specified value. Use this to initialize arrays before 
  * they're used.
  * 
  * @param fill  Value to fill array with
- * @param a     Vector of interest
+ * @param a     Vectorf of interest
  * @param n     Size/length of vector
  */
-void VectorFill(float *vec, float fill, size_t n)
+void VectorfFill(float *vec, float fill, size_t n)
 {
     size_t i;
     
@@ -81,7 +81,7 @@ void VectorFill(float *vec, float fill, size_t n)
 
 
 // ----------------------------------------------------------------------------
-// VectorAdd(float *c, float *a, float *b, size_t n)
+// VectorfAdd(float *c, float *a, float *b, size_t n)
 // ----------------------------------------------------------------------------
 /**
  * Add two vectors together and output result to a new vector. Assumes vectors
@@ -92,7 +92,7 @@ void VectorFill(float *vec, float fill, size_t n)
  * @param c     Pointer to output vector
  * @param n     Length of vector
  */
-void VectorAdd(float *c, float *a, float *b, size_t n)
+void VectorfAdd(float *c, float *a, float *b, size_t n)
 {
     size_t i;
     for (i = 0; i < n; i++)
@@ -101,7 +101,7 @@ void VectorAdd(float *c, float *a, float *b, size_t n)
 
 
 // ----------------------------------------------------------------------------
-// VectorAccumulate(float *a, float *b, size_t n)
+// VectorfAccumulate(float *a, float *b, size_t n)
 // ----------------------------------------------------------------------------
 /**
  * a <- a + b. Add two vectors in-place and output result to vector a. Assumes 
@@ -111,7 +111,7 @@ void VectorAdd(float *c, float *a, float *b, size_t n)
  * @param b     Pointer to second vector
  * @param n     Length of vector
  */
-void VectorAccumulate(float *a, float *b, size_t n)
+void VectorfAccumulate(float *a, float *b, size_t n)
 {
     size_t i;
 
@@ -121,7 +121,7 @@ void VectorAccumulate(float *a, float *b, size_t n)
 
 
 // ----------------------------------------------------------------------------
-// VectorSubtract(float *c, float *a, float *b, size_t n)
+// VectorfSubtract(float *c, float *a, float *b, size_t n)
 // ----------------------------------------------------------------------------
 /**
  * Subtract two vectors and output result to a new vector. Assumes vectors 
@@ -132,7 +132,7 @@ void VectorAccumulate(float *a, float *b, size_t n)
  * @param c     Pointer to output vector
  * @param n     Length of vector
  */
-void VectorSubtract(float *c, float *a, float *b, size_t n)
+void VectorfSubtract(float *c, float *a, float *b, size_t n)
 {
     size_t i;
 
@@ -385,20 +385,20 @@ void MatrixNegate(float *A, size_t rows, size_t cols)
 
 
 // ----------------------------------------------------------------------------
-// MatrixVectorMult(float *outVec, float *A, float *b, 
+// MatrixVectorfMult(float *outVec, float *A, float *b, 
 //                  size_t matRows, size_t matCols)
 // ----------------------------------------------------------------------------
 /**
  * c <- A * b. Perform matrix-vector multiplication and output result to a 
  * new array. Make sure that the matrix columns match the vector rows!
  * 
- * @param outVec    Vector to output result to
+ * @param outVec    Vectorf to output result to
  * @param A         Matrix
- * @param b         Vector
+ * @param b         Vectorf
  * @param rows      Matrix rows
  * @param cols      Matrix columns
  */
-void MatrixVectorMult(float *outVec, float *A, float *b, 
+void MatrixVectorfMult(float *outVec, float *A, float *b, 
                     size_t rows, size_t cols)
 {
     size_t i, j;
@@ -507,7 +507,7 @@ bool MatrixInverseCholesky(float *A, size_t n)
     if (_MatrixCholeskyDecomp(A, n) == false)
     {
         #ifdef MATRIX_MATH_DEBUG
-            DebugPort.println("MATRIX_MATH:MatrixInverseCholesky WARNING: Matrix is not SPD.");
+            DEBUG_PORT.println("MATRIX_MATH:MatrixInverseCholesky WARNING: Matrix is not SPD.");
         #endif
         // return false;  // TODO: raise error state?
     }
@@ -516,7 +516,7 @@ bool MatrixInverseCholesky(float *A, size_t n)
     if (_MatrixLowerTriangularInverse(A, n) == false)
     {
         #ifdef MATRIX_MATH_DEBUG
-            DebugPort.println("MATRIX_MATH:MatrixInverseCholesky WARNING: Zero element on the diagonal.");
+            DEBUG_PORT.println("MATRIX_MATH:MatrixInverseCholesky WARNING: Zero element on the diagonal.");
         #endif
         // return false;  // TOD: raise error state?
     }
@@ -571,7 +571,7 @@ bool _MatrixCholeskyDecomp(float *A, size_t n)
         if (*p_Lkk <= FLOAT_PREC_ZERO)
         {
             #ifdef MATRIX_MATH_DEBUG
-                DebugPort.println("MATRIX_MATH:MatrixCholeskyDecomp WARNING: Matrix is not SPD.");
+                DEBUG_PORT.println("MATRIX_MATH:MatrixCholeskyDecomp WARNING: Matrix is not SPD.");
             #endif
             return false;
         }
@@ -617,7 +617,7 @@ bool _MatrixLowerTriangularInverse(float *A, size_t n)
         if (fabsf(*pk) <= FLOAT_PREC_ZERO)
         {
             #ifdef MATRIX_MATH_DEBUG
-                DebugPort.println("MATRIX_MATH:_MatrixLowerTriangularInverse WARNING: Zero element on the diagonal.");
+                DEBUG_PORT.println("MATRIX_MATH:_MatrixLowerTriangularInverse WARNING: Zero element on the diagonal.");
             #endif
             return false;
         }
@@ -655,7 +655,7 @@ bool _MatrixLowerTriangularInverse(float *A, size_t n)
 //     #ifdef MATRIX_MATH_DEBUG
 //         if (rows != cols)
 //         {
-//             DebugPort.println("MATRIX_MATH:MatrixIsPosDef WARNING: Matrix must be square. Check that rows = columns.");
+//             DEBUG_PORT.println("MATRIX_MATH:MatrixIsPosDef WARNING: Matrix must be square. Check that rows = columns.");
 //         }
 //     #endif
 
@@ -684,24 +684,24 @@ bool _MatrixLowerTriangularInverse(float *A, size_t n)
 
 // #ifdef MATRIX_MATH_DEBUG  // ==================================================
 // // ----------------------------------------------------------------------------
-// // PrintVector(float *a, size_t n)
+// // PrintVectorf(float *a, size_t n)
 // // ----------------------------------------------------------------------------
 // /**
 //  * Print a vector to the debug port.
 //  * 
-//  * @param a     Vector to print
+//  * @param a     Vectorf to print
 //  * @param n     Length/size of vector
 //  */
-// void PrintVector(float *a, size_t n)
+// void PrintVectorf(float *a, size_t n)
 // {
 //     size_t i;
-//     DebugPort.print("[");
+//     DEBUG_PORT.print("[");
 //     for (i = 0; i < n; i++)
 //     {
-//         DebugPort.print(VECTOR_ELEMENT(a, i), 4);
-//         DebugPort.print((i != n-1) ? ", " : " ");
+//         DEBUG_PORT.print(VECTOR_ELEMENT(a, i), 4);
+//         DEBUG_PORT.print((i != n-1) ? ", " : " ");
 //     }
-//     DebugPort.println("]");
+//     DEBUG_PORT.println("]");
 // }
 
 
@@ -721,14 +721,14 @@ bool _MatrixLowerTriangularInverse(float *A, size_t n)
 
 //     for (i = 0; i < r; i++)
 //     {
-//         DebugPort.print("[[ ");
+//         DEBUG_PORT.print("[[ ");
 //         for (j = 0; j < c; j++)
 //         {
-//             DebugPort.print(MATRIX_ELEMENT(A, i, j, r, c), 4);
-//             DebugPort.print((j != c-1) ? ", " : "");
+//             DEBUG_PORT.print(MATRIX_ELEMENT(A, i, j, r, c), 4);
+//             DEBUG_PORT.print((j != c-1) ? ", " : "");
 //         }
-//         DebugPort.println(" ]]");
+//         DEBUG_PORT.println(" ]]");
 //     }
-//     DebugPort.println("");
+//     DEBUG_PORT.println("");
 // }
 // #endif  // ====================================================================

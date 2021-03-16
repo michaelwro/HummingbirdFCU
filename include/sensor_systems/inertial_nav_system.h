@@ -20,9 +20,9 @@
 #include "maths/vectors.h"
 #include "gravity_computer.h"
 #include "hummingbird_config.h"
-#include "sensors/fxas21002_gyro.h"
-#include "sensors/fxos8700_accelmag.h"
-#include "sensors/sensor_calib_params.h"
+#include "sensor_drivers/fxas21002_gyro.h"
+#include "sensor_drivers/fxos8700_accelmag.h"
+#include "sensor_drivers/sensor_calib_params.h"
 #include "filters/median_filter.h"
 #include "filters/low_pass_filter.h"
 

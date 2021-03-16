@@ -16,11 +16,11 @@
 #include <Wire.h>
 #include <math.h>
 #include "hummingbird_config.h"
-#include "sensors/lis3mdl_magnetometer.h"
+#include "sensor_drivers/lis3mdl_magnetometer.h"
 #include "maths/vectors.h"
 #include "constants.h"
 #include "maths/math_functs.h"
-#include "sensors/sensor_calib_params.h"
+#include "sensor_drivers/sensor_calib_params.h"
 
 
 #if defined(DEBUG) && defined(DEBUG_PORT)

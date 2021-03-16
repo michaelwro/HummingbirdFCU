@@ -27,8 +27,8 @@
 #include <math.h>
 #include <Wire.h>
 #include "hummingbird_config.h"  // Custom config settings
-#include "sensors/fxos8700_accelmag.h"  // [] COMPLETED
-#include "sensors/fxas21002_gyro.h"  // [] COMPLETED?
+#include "sensor_drivers/fxos8700_accelmag.h"  // [] COMPLETED
+#include "sensor_drivers/fxas21002_gyro.h"  // [] COMPLETED?
 #include "Adafruit_Sensor.h"
 #include "Adafruit_BMP3XX.h"
 // #include "baro_altimeter.h"
@@ -39,8 +39,8 @@
 // #include "Conversions.h"
 #include "filters/median_filter.h"  // [] COMPLETED
 #include "filters/low_pass_filter.h"  // [] COMPLETED
-#include "state_estimation/inertial_nav_system.h"
-#include "state_estimation/compass.h"
+#include "sensor_systems/inertial_nav_system.h"
+#include "sensor_systems/compass.h"
 
 
 

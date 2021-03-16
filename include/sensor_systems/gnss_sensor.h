@@ -40,9 +40,9 @@ typedef enum
 /* Various dynamic models for the GPS receiver's sensor fusion algorithms */
 typedef enum
 {
-    GNSS_DYNAMICS_Portable,     // Portable dynamic model, 12000m alt, 310m/s hvel, 50m/s vvel, med. dev.
-    GNSS_DYNAMICS_Pedestrian,   // Pedestrian dynamic model, 9000m alt, 30m/s hvel, 20m/s vvel, small dev.
-    GNSS_DYNAMICS_Airborne1G    // Airborne 1G dynamic model, 50000m alt, 100m/s hvel, 100m/s vvel, large dev.
+    GNSS_DYNAMICS_PORTABLE,     // Portable dynamic model, 12000m alt, 310m/s hvel, 50m/s vvel, med. dev.
+    GNSS_DYNAMICS_PEDESTRIAN,   // Pedestrian dynamic model, 9000m alt, 30m/s hvel, 20m/s vvel, small dev.
+    GNSS_DYNAMICS_AIRBORNE_1G    // Airborne 1G dynamic model, 50000m alt, 100m/s hvel, 100m/s vvel, large dev.
 } GNSSDynamics_t;
 
 

@@ -46,9 +46,7 @@
 
 // #include "TinyGPS++.h"
 
-#include "gravity_computer.h"
-
-
+// #include "gravity_computer.h"
 
 
 
@@ -76,9 +74,6 @@ unsigned long prev = 0;
 unsigned long now = 0;
 
 
-
-
-
 void setup()
 {
     // Initialize serial ports
@@ -98,16 +93,19 @@ void setup()
     digitalWrite(RED_LED, HIGH);  // Start off LOW
     digitalWrite(GRN_LED, LOW);  // digitalWrite(GRN_LED, LOW);
 
-    if (!INS.Initialize())
-    {
-        DEBUG_PORT.println("Could not init. INS...");
-    }
+    // if (!INS.Initialize())
+    // {
+    //     DEBUG_PORT.println("Could not init. INS...");
+    // }
 
 
-    if (!Compass.Initialize())
-    {
-        DEBUG_PORT.println("Could not init. compass...");
-    }
+    // if (!Compass.Initialize())
+    // {
+    //     DEBUG_PORT.println("Could not init. compass...");
+    // }
+
+
+
 
 
     #ifdef DEBUG
@@ -121,15 +119,15 @@ void setup()
 
 void loop()
 {
-    now = millis();
-    if (now - prev > 100)
-    {
-        INS.Update();
-        Compass.Update();
-        float h = Compass.GetHeading(INS.Accel);
-        DEBUG_PORT.print("Heading: "); DEBUG_PORT.print(h*RAD2DEG, 2); DEBUG_PORT.println(" deg.");
-        prev = now;
-    }
+    // now = millis();
+    // if (now - prev > 100)
+    // {
+    //     INS.Update();
+    //     Compass.Update();
+    //     float h = Compass.GetHeading(INS.Accel);
+    //     DEBUG_PORT.print("Heading: "); DEBUG_PORT.print(h*RAD2DEG, 2); DEBUG_PORT.println(" deg.");
+    //     prev = now;
+    // }
 
     // smartDelay(1000);
 }

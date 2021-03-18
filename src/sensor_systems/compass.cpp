@@ -10,7 +10,7 @@
  */
 
 
-#include "state_estimation/compass.h"
+#include "sensor_systems/compass.h"
 
 
 // ----------------------------------------------------------------------------
@@ -57,6 +57,8 @@ bool MagCompass::Initialize()
     #ifdef MAGCOMPASS_DEBUG
     DEBUG_PORT.println("Done!");
     #endif
+
+    return true;
 }
 
 
@@ -126,7 +128,8 @@ bool MagCompass::Update()
  */
 float MagCompass::GetHeading(Vectorf AccelMeas)
 {
-    float ax, ay, az;  // Normalized
+    float ax, ay;
+    // float az;  // Normalized
     float axsq, aysq, sqrtTerm;
     float mx, my, mz;  // Normalized
     float xterm, yterm;
@@ -136,7 +139,7 @@ float MagCompass::GetHeading(Vectorf AccelMeas)
     invMagn = 1.0f / AccelMeas.GetNorm();
     ax = AccelMeas.vec[0] * invMagn;
     ay = AccelMeas.vec[1] * invMagn;
-    az = AccelMeas.vec[2] * invMagn;
+    // az = AccelMeas.vec[2] * invMagn;
 
     // Normalize magnetometer measurements
     invMagn = 1.0f / Mag.GetNorm();

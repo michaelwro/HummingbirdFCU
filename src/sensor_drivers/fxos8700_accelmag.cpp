@@ -13,7 +13,7 @@
 #include <Arduino.h>
 #include <Wire.h>
 // #include <limits.h>
-#include "sensors/fxos8700_accelmag.h"
+#include "sensor_drivers/fxos8700_accelmag.h"
 
 
 // ------------------------------------

@@ -17,9 +17,10 @@
 #include "hummingbird_config.h"
 
 #if defined(DEBUG) && defined(DEBUG_PORT)
-    /* Enable a message to signal when a vector was created and destroyed */
-    // #define VECTOR_OBJ_DEBUG
+/* Enable a message to signal when a vector was created and destroyed */
+// #define VECTOR_OBJ_DEBUG
 #endif
+
 
 /**
  * Macro to extract the value in vector "VEC" at "VEC(i)" with length "len." 
@@ -62,6 +63,7 @@ public:
 
         // Create the array on the heap (RAM2 on Teensy 4.1)
         this->vec = new float[this->len];
+        
         
         // Init. values
         for (i = 0; i < this->len; i++)

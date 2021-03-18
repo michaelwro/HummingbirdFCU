@@ -330,7 +330,7 @@ double TinyGPSPlus::courseTo(double lat1, double long1, double lat2, double long
 const char *TinyGPSPlus::cardinal(double course)
 {
   static const char* directions[] = {"N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"};
-  int direction = (int)((course + 11.25f) / 22.5f);
+  int direction = (int)((course + 11.25) / 22.5);
   return directions[direction % 16];
 }
 

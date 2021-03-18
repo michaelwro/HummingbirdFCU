@@ -9,7 +9,7 @@
  * Adafruit's BMP388 driver code.
  */
 
-#include "sensors/bmp388_barometer.h"
+#include "sensor_drivers/bmp388_barometer.h"
 
 
 

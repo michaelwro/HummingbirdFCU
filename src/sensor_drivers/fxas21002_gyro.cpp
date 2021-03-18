@@ -22,7 +22,7 @@
 #include "Arduino.h"
 #include <Wire.h>
 #include <limits.h>
-#include "sensors/fxas21002_gyro.h"
+#include "sensor_drivers/fxas21002_gyro.h"
 
 
 

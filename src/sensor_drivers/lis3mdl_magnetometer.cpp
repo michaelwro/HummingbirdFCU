@@ -14,7 +14,7 @@
 
 #include <Wire.h>
 #include <Arduino.h>
-#include "sensors/lis3mdl_magnetometer.h"
+#include "sensor_drivers/lis3mdl_magnetometer.h"
 
 
 

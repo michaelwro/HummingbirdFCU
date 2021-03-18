@@ -12,7 +12,7 @@
  */
 
 
-#include "state_estimation/inertial_nav_system.h"
+#include "sensor_systems/inertial_nav_system.h"
 
 
 

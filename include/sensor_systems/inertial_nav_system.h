@@ -58,6 +58,7 @@ class InertialNavSystem
 public:
     InertialNavSystem();
     ~InertialNavSystem();
+
     // Do not allow copies (singleton)
     static InertialNavSystem &GetInstance();  // Accessor
     InertialNavSystem(const InertialNavSystem &) = delete;

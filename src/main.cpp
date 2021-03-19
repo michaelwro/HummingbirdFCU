@@ -44,7 +44,8 @@
 
 
 
-// #include "TinyGPS++.h"
+#include "TinyGPS++.h"
+#include "sensor_systems/gnss_computer.h"
 
 // #include "gravity_computer.h"
 
@@ -102,6 +103,50 @@ void setup()
     // if (!Compass.Initialize())
     // {
     //     DEBUG_PORT.println("Could not init. compass...");
+    // }
+
+    if (!GPS.ConfigureDevice())
+    {
+        DEBUG_PORT.println("ERROR CONFIGGING!");
+    }
+
+
+
+    // while (!GPS_PORT) {;}
+
+    // if (!GPS.WaitForSatellites())
+    // {
+    //     DEBUG_PORT.println("ERROR WAITING FOR SATS!");
+    // }
+
+
+
+    // GPS_PORT.begin(9600);
+    // delay(1000);
+
+    // while (!GPS_PORT) {;}
+
+    // TinyGPSPlus gps;
+    while (1)
+    {
+        while (GPS_PORT.available()) {
+            char b =  GPS_PORT.read();
+            DEBUG_PORT.print(b);
+            // if (b == '\n')
+            //     DEBUG_PORT.println();
+        }
+    }
+
+        
+    //     if (gps.satellites.isUpdated())
+    //     {
+    //         DEBUG_PORT.println("-------------------------------------------");
+    //         DEBUG_PORT.print(F("SATELLITES Fix Age="));
+    //         DEBUG_PORT.print(gps.satellites.age());
+    //         DEBUG_PORT.print(F("ms Value="));
+    //         DEBUG_PORT.println(gps.satellites.value());
+    //         DEBUG_PORT.println("-------------------------------------------");
+    //     }
     // }
 
 

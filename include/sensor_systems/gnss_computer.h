@@ -113,7 +113,7 @@ public:
 
 protected:
 private:
-    TinyGPSPlus gpsDevice;          // TinyGPS++ GPS object
+    TinyGPSPlus NMEAParser;          // TinyGPS++ GPS object
     Vectord PosLLA;     // [rad, rad, m] Lat, lon, altitude
     Vectorf PosECEF;    // [m, m, m] ECEF position
     Vectorf VelECEF;    // [m/s, m/s, m/s] ECEF velocity

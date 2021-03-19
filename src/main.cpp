@@ -114,10 +114,10 @@ void setup()
 
     // while (!GPS_PORT) {;}
 
-    // if (!GPS.WaitForSatellites())
-    // {
-    //     DEBUG_PORT.println("ERROR WAITING FOR SATS!");
-    // }
+    if (!GPS.WaitForSatellites())
+    {
+        DEBUG_PORT.println("ERROR WAITING FOR SATS!");
+    }
 
 
 
@@ -127,15 +127,15 @@ void setup()
     // while (!GPS_PORT) {;}
 
     // TinyGPSPlus gps;
-    while (1)
-    {
-        while (GPS_PORT.available()) {
-            char b =  GPS_PORT.read();
-            DEBUG_PORT.print(b);
-            // if (b == '\n')
-            //     DEBUG_PORT.println();
-        }
-    }
+    // while (1)
+    // {
+    //     while (GPS_PORT.available()) {
+    //         char b =  GPS_PORT.read();
+    //         DEBUG_PORT.print(b);
+    //         // if (b == '\n')
+    //         //     DEBUG_PORT.println();
+    //     }
+    // }
 
         
     //     if (gps.satellites.isUpdated())

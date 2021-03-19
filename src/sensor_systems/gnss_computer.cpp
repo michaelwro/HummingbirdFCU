@@ -225,79 +225,66 @@ bool GNSSComputer::ConfigureDevice(
 
 bool GNSSComputer::WaitForSatellites(uint32_t minSats)
 {
-    // bool completeMessage;
-    // char b;
+    char b;
     // int i;
-    // uint32_t nSats;
-    // uint32_t startMillis;
-    // uint32_t currMillis;
-    // uint32_t waitTimeout = 120000;  // 2min. [ms] How long to wait for nSat connections
+    uint32_t nSats;
+    uint32_t startMillis;
+    uint32_t currMillis;
     // int nbytes;
 
-    // #ifdef GNSS_DEBUG
-    // uint32_t prevPrint, currPrint;
-    // prevPrint = 0;
-    // currPrint = millis();
-    // DEBUG_PORT.println("GNSSComputer::WaitForSatellites: Waiting for satellites.");
-    // DEBUG_PORT.print("  Sats: ");
-    // #endif
+    #ifdef GNSS_DEBUG
+    uint32_t prevPrint;
+    uint32_t currPrint;
+    uint32_t printdt;
 
-    // startMillis = millis();
-    // currMillis = millis();
-    // nSats = 0;
-    // completeMessage = false;
-    while (1)
+    prevPrint = 0;
+    currPrint = millis();
+    printdt = (uint32_t)(navTs * 1000.0f);
+    DEBUG_PORT.println("GNSSComputer::WaitForSatellites: Waiting for satellites.");
+    DEBUG_PORT.print("    Sats: ");
+    #endif
+
+    nSats = 0;
+    startMillis = millis();
+    currMillis = millis();
+    while (currMillis - startMillis <= GNSS_POS_LOCK_TIMEOUT)
     {
-        // currMillis = millis();
+        currMillis = millis();
 
         while (GPS_PORT.available())
         {
-            char b = GPS_PORT.read();
-            // completeMessage = gpsDevice.encode(b);
-            // gpsDevice.encode(b);
-            DEBUG_PORT.print(b);
+            b = GPS_PORT.read();
+            NMEAParser.encode(b);
 
-            if (b == '\n')
-                DEBUG_PORT.println();
-
-            // New message with updated nsats
-
-            // if (completeMessage)
-            // {
-            //     #ifdef GNSS_DEBUG
-            //     DEBUG_PORT.print(".");
-            //     #endif
-            // }
         }
     
-        // if (gpsDevice.satellites.isUpdated() && gpsDevice.satellites.isValid())
-        // {
-        //     nSats = gpsDevice.satellites.value();
+        if (NMEAParser.satellites.isUpdated() && NMEAParser.satellites.isValid())
+        {
+            nSats = NMEAParser.satellites.value();
 
-        //     #ifdef GNSS_DEBUG
-        //     DEBUG_PORT.print("CHECK ");
-        //     #endif
+            #ifdef GNSS_DEBUG
+            DEBUG_PORT.print(nSats);
+            DEBUG_PORT.print(",");
+            #endif
             
-        //     if (nSats >= minSats)
-        //     {
-        //         #ifdef GNSS_DEBUG
-        //         DEBUG_PORT.println(" Satellites acquired!");
-        //         #endif
-        //         return true;
-        //     }
-        // }
+            if (nSats >= minSats)
+            {
+                #ifdef GNSS_DEBUG
+                DEBUG_PORT.println(" Sufficient sats. acq.");
+                #endif
+                return true;
+            }
+        }
 
-        // completeMessage = false;
-
-        // #ifdef GNSS_DEBUG
-        // currPrint = millis();
-        // if (currPrint - prevPrint >= 1000)
-        // {
-        //     DEBUG_PORT.print(nSats);
-        //     DEBUG_PORT.print(",");
-        //     prevPrint = currPrint;
-        // }
-        // #endif
+        #ifdef GNSS_DEBUG
+        currPrint = millis();
+        if (currPrint - prevPrint >= printdt)
+        {
+            DEBUG_PORT.print(nSats);
+            DEBUG_PORT.print(",");
+            prevPrint = currPrint;
+        }
+        #endif
 
     }
 

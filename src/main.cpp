@@ -73,6 +73,8 @@
 
 unsigned long prev = 0;
 unsigned long now = 0;
+unsigned long gpstimer1 = 0;
+unsigned long gpstimer2 = 0;
 
 
 void setup()
@@ -105,19 +107,19 @@ void setup()
     //     DEBUG_PORT.println("Could not init. compass...");
     // }
 
-    if (!GPS.ConfigureDevice())
-    {
-        DEBUG_PORT.println("ERROR CONFIGGING!");
-    }
+    // if (!GPS.ConfigureDevice())
+    // {
+    //     DEBUG_PORT.println("ERROR CONFIGGING!");
+    // }
 
 
 
-    // while (!GPS_PORT) {;}
+    // // while (!GPS_PORT) {;}
 
-    if (!GPS.WaitForSatellites())
-    {
-        DEBUG_PORT.println("ERROR WAITING FOR SATS!");
-    }
+    // if (!GPS.WaitForSatellites())
+    // {
+    //     DEBUG_PORT.println("ERROR WAITING FOR SATS!");
+    // }
 
 
 
@@ -159,11 +161,57 @@ void setup()
 
     digitalWrite(RED_LED, LOW);
     digitalWrite(GRN_LED, HIGH);
+
+
+    // gpstimer1 = millis();
+    GPS_PORT.begin(115200);
+    SENSOR_I2C.begin();
 }
 
 
 void loop()
 {
+    // https://forum.arduino.cc/index.php?topic=713603.0
+    uint8_t b;
+    do
+    {
+        SENSOR_I2C.requestFrom(0x42, 1);
+        b = SENSOR_I2C.read();
+
+        if (b != 0xFF)
+        {
+            DEBUG_PORT.write(b);
+            DEBUG_PORT.print(" ");
+        }
+    }
+    while (true);
+    
+    
+    // while (GPS_PORT.available())
+    // {
+    //     uint8_t b = GPS_PORT.read();
+    //     gpstimer1++;
+    //     DEBUG_PORT.print("Count: ");
+    //     DEBUG_PORT.println(gpstimer1);
+    // }
+
+    // gpstimer1 = 0;
+    // delay(100);
+
+    // now = millis();
+    // if (now - prev >= 20)
+    // {
+    //     if (GPS.ListenForData())
+    //     {
+    //         gpstimer2 = millis();
+    //         DEBUG_PORT.print("Time between: ");
+    //         DEBUG_PORT.println(gpstimer2 - gpstimer1);
+    //         gpstimer1 = gpstimer2;
+    //     }
+
+    //     prev = now;
+    // }
+
     // now = millis();
     // if (now - prev > 100)
     // {

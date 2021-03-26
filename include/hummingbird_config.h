@@ -49,7 +49,15 @@
  * ====================================
  * UART/serial port that the GPS is connected to. Found in hummingbird_config.h
  */
-#define GPS_PORT Serial7
+// #define GPS_PORT Serial7
+
+/**
+ * ====================================
+ * GPS I2C BUS
+ * ====================================
+ * I2C bus that the GPS is connected to. Found in hummingbird_config.h
+ */
+#define GPS_I2C Wire2
 
 /**
  * ====================================

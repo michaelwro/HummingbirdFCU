@@ -13,6 +13,7 @@
 
 
 #include <Arduino.h>
+#include <Wire.h>
 #include "hummingbird_config.h"
 #include "maths/vectors.h"
 #include "TinyGPS++.h"
@@ -26,6 +27,8 @@
 #endif
 
 
+
+
 /** 
  * [ms] millis() How long we will wait for the GPS to get a position lock and connect to at 
  * least N sats. 
@@ -35,8 +38,11 @@ constexpr uint32_t GNSS_POS_LOCK_TIMEOUT = 120000;
 /* Baud rate that the unconfigured GPS has when powered up */
 constexpr int32_t GNSS_DEFAULT_BAUD = 9600;
 
-/* Minimum number of GNSS satellites to signal a valid fix */
+/* Minimum number of GNSS satellites to ensure a valid fix */
 constexpr uint32_t GNSS_MIN_SATS = 5;
+
+/* I2C address of the UBLOX GPS module */
+constexpr uint8_t GNSS_I2C_ADDR = 0x42;
 
 
 /* Possible baud rates for the GNSS sensor */
@@ -95,7 +101,10 @@ typedef enum
 class GNSSComputer
 {
 public:
-    GNSSComputer(HardwareSerial *userSerial = &GPS_PORT);
+    GNSSComputer(
+        TwoWire *userWire = &GPS_I2C,
+        GNSSBaudRates_t initialBaud = GNSS_BAUD_115200
+        );
     ~GNSSComputer() {};
 
     // Do not allow copies (singleton)
@@ -110,10 +119,34 @@ public:
         GNSSNavRate_t userODR       = GNSS_NAVRATE_5HZ
         );
     bool WaitForSatellites(uint32_t nSats = GNSS_MIN_SATS);
+    bool ListenForData();
 
 protected:
 private:
     TinyGPSPlus NMEAParser;          // TinyGPS++ GPS object
+    // GGA
+    // ortho. height
+    // geoid sep.
+    // gps quality/fix type?
+    // TinyGPSCustom AltMSLParser;  // Parse GxGGA for orthometric alt [m] (alt MSL)
+    TinyGPSCustom GeoidSepParser;  // Parse GxGGA for geoid separation [m] (Sep = AltWGS84 - AltMSL)
+
+    // GSA
+    // pdop
+    // hdop
+    // vdop
+    TinyGPSCustom PDOPParser;  // Parse GxGSA for PDOP
+    // TinyGPSCustom HDOPParser;  // Parse GxGSA for HDOP
+    TinyGPSCustom VDOPParser;  // Parse GxGSA for VDOP
+
+    // VTG
+    // mag. track/cog
+    // true track/cog
+    // speed, kts
+    // speed over gnd, kph
+    TinyGPSCustom TrueTrackParser;  // Parse GxVTG for true track [deg]
+    TinyGPSCustom GroundSpeedParser;  // Parse GxVTG for ground speed [kts]
+
     Vectord PosLLA;     // [rad, rad, m] Lat, lon, altitude
     Vectorf PosECEF;    // [m, m, m] ECEF position
     Vectorf VelECEF;    // [m/s, m/s, m/s] ECEF velocity
@@ -122,6 +155,8 @@ private:
     // LPF for smoothing altitude
 private:
     bool isConfigured;  // True if ConfigureDevice() was called, false if not
+    uint32_t lastDataCheck;  // [ms] millis() of when last checked for new data.
+    uint32_t dataPollWait;  // [ms] Period between polling for new data. 
     int32_t gpsBaud;  // Baud rate for serial connection
     float navTs;  // [sec] GPS navigation sample period
     float navRate;  // [Hz] GPS navigation rate
@@ -131,7 +166,7 @@ private:
     GNSSNetworks_t network;         // Satellite network(s) that the GPS is connected to
     GNSSDynamics_t dynamicModel;    // Dynamic model for the GPS fusion algorithms
     GNSSNavRate_t updateRate;       // [Hz] navigation rate from gps
-    HardwareSerial *gpsSerial;      // HW serial port that the GPS is connected to
+    TwoWire *gpsWire;      // HW I2C bus that the GPS is connected to
 };
 
 // Only one instance

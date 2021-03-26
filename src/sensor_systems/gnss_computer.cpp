@@ -5,11 +5,45 @@
 
 #include "sensor_systems/gnss_computer.h"
 
-
-GNSSComputer::GNSSComputer(HardwareSerial *userSerial)
+// AltMSLParser(NMEAParser, "GNGGA", 9),
+// HDOPParser(NMEAParser, "GNGSA", 16),
+GNSSComputer::GNSSComputer(TwoWire *userWire, GNSSBaudRates_t initialBaud):
+GeoidSepParser(NMEAParser, "GNGGA", 11),
+PDOPParser(NMEAParser, "GNGSA", 15),
+VDOPParser(NMEAParser, "GNGSA", 17),
+TrueTrackParser(NMEAParser, "GNVTG", 1),
+GroundSpeedParser(NMEAParser, "GNVTG", 5)
 {
     isConfigured = false;
-    gpsSerial = userSerial;
+    gpsWire = userWire;
+
+    // Set initial baud rate
+    switch (initialBaud)
+    {
+        case GNSS_BAUD_9600: {
+            gpsBaud = 9600;
+            break;
+        }
+        case GNSS_BAUD_38400: {
+            gpsBaud = 38400;
+            break;
+        }
+        case GNSS_BAUD_115200: {
+            gpsBaud = 115200;
+            break;
+        }
+        case GNSS_BAUD_230400: {
+            gpsBaud = 230400;
+            break;
+        }
+        default: {
+            #ifdef GNSS_DEBUG
+            DEBUG_PORT.println("GNSSComputer::GNSSComputer ERROR: Unknown initial baud rate, defaulting to 9600");
+            #endif
+            gpsBaud = 9600;
+            break;
+        }
+    }
 }
 
 
@@ -36,11 +70,11 @@ bool GNSSComputer::ConfigureDevice(
         userODR = GNSS_NAVRATE_5HZ;
     }
 
-    GPS_PORT.begin(GNSS_DEFAULT_BAUD);
-    delay(250);  // Wait a sec
+    // GPS_PORT.begin(GNSS_DEFAULT_BAUD);
+    // delay(250);  // Wait a sec
 
     GPS_PORT.flush();
-    GPS_PORT.begin(GNSS_DEFAULT_BAUD);  // Reconnect
+    GPS_PORT.begin(gpsBaud);  // Reconnect
     delay(250);
 
     /* Config baud rate */
@@ -165,10 +199,8 @@ bool GNSSComputer::ConfigureDevice(
     DEBUG_PORT.println("GNSSComputer::ConfigureDevice: Changed dynamic model.");
     #endif
 
-    
 
-
-    /* Config NMEA messages */
+    /* Config/disable NMEA messages */
     SendUBXConfigMessage(UBX_CFG_MSG_DISABLE_GLL, 16);
     delay(pauseBetweenTasks);
 
@@ -210,6 +242,7 @@ bool GNSSComputer::ConfigureDevice(
     }
 
     navTs = 1.0f / navRate;
+    dataPollWait = 1000UL / (((uint32_t)navRate) * 4UL);
     delay(pauseBetweenTasks);
     #ifdef GNSS_DEBUG
     DEBUG_PORT.print("GNSSComputer::ConfigureDevice: Changed nav rate to ");
@@ -226,25 +259,33 @@ bool GNSSComputer::ConfigureDevice(
 bool GNSSComputer::WaitForSatellites(uint32_t minSats)
 {
     char b;
-    // int i;
     uint32_t nSats;
     uint32_t startMillis;
     uint32_t currMillis;
-    // int nbytes;
+    uint16_t enoughSatsCounter;
 
     #ifdef GNSS_DEBUG
     uint32_t prevPrint;
     uint32_t currPrint;
     uint32_t printdt;
-
     prevPrint = 0;
     currPrint = millis();
     printdt = (uint32_t)(navTs * 1000.0f);
-    DEBUG_PORT.println("GNSSComputer::WaitForSatellites: Waiting for satellites.");
-    DEBUG_PORT.print("    Sats: ");
+    DEBUG_PORT.println("GNSSComputer::WaitForSatellites: Waiting for SVs.");
+    DEBUG_PORT.print("    SVs: ");
     #endif
 
+    // If we aren't configured, configure the GPS
+    if (isConfigured == false)
+    {
+        if (!ConfigureDevice())
+            return false;
+    }
+
+    // We will wait a minute or so to acquire a sufficient number of
+    // GNSS satellite signals to ensure a good fix.
     nSats = 0;
+    enoughSatsCounter = 0;
     startMillis = millis();
     currMillis = millis();
     while (currMillis - startMillis <= GNSS_POS_LOCK_TIMEOUT)
@@ -255,27 +296,25 @@ bool GNSSComputer::WaitForSatellites(uint32_t minSats)
         {
             b = GPS_PORT.read();
             NMEAParser.encode(b);
-
         }
     
-        if (NMEAParser.satellites.isUpdated() && NMEAParser.satellites.isValid())
+        // if (NMEAParser.satellites.isUpdated() && NMEAParser.satellites.isValid())
+        if (NMEAParser.satellites.isUpdated())
         {
-            nSats = NMEAParser.satellites.value();
+            nSats = NMEAParser.satellites.value();  // Parse GxGGA message
 
             #ifdef GNSS_DEBUG
             DEBUG_PORT.print(nSats);
             DEBUG_PORT.print(",");
             #endif
             
+            // We must be connected to enough sats. for a few readings to
+            // ensure a good fix
             if (nSats >= minSats)
-            {
-                #ifdef GNSS_DEBUG
-                DEBUG_PORT.println(" Sufficient sats. acq.");
-                #endif
-                return true;
-            }
+                enoughSatsCounter++;
         }
 
+        // Print status to debug port
         #ifdef GNSS_DEBUG
         currPrint = millis();
         if (currPrint - prevPrint >= printdt)
@@ -286,17 +325,72 @@ bool GNSSComputer::WaitForSatellites(uint32_t minSats)
         }
         #endif
 
+        // If we've acquired enough sats. for at least 5 nav. updates,
+        // it is safe to say that we are reliably connected to enough sats.
+        if (enoughSatsCounter >= 5)
+        {
+            #ifdef GNSS_DEBUG
+            DEBUG_PORT.println(" Sufficient SVs. acq.");
+            #endif
+            return true;
+        }
+
     }
 
+    // If our code gets to this point, we've waited too long to connect to 
+    // enough sats. Something might not be right or sat. orbits aren't in our 
+    // favor :(
     #ifdef GNSS_DEBUG
     DEBUG_PORT.println();
     DEBUG_PORT.print("GNSSComputer::WaitForSatellites ERROR: Took too long to find ");
     DEBUG_PORT.print(minSats);
-    DEBUG_PORT.println(" sats.");
+    DEBUG_PORT.println(" SVs.");
     #endif
 
     return false;
 }
+
+
+
+bool GNSSComputer::ListenForData()
+{
+    char b;
+
+    while (GPS_PORT.available() > 0)
+    {
+        b = GPS_PORT.read();
+        NMEAParser.encode(b);
+    }
+
+    if (NMEAParser.location.isUpdated())
+    {
+        #ifdef GNSS_DEBUG
+        DEBUG_PORT.print("GNSSComputer::ListenForData: Updated param: ");
+        DEBUG_PORT.println(NMEAParser.location.lat(), 8);
+        #endif
+        return true;
+    }
+
+    return false;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 void GNSSComputer::SendUBXConfigMessage(const uint8_t *msg, size_t len)

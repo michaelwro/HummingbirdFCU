@@ -44,15 +44,18 @@ constexpr uint32_t GNSS_MIN_SATS = 5;
 /* I2C address of the UBLOX GPS module */
 constexpr uint8_t GNSS_I2C_ADDR = 0x42;
 
+/* I2C buffer size of the device. 32 bytes for Arduino Nano and Teensy 4.1 */
+constexpr uint16_t GNSS_I2C_BUFFSIZE = 32;
+
 
 /* Possible baud rates for the GNSS sensor */
-typedef enum
-{
-    GNSS_BAUD_9600,     // 9600 serial baud rate (default when NEO-M8N powers up)
-    GNSS_BAUD_38400,    // 38.4k serial baud rate
-    GNSS_BAUD_115200,   // 115.2K serial baud rate
-    GNSS_BAUD_230400    // 230.4k serial baud rate
-} GNSSBaudRates_t;
+// typedef enum
+// {
+//     GNSS_BAUD_9600,     // 9600 serial baud rate (default when NEO-M8N powers up)
+//     GNSS_BAUD_38400,    // 38.4k serial baud rate
+//     GNSS_BAUD_115200,   // 115.2K serial baud rate
+//     GNSS_BAUD_230400    // 230.4k serial baud rate
+// } GNSSBaudRates_t;
 
 /* Possible GNSS networks to connect to. */
 typedef enum
@@ -87,24 +90,22 @@ typedef enum
 } GNSSNavRate_t;
 
 
-/* GPS configuration error types */
+/* GPS status types */
 typedef enum
 {
-    GNSS_CONFIG_SUCCESS,  // Successful configuration
-    GNSS_CONFIG_NO_DEVICE,  // No GPS sensor connected/detected
-    GNSS_CONFIG_RECONNECT_ERROR,  // When we change the baud rate and cannot reconnect to the GPS
-    GNSS_CONFIG_NO_HOME_LOCATION  // No home location specified
-} GNSSConfig_t;
+    // GNSS_I2C_COMM_ERROR  // If an error was encountered communicating to the GPS over I2C
+    // GNSS_CONFIG_SUCCESS,  // Successful configuration
+    // GNSS_CONFIG_NO_DEVICE,  // No GPS sensor connected/detected
+    // GNSS_CONFIG_RECONNECT_ERROR,  // When we change the baud rate and cannot reconnect to the GPS
+    // GNSS_CONFIG_NO_HOME_LOCATION  // No home location specified
+} GNSSStatus_t;
 
 
 
 class GNSSComputer
 {
 public:
-    GNSSComputer(
-        TwoWire *userWire = &GPS_I2C,
-        GNSSBaudRates_t initialBaud = GNSS_BAUD_115200
-        );
+    GNSSComputer(TwoWire *userWire = &GPS_I2C);
     ~GNSSComputer() {};
 
     // Do not allow copies (singleton)
@@ -113,31 +114,31 @@ public:
     GNSSComputer &operator=(const GNSSComputer &) = delete;
 
     bool ConfigureDevice(
-        GNSSBaudRates_t userBaud    = GNSS_BAUD_115200, 
-        GNSSNetworks_t userNetwork  = GNSS_NET_GPS_GLONASS, 
+        GNSSNetworks_t userNetwork  = GNSS_NET_GPS, 
         GNSSDynamics_t userDynModel = GNSS_DYNAMICS_PEDESTRIAN,
-        GNSSNavRate_t userODR       = GNSS_NAVRATE_5HZ
+        GNSSNavRate_t userODR       = GNSS_NAVRATE_10HZ
         );
     bool WaitForSatellites(uint32_t nSats = GNSS_MIN_SATS);
     bool ListenForData();
 
+    TinyGPSPlus NMEAParser;          // TinyGPS++ GPS object
+
 protected:
 private:
-    TinyGPSPlus NMEAParser;          // TinyGPS++ GPS object
+    
     // GGA
     // ortho. height
     // geoid sep.
     // gps quality/fix type?
-    // TinyGPSCustom AltMSLParser;  // Parse GxGGA for orthometric alt [m] (alt MSL)
     TinyGPSCustom GeoidSepParser;  // Parse GxGGA for geoid separation [m] (Sep = AltWGS84 - AltMSL)
 
     // GSA
     // pdop
     // hdop
     // vdop
-    TinyGPSCustom PDOPParser;  // Parse GxGSA for PDOP
+    // TinyGPSCustom PDOPParser;  // Parse GxGSA for PDOP
     // TinyGPSCustom HDOPParser;  // Parse GxGSA for HDOP
-    TinyGPSCustom VDOPParser;  // Parse GxGSA for VDOP
+    // TinyGPSCustom VDOPParser;  // Parse GxGSA for VDOP
 
     // VTG
     // mag. track/cog

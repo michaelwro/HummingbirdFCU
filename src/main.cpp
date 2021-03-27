@@ -77,16 +77,22 @@ unsigned long gpstimer1 = 0;
 unsigned long gpstimer2 = 0;
 
 
+uint8_t b;
+
+TinyGPSPlus gps;
+
+
 void setup()
 {
     // Initialize serial ports
     // GPSSerial.begin(9600);
 
     DEBUG_PORT.begin(115200);
+    GPS_I2C.setClock(400000);
     delay(1000);
 
     #ifdef DEBUG
-        while (!DEBUG_PORT);  // Wait for console to open
+        while (!DEBUG_PORT) {;}  // Wait for console to open
     #endif
 
     
@@ -107,10 +113,10 @@ void setup()
     //     DEBUG_PORT.println("Could not init. compass...");
     // }
 
-    // if (!GPS.ConfigureDevice())
-    // {
-    //     DEBUG_PORT.println("ERROR CONFIGGING!");
-    // }
+    if (!GPS.ConfigureDevice())
+    {
+        DEBUG_PORT.println("ERROR CONFIGGING!");
+    }
 
 
 
@@ -126,18 +132,7 @@ void setup()
     // GPS_PORT.begin(9600);
     // delay(1000);
 
-    // while (!GPS_PORT) {;}
 
-    // TinyGPSPlus gps;
-    // while (1)
-    // {
-    //     while (GPS_PORT.available()) {
-    //         char b =  GPS_PORT.read();
-    //         DEBUG_PORT.print(b);
-    //         // if (b == '\n')
-    //         //     DEBUG_PORT.println();
-    //     }
-    // }
 
         
     //     if (gps.satellites.isUpdated())
@@ -163,54 +158,51 @@ void setup()
     digitalWrite(GRN_LED, HIGH);
 
 
-    // gpstimer1 = millis();
-    GPS_PORT.begin(115200);
-    SENSOR_I2C.begin();
+    gpstimer1 = millis();
+    // GPS_PORT.begin(115200);
+    // GPS_I2C.begin();
 }
 
 
 void loop()
 {
-    // https://forum.arduino.cc/index.php?topic=713603.0
-    uint8_t b;
-    do
-    {
-        SENSOR_I2C.requestFrom(0x42, 1);
-        b = SENSOR_I2C.read();
+    // // gpstimer2 = millis();
+    // GPS.ListenForData();
+    // // gpstimer1 = millis();
 
+    // gpstimer2 = millis();
+
+    // if (GPS.NMEAParser.location.isUpdated())
+    // {
+    //     DEBUG_PORT.print("Lat: "); DEBUG_PORT.print(GPS.NMEAParser.location.lat(), 6);
+    //     DEBUG_PORT.print(" Lon: "); DEBUG_PORT.print(GPS.NMEAParser.location.lng(), 6);
+    //     // DEBUG_PORT.print(" TimeBetween: "); DEBUG_PORT.println(gpstimer1 - gpstimer2);
+    //     DEBUG_PORT.print(" TimeBetween: "); DEBUG_PORT.println(gpstimer2 - gpstimer1);
+    //     gpstimer1 = gpstimer2;
+    // }
+
+
+
+    // // ====== Simple echo code ======
+    // https://forum.arduino.cc/index.php?topic=713603.0
+    do {
+        GPS_I2C.requestFrom(GNSS_I2C_ADDR, 1);
+        b = GPS_I2C.read();
         if (b != 0xFF)
         {
             DEBUG_PORT.write(b);
-            DEBUG_PORT.print(" ");
+            gps.encode((char)b);
+
+            // if (gps.location.isUpdated())
+            // {
+            //     DEBUG_PORT.print("Sats: ");
+            //     DEBUG_PORT.println(gps.location.lat(), 10);
+            // }
         }
     }
     while (true);
     
-    
-    // while (GPS_PORT.available())
-    // {
-    //     uint8_t b = GPS_PORT.read();
-    //     gpstimer1++;
-    //     DEBUG_PORT.print("Count: ");
-    //     DEBUG_PORT.println(gpstimer1);
-    // }
 
-    // gpstimer1 = 0;
-    // delay(100);
-
-    // now = millis();
-    // if (now - prev >= 20)
-    // {
-    //     if (GPS.ListenForData())
-    //     {
-    //         gpstimer2 = millis();
-    //         DEBUG_PORT.print("Time between: ");
-    //         DEBUG_PORT.println(gpstimer2 - gpstimer1);
-    //         gpstimer1 = gpstimer2;
-    //     }
-
-    //     prev = now;
-    // }
 
     // now = millis();
     // if (now - prev > 100)

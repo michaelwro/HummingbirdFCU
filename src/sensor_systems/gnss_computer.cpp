@@ -7,50 +7,22 @@
 
 // AltMSLParser(NMEAParser, "GNGGA", 9),
 // HDOPParser(NMEAParser, "GNGSA", 16),
-GNSSComputer::GNSSComputer(TwoWire *userWire, GNSSBaudRates_t initialBaud):
-GeoidSepParser(NMEAParser, "GNGGA", 11),
-PDOPParser(NMEAParser, "GNGSA", 15),
-VDOPParser(NMEAParser, "GNGSA", 17),
+GNSSComputer::GNSSComputer(TwoWire *userWire)
+:GeoidSepParser(NMEAParser, "GNGGA", 11),
+// PDOPParser(NMEAParser, "GNGSA", 15),
+// VDOPParser(NMEAParser, "GNGSA", 17),
 TrueTrackParser(NMEAParser, "GNVTG", 1),
 GroundSpeedParser(NMEAParser, "GNVTG", 5)
 {
     isConfigured = false;
     gpsWire = userWire;
-
-    // Set initial baud rate
-    switch (initialBaud)
-    {
-        case GNSS_BAUD_9600: {
-            gpsBaud = 9600;
-            break;
-        }
-        case GNSS_BAUD_38400: {
-            gpsBaud = 38400;
-            break;
-        }
-        case GNSS_BAUD_115200: {
-            gpsBaud = 115200;
-            break;
-        }
-        case GNSS_BAUD_230400: {
-            gpsBaud = 230400;
-            break;
-        }
-        default: {
-            #ifdef GNSS_DEBUG
-            DEBUG_PORT.println("GNSSComputer::GNSSComputer ERROR: Unknown initial baud rate, defaulting to 9600");
-            #endif
-            gpsBaud = 9600;
-            break;
-        }
-    }
 }
 
 
 
 bool GNSSComputer::ConfigureDevice(
-    GNSSBaudRates_t userBaud, GNSSNetworks_t userNetwork,
-    GNSSDynamics_t userDynModel, GNSSNavRate_t userODR)
+    GNSSNetworks_t userNetwork, GNSSDynamics_t userDynModel,
+    GNSSNavRate_t userODR)
 {
     uint32_t pauseBetweenTasks = 100;  // [ms] millis() between configuration tasks
     
@@ -70,64 +42,30 @@ bool GNSSComputer::ConfigureDevice(
         userODR = GNSS_NAVRATE_5HZ;
     }
 
-    // GPS_PORT.begin(GNSS_DEFAULT_BAUD);
-    // delay(250);  // Wait a sec
+    gpsWire->begin();
+    delay(250);  // Wait a sec
+    // gpsWire->flush();
 
-    GPS_PORT.flush();
-    GPS_PORT.begin(gpsBaud);  // Reconnect
-    delay(250);
+    gpsWire->beginTransmission(GNSS_I2C_ADDR);
+    gpsWire->write(0xFF);
 
-    /* Config baud rate */
-    switch (userBaud)
+    // Check to see if the sensor ack'd
+    if (gpsWire->endTransmission(false) != 0)
     {
-        case GNSS_BAUD_9600: {
-            SendUBXConfigMessage(UBX_CFG_PRT_9600B, UBX_CFG_PRTLEN);
-            gpsBaud = 9600;
-            break;
-        }
-        case GNSS_BAUD_38400: {
-            SendUBXConfigMessage(UBX_CFG_PRT_38400B, UBX_CFG_PRTLEN);
-            gpsBaud = 38400;
-            break;
-        }
-        case GNSS_BAUD_115200: {
-            SendUBXConfigMessage(UBX_CFG_PRT_115200B, UBX_CFG_PRTLEN);
-            gpsBaud = 115200;
-            break;
-        }
-        case GNSS_BAUD_230400: {
-            SendUBXConfigMessage(UBX_CFG_PRT_230400B, UBX_CFG_PRTLEN);
-            gpsBaud = 230400;
-            break;
-        }
-        default: {
-            #ifdef GNSS_DEBUG
-            DEBUG_PORT.println("GNSSComputer::ConfigureDevice WARNING: Unknown baud rate, defaulting to 115200");
-            #endif
-            SendUBXConfigMessage(UBX_CFG_PRT_115200B, UBX_CFG_PRTLEN);
-            gpsBaud = 115200;
-            break;
-        }
+        #ifdef GNSS_DEBUG
+        DEBUG_PORT.println("GNSSComputer::ConfigureDevice ERROR: GPS did not respond");
+        #endif
+        return false;
     }
 
-    delay(pauseBetweenTasks);  // Wait a sec
-    GPS_PORT.flush();
-    GPS_PORT.begin(gpsBaud);  // Reconnect
-    delay(500);
 
+    // Set port settings
+    SendUBXConfigMessage(UBX_CFG_PRT_I2C, UBX_CFG_PRTLEN);
     #ifdef GNSS_DEBUG
-    DEBUG_PORT.print("GNSSComputer::ConfigureDevice: Changed baud to ");
-    DEBUG_PORT.print(gpsBaud);
-    DEBUG_PORT.println(" and reconnected.");
+    DEBUG_PORT.println("GNSSComputer::ConfigureDevice: Changed I2C port settings.");
     #endif
 
-    // if (!GPS_PORT)
-    // {
-    //     #ifdef GNSS_DEBUG
-    //     DEBUG_PORT.println("GNSSComputer::ConfigureDevice ERROR: Could not reconnect to GPS after changing baud.");
-    //     #endif
-    //     return false;
-    // }
+    delay(pauseBetweenTasks);  // Wait a sec
 
 
     /* Config. satellite network */
@@ -243,6 +181,7 @@ bool GNSSComputer::ConfigureDevice(
 
     navTs = 1.0f / navRate;
     dataPollWait = 1000UL / (((uint32_t)navRate) * 4UL);
+    // dataPollWait = 20UL;
     delay(pauseBetweenTasks);
     #ifdef GNSS_DEBUG
     DEBUG_PORT.print("GNSSComputer::ConfigureDevice: Changed nav rate to ");
@@ -256,122 +195,239 @@ bool GNSSComputer::ConfigureDevice(
 
 
 
-bool GNSSComputer::WaitForSatellites(uint32_t minSats)
-{
-    char b;
-    uint32_t nSats;
-    uint32_t startMillis;
-    uint32_t currMillis;
-    uint16_t enoughSatsCounter;
+// bool GNSSComputer::WaitForSatellites(uint32_t minSats)
+// {
+//     char b;
+//     uint32_t nSats;
+//     uint32_t startMillis;
+//     uint32_t currMillis;
+//     uint16_t enoughSatsCounter;
 
-    #ifdef GNSS_DEBUG
-    uint32_t prevPrint;
-    uint32_t currPrint;
-    uint32_t printdt;
-    prevPrint = 0;
-    currPrint = millis();
-    printdt = (uint32_t)(navTs * 1000.0f);
-    DEBUG_PORT.println("GNSSComputer::WaitForSatellites: Waiting for SVs.");
-    DEBUG_PORT.print("    SVs: ");
-    #endif
+//     #ifdef GNSS_DEBUG
+//     uint32_t prevPrint;
+//     uint32_t currPrint;
+//     uint32_t printdt;
+//     prevPrint = 0;
+//     currPrint = millis();
+//     printdt = (uint32_t)(navTs * 1000.0f);
+//     DEBUG_PORT.println("GNSSComputer::WaitForSatellites: Waiting for SVs.");
+//     DEBUG_PORT.print("    SVs: ");
+//     #endif
 
-    // If we aren't configured, configure the GPS
-    if (isConfigured == false)
-    {
-        if (!ConfigureDevice())
-            return false;
-    }
+//     // If we aren't configured, configure the GPS
+//     if (isConfigured == false)
+//     {
+//         if (!ConfigureDevice())
+//             return false;
+//     }
 
-    // We will wait a minute or so to acquire a sufficient number of
-    // GNSS satellite signals to ensure a good fix.
-    nSats = 0;
-    enoughSatsCounter = 0;
-    startMillis = millis();
-    currMillis = millis();
-    while (currMillis - startMillis <= GNSS_POS_LOCK_TIMEOUT)
-    {
-        currMillis = millis();
+//     // We will wait a minute or so to acquire a sufficient number of
+//     // GNSS satellite signals to ensure a good fix.
+//     nSats = 0;
+//     enoughSatsCounter = 0;
+//     startMillis = millis();
+//     currMillis = millis();
+//     while (currMillis - startMillis <= GNSS_POS_LOCK_TIMEOUT)
+//     {
+//         currMillis = millis();
 
-        while (GPS_PORT.available())
-        {
-            b = GPS_PORT.read();
-            NMEAParser.encode(b);
-        }
+//         while (GPS_PORT.available())
+//         {
+//             b = GPS_PORT.read();
+//             NMEAParser.encode(b);
+//         }
     
-        // if (NMEAParser.satellites.isUpdated() && NMEAParser.satellites.isValid())
-        if (NMEAParser.satellites.isUpdated())
-        {
-            nSats = NMEAParser.satellites.value();  // Parse GxGGA message
+//         // if (NMEAParser.satellites.isUpdated() && NMEAParser.satellites.isValid())
+//         if (NMEAParser.satellites.isUpdated())
+//         {
+//             nSats = NMEAParser.satellites.value();  // Parse GxGGA message
 
-            #ifdef GNSS_DEBUG
-            DEBUG_PORT.print(nSats);
-            DEBUG_PORT.print(",");
-            #endif
+//             #ifdef GNSS_DEBUG
+//             DEBUG_PORT.print(nSats);
+//             DEBUG_PORT.print(",");
+//             #endif
             
-            // We must be connected to enough sats. for a few readings to
-            // ensure a good fix
-            if (nSats >= minSats)
-                enoughSatsCounter++;
-        }
+//             // We must be connected to enough sats. for a few readings to
+//             // ensure a good fix
+//             if (nSats >= minSats)
+//                 enoughSatsCounter++;
+//         }
 
-        // Print status to debug port
-        #ifdef GNSS_DEBUG
-        currPrint = millis();
-        if (currPrint - prevPrint >= printdt)
-        {
-            DEBUG_PORT.print(nSats);
-            DEBUG_PORT.print(",");
-            prevPrint = currPrint;
-        }
-        #endif
+//         // Print status to debug port
+//         #ifdef GNSS_DEBUG
+//         currPrint = millis();
+//         if (currPrint - prevPrint >= printdt)
+//         {
+//             DEBUG_PORT.print(nSats);
+//             DEBUG_PORT.print(",");
+//             prevPrint = currPrint;
+//         }
+//         #endif
 
-        // If we've acquired enough sats. for at least 5 nav. updates,
-        // it is safe to say that we are reliably connected to enough sats.
-        if (enoughSatsCounter >= 5)
-        {
-            #ifdef GNSS_DEBUG
-            DEBUG_PORT.println(" Sufficient SVs. acq.");
-            #endif
-            return true;
-        }
+//         // If we've acquired enough sats. for at least 5 nav. updates,
+//         // it is safe to say that we are reliably connected to enough sats.
+//         if (enoughSatsCounter >= 5)
+//         {
+//             #ifdef GNSS_DEBUG
+//             DEBUG_PORT.println(" Sufficient SVs. acq.");
+//             #endif
+//             return true;
+//         }
 
-    }
+//     }
 
-    // If our code gets to this point, we've waited too long to connect to 
-    // enough sats. Something might not be right or sat. orbits aren't in our 
-    // favor :(
-    #ifdef GNSS_DEBUG
-    DEBUG_PORT.println();
-    DEBUG_PORT.print("GNSSComputer::WaitForSatellites ERROR: Took too long to find ");
-    DEBUG_PORT.print(minSats);
-    DEBUG_PORT.println(" SVs.");
-    #endif
+//     // If our code gets to this point, we've waited too long to connect to 
+//     // enough sats. Something might not be right or sat. orbits aren't in our 
+//     // favor :(
+//     #ifdef GNSS_DEBUG
+//     DEBUG_PORT.println();
+//     DEBUG_PORT.print("GNSSComputer::WaitForSatellites ERROR: Took too long to find ");
+//     DEBUG_PORT.print(minSats);
+//     DEBUG_PORT.println(" SVs.");
+//     #endif
 
-    return false;
-}
+//     return false;
+// }
 
 
 
+// https://github.com/sparkfun/SparkFun_Ublox_Arduino_Library/blob/1e70755453a898d8267ced641500c33d377409b7/src/SparkFun_Ublox_Arduino_Library.cpp#L347
 bool GNSSComputer::ListenForData()
 {
-    char b;
-
-    while (GPS_PORT.available() > 0)
+    // Put statement at the top of the code and allocate variables within it
+    if (millis() - lastDataCheck >= dataPollWait)
     {
-        b = GPS_PORT.read();
-        NMEAParser.encode(b);
+        /* Get the bytes available for read */
+        uint8_t hibyte;
+        uint8_t lobyte;
+        uint8_t byteFromGps;
+        uint16_t i;
+        uint16_t bytesAvail;
+        uint16_t bytesToRead;
+
+        bytesAvail = 0;
+
+        // Check for connection
+        gpsWire->beginTransmission(GNSS_I2C_ADDR);
+        gpsWire->write(0xFD);  // See p. 38 of u-blox M8 Receiver description
+        if (gpsWire->endTransmission(false) != 0)
+        {
+            #ifdef GNSS_DEBUG
+            DEBUG_PORT.println("GNSSComputer::ListenForData ERROR: GPS did not respond");
+            #endif
+            return false;
+        }
+
+        gpsWire->requestFrom(GNSS_I2C_ADDR, (uint8_t)2);  // req. hi and lo byte
+
+        if (gpsWire->available())
+        {
+            hibyte = gpsWire->read();
+            lobyte = gpsWire->read();
+
+            // Check for possible ublox bug presented in Sparkfun code
+            if (lobyte == 0xFF)
+            {
+                #ifdef GNSS_DEBUG
+                DEBUG_PORT.println("GNSSComputer::ListenForData ERROR: Encountered lsb=0xFF bug");
+                #endif
+                lastDataCheck = millis();
+                return false;
+            }
+
+            bytesAvail = (uint16_t)hibyte << 8 | lobyte;  // Cvt. to 16-bit value
+        }
+
+        // Check if empty
+        if (bytesAvail == 0)
+        {
+            // #ifdef GNSS_DEBUG
+            // DEBUG_PORT.println("GNSSComputer::ListenForData No bytes available, ok");
+            // #endif
+            lastDataCheck = millis();
+            return false;
+        }
+
+        // Check for "bytes available" error documented in Sparkfun's code
+        if (bytesAvail & ((uint16_t)1 << 15))
+        {
+            // Clear hibyte
+            bytesAvail &= ~((uint16_t)1 << 15);
+
+            #ifdef GNSS_DEBUG
+            DEBUG_PORT.println("GNSSComputer::ListenForData ERROR: Encountered bytes available error");
+            #endif
+        }
+
+        /* Read the data */
+        // Yeah, while loops are bad, but whatevs
+        // bytesAvail decreases as bytes are read. The loop will terminate when all 
+        // bytes are read (bytesAvail = 0)
+        bytesToRead = 0;
+        while (bytesAvail)
+        {
+            // Check connection
+            gpsWire->beginTransmission(GNSS_I2C_ADDR);
+            gpsWire->write(0xFF);
+            if (gpsWire->endTransmission(false) != 0)
+            {
+                #ifdef GNSS_DEBUG
+                DEBUG_PORT.println("GNSSComputer::ListenForData ERROR: GPS did not respond");
+                #endif
+                return false;
+            }
+
+            /**
+             * Limit bytes to read to device I2C buffer size, 32 bytes for 
+             * Arduino boards and Teensy 4.1
+             * 
+             * bytesToRead = bytesAvail;
+             * if (bytesToRead > 32)
+             *     bytesToRead = 32;
+             */
+            bytesToRead = (bytesAvail > GNSS_I2C_BUFFSIZE) ? GNSS_I2C_BUFFSIZE : bytesAvail;
+        
+            // TRY_AGAIN:  // Checkpoint for when we encounter the 0x7F thingy
+
+            // Grab some bytes to eat
+            gpsWire->requestFrom(GNSS_I2C_ADDR, (uint8_t)bytesToRead);
+            if (gpsWire->available())
+            {
+                for (i = 0; i < bytesToRead; i++)
+                {
+                    byteFromGps = gpsWire->read();
+
+                    // Check for 0x7F error-thing outlined in Sparkfun's code
+                    // I'm not sure if we need to check for this, but I put in in, just
+                    // in case. Otherwise, we can comment it out
+                    // if (i == 0 && byteFromGps == 0x7F)
+                    // {
+                    //     #ifdef GNSS_DEBUG
+                    //     DEBUG_PORT.println("GNSSComputer::ListenForData WARNING: Encountered 0x7F error");
+                    //     #endif
+
+                    //     // This delay() probs isn't good to have in final flight code, but we might need it if this 
+                    //     // error is frequent
+                    //     delay(3);  // Sparkfun has 5ms, imma use 3ms
+                    //     goto TRY_AGAIN;
+                    // }
+
+                    /* Pass the received byte on to TinyGPS to form and parse NMEA data */
+                    NMEAParser.encode((char)byteFromGps);
+                }
+            }
+            else
+            {
+                // Sensor was not available/didn't respond
+                return false;
+            }
+
+            bytesAvail -= bytesToRead;  // Decrease counter
+        }
     }
 
-    if (NMEAParser.location.isUpdated())
-    {
-        #ifdef GNSS_DEBUG
-        DEBUG_PORT.print("GNSSComputer::ListenForData: Updated param: ");
-        DEBUG_PORT.println(NMEAParser.location.lat(), 8);
-        #endif
-        return true;
-    }
-
-    return false;
+    // If we get to this point, we've received valid bytes!
+    return true;
 }
 
 
@@ -389,18 +445,46 @@ bool GNSSComputer::ListenForData()
 
 
 
-
-
-
-
+// Send I2C message to gps
 void GNSSComputer::SendUBXConfigMessage(const uint8_t *msg, size_t len)
 {
-    // Send over userSerial port
-    GPS_PORT.write(msg, len);
+    gpsWire->beginTransmission(GNSS_I2C_ADDR);
+    gpsWire->write(0xFF);
+
+    // Check to see if the sensor ack'd
+    if (gpsWire->endTransmission(false) != 0)
+    {
+        #ifdef GNSS_DEBUG
+        DEBUG_PORT.println("GNSSComputer::SendUBXConfigMessage ERROR: GPS did not respond to request");
+        #endif
+        // return GNSS_I2C_COMM_ERROR;
+    }
+
+    // Send message
+    gpsWire->beginTransmission(GNSS_I2C_ADDR);
+    gpsWire->write(msg, len);
     
-    // Wait a bit after sending config command to the device
+    // Release the bus
+    if (gpsWire->endTransmission() != 0)
+    {
+        #ifdef GNSS_DEBUG
+        DEBUG_PORT.println("GNSSComputer::SendUBXConfigMessage ERROR: GPS did not release after message");
+        #endif
+    }
+
+    // Wait a bit
     delay(50);
 }
+
+// // Serial Version
+// void GNSSComputer::SendUBXConfigMessage(const uint8_t *msg, size_t len)
+// {
+//     // Send over userSerial port
+//     GPS_PORT.write(msg, len);
+    
+//     // Wait a bit after sending config command to the device
+//     delay(50);
+// }
 
 
 /* GetInstance() function for singleton */

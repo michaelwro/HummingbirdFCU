@@ -99,7 +99,7 @@ bool FXAS21002Gyro::Initialize(GyroRanges_t rng)
     this->I2Cwrite8(GYRO_REG_CTRL1, 0x00);  // Stby
     this->I2Cwrite8(GYRO_REG_CTRL1, (1 << 6));  // Reset
     this->I2Cwrite8(GYRO_REG_CTRL0, ctrlReg0);  // Set sensitivity
-    this->I2Cwrite8(GYRO_REG_CTRL1, 0x0E);  // Active, ODR = 400Hz
+    this->I2Cwrite8(GYRO_REG_CTRL1, 0x06);  // Active, ODR = 400Hz
     // this->I2Cwrite8(GYRO_REG_CTRL1, 0x0C);  // Active, ODR = 800Hz
     delay(100);  // Short delay
 

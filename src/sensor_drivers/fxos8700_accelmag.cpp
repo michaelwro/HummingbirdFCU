@@ -96,12 +96,13 @@ bool FXOS8700AccelMag::Initialize(AccelRanges_t accRange)
             break;
     }
 
-    this->I2Cwrite8(ACCELMAG_REG_CTRL2, 0x02);  // High resolution
+    // Configure accel.
+    this->I2Cwrite8(ACCELMAG_REG_CTRL2, 0x12);  // High resolution
     // this->I2Cwrite8(ACCELMAG_REG_CTRL1, 0x15);  // Active, Normal Mode, Low Noise, 100Hz in Hybrid Mode
-    this->I2Cwrite8(ACCELMAG_REG_CTRL1, 0x0D);  // Active, Normal Mode, Low Noise, 200Hz in Hybrid Mode
+    this->I2Cwrite8(ACCELMAG_REG_CTRL1, 0x05);  // Active, Normal Mode, Low Noise, 200Hz in Hybrid Mode
 
     // Configure magnetometer
-    this->I2Cwrite8(ACCELMAG_REG_MCTRL1, 0x1F);  // Hybrid Mode, Over Sampling Rate = 1
+    this->I2Cwrite8(ACCELMAG_REG_MCTRL1, 0x13);  // Hybrid Mode, Over Sampling Rate = 1
     this->I2Cwrite8(ACCELMAG_REG_MCTRL2, 0x20);  // Jump to reg 0x33 after reading 0x06
 
     return true;

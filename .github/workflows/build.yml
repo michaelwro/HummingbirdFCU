@@ -26,4 +26,4 @@ jobs:
           python -m pip install platformio --upgrade
 
       - name: Run PlatformIO
-        run: pio run
+        run: pio run --verbose

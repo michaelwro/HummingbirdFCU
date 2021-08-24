@@ -21,8 +21,7 @@
 
 
 #if defined(DEBUG) && defined(DEBUG_PORT)
-    /* Enable a message to signal when a matrix was created and destroyed */
-    #define MATRIX_OBJ_DEBUG
+    // #define MATRIX_OBJ_DEBUG  /* Enable a message to signal when a matrix was created and destroyed */
 #endif
 
 /**

@@ -15,7 +15,7 @@ jobs:
     if: "!contains(github.event.head_commit.message, 'ci skip')"
 
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v2
 
       - name: Set up Python
@@ -28,7 +28,7 @@ jobs:
           python -m pip install pip wheel --upgrade
           python -m pip install platformio --upgrade
 
-      - name: Install Device Platforms
+      - name: Install device platforms
         run: |
           pio platform install atmelavr teensy
 
@@ -40,7 +40,7 @@ jobs:
     if: "!contains(github.event.head_commit.message, 'tests skip')"
 
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v2
 
       - name: Set up Python
@@ -53,12 +53,11 @@ jobs:
           python -m pip install pip wheel --upgrade
           python -m pip install platformio --upgrade
       
-      - name: Install Device Platforms
+      - name: Install device platforms
         run: |
           pio platform install atmelavr teensy
-      
-      - name: Add CLI Option to platformio.ini
-        run: echo "upload_protocol = teensy-cli" >> platformio.ini
 
-      - name: Test PlatformIO
-        run: pio test --verbose
+      - name: Run remote tests on the embedded target
+        env:
+          PLATFORMIO_AUTH_TOKEN: ${{ secrets.PLATFORMIO_AUTH_TOKEN }}
+        run: pio test --environment teensy41 --verbose

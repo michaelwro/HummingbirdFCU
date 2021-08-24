@@ -56,6 +56,9 @@ jobs:
       - name: Install Device Platforms
         run: |
           pio platform install atmelavr teensy
+      
+      - name: Add CLI Option to platformio.ini
+        run: echo "upload_protocol = teensy-cli" >> platformio.ini
 
       - name: Test PlatformIO
         run: pio test --verbose

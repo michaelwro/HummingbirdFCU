@@ -29,4 +29,25 @@ jobs:
           python -m pip install platformio --upgrade
 
       - name: Run PlatformIO
-        run: pio run --verbose
+        run: pio run --environment teensy41_hfcu --verbose
+
+  test:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'tests skip')"
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: "3.9"
+
+      - name: Install PlatformIO
+        run: |
+          python -m pip install pip wheel --upgrade
+          python -m pip install platformio --upgrade
+
+      - name: Run PlatformIO
+        run: pio test --environment teensy41_hfcu --verbose

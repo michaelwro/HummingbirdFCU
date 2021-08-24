@@ -38,13 +38,6 @@ constexpr uint8_t FXAS21002C_ID       = 0xD7;  // Device ID
 // ----------------------------------------------------------------------------
 // Gyro measurement sensitivity settings
 // ----------------------------------------------------------------------------
-//typedef enum
-//{
-//    GYRO_SENS_250  = 0.0078125f, // 250dps sensitivity
-//    GYRO_SENS_500  = 0.015625f,  // 500dps sensitivity
-//    GYRO_SENS_1000 = 0.03125f,  // 1000dps sensitivity
-//    GYRO_SENS_2000 = 0.0625f  // 2000dps sensitivity
-//} GyroSensitivity_t;
 
 constexpr float GYRO_SENS_250   = 0.0078125f; // 250dps sensitivity
 constexpr float GYRO_SENS_500   = 0.015625f;  // 500dps sensitivity

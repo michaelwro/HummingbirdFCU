@@ -27,21 +27,22 @@
 #include "filters/low_pass_filter.h"
 
 
+/* Print INS debug messages to the debug port. Both DEBUG and DEBUG_PORT in 
+ * hummingbird_config.h must be defined.
+ */
 #if defined(DEBUG) && defined(DEBUG_PORT)
-    /* Print INS debug messages to the debug port. Both DEBUG and DEBUG_PORT in hummingbird_config.h must be defined. */
     #define INS_DEBUG
 #endif
 
+/* Filters */
+constexpr float INS_ACCEL_LPF_SF = 0.98f;  // Smoothing factor (alpha) of accelerometer low-pass filter, [0, 1]
+constexpr float INS_GYRO_LPF_SF = 0.99f;  // Gyro low pass filter smoothing factor [0, 1]
 
-/* CONFIGURATION PARAMETERS */
-constexpr size_t INS_ACCEL_MFILT_LEN    = 3;  // Size/length of accelerometer median filter
-constexpr float INS_GYRO_LPF_SF         = 0.99f;  // Gyro low pass filter smoothing factor [0, 1]
+/* Turn-on biases */
+constexpr float INS_BIAS_INIT_TIME = 1.0f;  // [sec] Amount of time taken to determine accel. and gyro turn-on bias
 
-/* [sec] Amount of time taken to determine accel. and gyro turn-on bias */
-constexpr float INS_BIAS_INIT_TIME = 1.0f;
-
-/* Set gyro and accelerometer measurement ranges */
-constexpr GyroRanges_t INS_GYRO_RANGE   = GYRO_RNG_1000DPS;  // Gyro measurement range
+/* Measurement ranges */
+constexpr GyroRanges_t INS_GYRO_RANGE = GYRO_RNG_1000DPS;  // Gyro measurement range
 constexpr AccelRanges_t INS_ACCEL_RANGE = ACCEL_RNG_4G;  // Accelerometer measurement range
 
 
@@ -91,9 +92,9 @@ private:
     
     FXOS8700AccelMag AccelMagSensor;  // Accelerometer/magnetometer sensor class
     FXAS21002Gyro GyroSensor;  // Gyroscope sensor class
-    MedianFilter AxMFilt;  // Ax data filter
-    MedianFilter AyMFilt;  // Ay data filter
-    MedianFilter AzMFilt;  // Az data filter
+    LowPassFilter AxLPF;  // Ax data filter
+    LowPassFilter AyLPF;  // Ay data filter
+    LowPassFilter AzLPF;  // Az data filter
 };
 
 

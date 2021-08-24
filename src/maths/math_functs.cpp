@@ -32,10 +32,10 @@ float InvSqrtf(float num)
 
     x2 = num * 0.5f;
     y = num;
-    i = *(long*) &y;
-    i = 0x5f3759df - (i >> 1);
-    y = *(float*) &i;
-    y = y * (threehalfs - (x2 * y * y));
+    i = *(long*) &y;                        // evil floating point bit level hacking
+    i = 0x5f3759df - (i >> 1);              // what the fuck? 
+    y = *(float*) &i;                       // 1st iteration
+    y = y * (threehalfs - (x2 * y * y));    // 2nd iteration, this can be removed
     return y;
 }
 

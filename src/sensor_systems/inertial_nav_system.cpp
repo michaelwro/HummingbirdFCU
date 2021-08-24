@@ -27,9 +27,7 @@
 InertialNavSystem::InertialNavSystem()
 : Gyro(3), GyroRaw(3), GyroTOBias(3),
 Accel(3), AccelRaw(3), AccelTOBias(3), 
-AccelMagSensor(&SENSOR_I2C), GyroSensor(&SENSOR_I2C), 
-AxMFilt(INS_ACCEL_MFILT_LEN), AyMFilt(INS_ACCEL_MFILT_LEN),
-AzMFilt(INS_ACCEL_MFILT_LEN)
+AccelMagSensor(&SENSOR_I2C), GyroSensor(&SENSOR_I2C)
 {
     fs = 200.0f;  // Default, just in case
     ts = 1.0f / fs;
@@ -97,6 +95,11 @@ bool InertialNavSystem::Initialize()
     DEBUG_PORT.println("Done!");
     #endif
 
+    /* Init accelerometer filters */
+    AxLPF.SetSmoothingFactor(INS_ACCEL_LPF_SF);
+    AyLPF.SetSmoothingFactor(INS_ACCEL_LPF_SF);
+    AzLPF.SetSmoothingFactor(INS_ACCEL_LPF_SF);
+
 
     /* Compute initial gyro turn-on biases */
     #ifdef INS_DEBUG
@@ -158,7 +161,7 @@ bool InertialNavSystem::Update()
 {
     float gx, gy, gz;
     float axRaw, ayRaw, azRaw;
-    float ax, ay, az;
+    float bax, bay, baz;
     float g;
     
     /* Read gyro sensor */
@@ -187,29 +190,37 @@ bool InertialNavSystem::Update()
         // return false;
     }
 
-    g = GravComputer.GetGravity();
-    axRaw = AccelMagSensor.GetAx() * g;
-    ayRaw = AccelMagSensor.GetAy() * g;
-    azRaw = AccelMagSensor.GetAz() * g;
-    AccelRaw.vec[0] = axRaw;
+    /* Retrieve and log raw accel. values */
+    axRaw = AccelMagSensor.GetAx();
+    ayRaw = AccelMagSensor.GetAy();
+    azRaw = AccelMagSensor.GetAz();
+    AccelRaw.vec[0] = axRaw;  // In G's
     AccelRaw.vec[1] = ayRaw;
     AccelRaw.vec[2] = azRaw;
 
     prevUpdateMicros = micros();
 
     /* Apply calibration */
-    ax = axRaw - SENSCALIB_ACCEL_BX;
-    ay = ayRaw - SENSCALIB_ACCEL_BY;
-    az = azRaw - SENSCALIB_ACCEL_BZ;
+    bax = axRaw - SENSCALIB_ACCEL_BX;
+    bay = ayRaw - SENSCALIB_ACCEL_BY;
+    baz = azRaw - SENSCALIB_ACCEL_BZ;
+    Accel.vec[0] = (SENSCALIB_ACCEL_S11 * bax) + (SENSCALIB_ACCEL_S12 * bay) + (SENSCALIB_ACCEL_S13 * baz);
+    Accel.vec[1] = (SENSCALIB_ACCEL_S12 * bax) + (SENSCALIB_ACCEL_S22 * bay) + (SENSCALIB_ACCEL_S23 * baz);
+    Accel.vec[2] = (SENSCALIB_ACCEL_S13 * bax) + (SENSCALIB_ACCEL_S23 * bay) + (SENSCALIB_ACCEL_S33 * baz);
 
+    /* Convert from G's to m/s/s */
+    g = GravComputer.GetGravity();
+    Accel.vec[0] *= g;
+    Accel.vec[1] *= g;
+    Accel.vec[2] *= g;
 
     /* Apply filters */
-    Gyro.vec[0] = gx;
+    Gyro.vec[0] = gx;  // TODO: apply gyro filter?
     Gyro.vec[1] = gy;
     Gyro.vec[2] = gz;
-    Accel.vec[0] = AxMFilt.Filter(ax);
-    Accel.vec[1] = AyMFilt.Filter(ay);
-    Accel.vec[2] = AzMFilt.Filter(az);
+    Accel.vec[0] = AxLPF.Filter(Accel.vec[0]);
+    Accel.vec[1] = AyLPF.Filter(Accel.vec[1]);
+    Accel.vec[2] = AzLPF.Filter(Accel.vec[2]);
 
 
     /* Update accelerometer tilt angles */
@@ -246,9 +257,9 @@ float InertialNavSystem::GetAccelRoll()
  */
 void InertialNavSystem::UpdateAccelAngles()
 {
-    float ax = Accel.vec[0] - 0.1511f;
-    float ay = Accel.vec[1] + 0.0161f;
-    float az = Accel.vec[2] - 0.2685f;
+    float ax = Accel.vec[0];
+    float ay = Accel.vec[1];
+    float az = Accel.vec[2];
     float magn = Accel.GetNorm();
     
     pitch = asinf_safe(ax / magn);

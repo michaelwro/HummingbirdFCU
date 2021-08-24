@@ -206,24 +206,24 @@ bool LIS3MDL_Mag::ReadSensor()
     switch(this->_range)
     {
         case LIS3MDL_RANGE_4G:
-            this->_mx = ((float)mxRaw / 6842.0f) * 100.0f;
-            this->_my = ((float)myRaw / 6842.0f) * 100.0f;
-            this->_mz = ((float)mzRaw / 6842.0f) * 100.0f;
+            this->_mx = (float)mxRaw * 0.01461560947091493715287927506577f;  // 100/6842
+            this->_my = (float)myRaw * 0.01461560947091493715287927506577f;
+            this->_mz = (float)mzRaw * 0.01461560947091493715287927506577f;
             break;
         case LIS3MDL_RANGE_8G:
-            this->_mx = ((float)mxRaw / 3421.0f) * 100.0f;
-            this->_my = ((float)myRaw / 3421.0f) * 100.0f;
-            this->_mz = ((float)mzRaw / 3421.0f) * 100.0f;
+            this->_mx = (float)mxRaw * 0.02923121894182987430575855013154f;  // 100/3421
+            this->_my = (float)myRaw * 0.02923121894182987430575855013154f;
+            this->_mz = (float)mzRaw * 0.02923121894182987430575855013154f;
             break;
         case LIS3MDL_RANGE_12G:
-            this->_mx = ((float)mxRaw / 2281.0f) * 100.0f;
-            this->_my = ((float)myRaw / 2281.0f) * 100.0f;
-            this->_mz = ((float)mzRaw / 2281.0f) * 100.0f;
+            this->_mx = (float)mxRaw * 0.04384042086804033318719859710653f;  // 100/2281
+            this->_my = (float)myRaw * 0.04384042086804033318719859710653f;
+            this->_mz = (float)mzRaw * 0.04384042086804033318719859710653f;
             break;
         case LIS3MDL_RANGE_16G:
-            this->_mx = ((float)mxRaw / 1711.0f) * 100.0f;
-            this->_my = ((float)myRaw / 1711.0f) * 100.0f;
-            this->_mz = ((float)mzRaw / 1711.0f) * 100.0f;
+            this->_mx = (float)mxRaw * 0.05844535359438924605493863237873f;  // 100/1711
+            this->_my = (float)myRaw * 0.05844535359438924605493863237873f;
+            this->_mz = (float)mzRaw * 0.05844535359438924605493863237873f;
             break;
         default:
             #if defined(LIS3MDL_DEBUG)

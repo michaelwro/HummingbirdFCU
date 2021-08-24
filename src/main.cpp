@@ -89,6 +89,7 @@ void setup()
 
     DEBUG_PORT.begin(115200);
     GPS_I2C.setClock(400000);
+    
     delay(1000);
 
     #ifdef DEBUG
@@ -166,41 +167,45 @@ void setup()
 
 void loop()
 {
-    // // gpstimer2 = millis();
-    // GPS.ListenForData();
-    // // gpstimer1 = millis();
-
     // gpstimer2 = millis();
+    GPS.ListenForData();
+    // gpstimer1 = millis();
 
-    // if (GPS.NMEAParser.location.isUpdated())
-    // {
-    //     DEBUG_PORT.print("Lat: "); DEBUG_PORT.print(GPS.NMEAParser.location.lat(), 6);
-    //     DEBUG_PORT.print(" Lon: "); DEBUG_PORT.print(GPS.NMEAParser.location.lng(), 6);
-    //     // DEBUG_PORT.print(" TimeBetween: "); DEBUG_PORT.println(gpstimer1 - gpstimer2);
-    //     DEBUG_PORT.print(" TimeBetween: "); DEBUG_PORT.println(gpstimer2 - gpstimer1);
-    //     gpstimer1 = gpstimer2;
-    // }
+    gpstimer2 = millis();
+
+    
+    
+    // (GPS.NMEAParser.location.isUpdated()
+    if (GPS.NMEAParser.time.isUpdated())
+    {
+        // DEBUG_PORT.print("Lat: "); DEBUG_PORT.println(GPS.NMEAParser.location.rawLat().billionths);
+        // DEBUG_PORT.print(" Lon: "); DEBUG_PORT.print(GPS.NMEAParser.location.rawLng().billionths);
+        // DEBUG_PORT.print("Val: "); DEBUG_PORT.print(GPS.NMEAParser.time.value());
+        // DEBUG_PORT.print(" TimeBetween: "); DEBUG_PORT.println(gpstimer2 - gpstimer1);
+        // DEBUG_PORT.print(" TimeBetween: "); DEBUG_PORT.println(gpstimer1 - gpstimer2);
+        gpstimer1 = gpstimer2;
+    }
 
 
 
     // // ====== Simple echo code ======
     // https://forum.arduino.cc/index.php?topic=713603.0
-    do {
-        GPS_I2C.requestFrom(GNSS_I2C_ADDR, 1);
-        b = GPS_I2C.read();
-        if (b != 0xFF)
-        {
-            DEBUG_PORT.write(b);
-            gps.encode((char)b);
+    // do {
+    //     GPS_I2C.requestFrom(GNSS_I2C_ADDR, 1);
+    //     b = GPS_I2C.read();
+    //     if (b != 0xFF)
+    //     {
+    //         DEBUG_PORT.write(b);
+    //         gps.encode((char)b);
 
-            // if (gps.location.isUpdated())
-            // {
-            //     DEBUG_PORT.print("Sats: ");
-            //     DEBUG_PORT.println(gps.location.lat(), 10);
-            // }
-        }
-    }
-    while (true);
+    //         // if (gps.location.isUpdated())
+    //         // {
+    //         //     DEBUG_PORT.print("Sats: ");
+    //         //     DEBUG_PORT.println(gps.location.lat(), 10);
+    //         // }
+    //     }
+    // }
+    // while (true);
     
 
 

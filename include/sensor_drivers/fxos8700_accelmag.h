@@ -15,19 +15,16 @@
 #include "hummingbird_config.h"
 #include "constants.h"
 
-// #define FX0S8700_ACCEL_RANGE_CHECK  // Enable if range checks for the accelerometer measurements should be performed
-// #define FXOS8700_MAG_RANGE_CHECK  // Enable if range checks for the magnetometer measurements should be performed
-
-constexpr uint8_t FXOS8700_ID       = 0xC7;
-constexpr uint8_t FXOS8700_ADDRESS  = 0x1F;
+constexpr uint8_t FXOS8700_ID       = 0xC7;  // Unique ID
+constexpr uint8_t FXOS8700_ADDRESS  = 0x1F;  // I2C address
 
 // ----------------------------------------------------------------------------
 // Define conversion factors to convert accel. and mag. data to floats
 // ----------------------------------------------------------------------------
-constexpr float ACCEL_MSS_LSB_2G    = 0.000244f;    // Convert to [m/s/s]
-constexpr float ACCEL_MSS_LSB_4G    = 0.000488f;    // Convert to [m/s/s]
-constexpr float ACCEL_MSS_LSB_8G    = 0.000976f;    // Convert to [m/s/s]
-constexpr float MAG_UT_LSB          = 0.1f;         // Convert to [uT]
+constexpr float ACCELMAG_CVT_GS_2G    = 0.000244140625f;   // Convert int16 to g's for +/- 2G range
+constexpr float ACCELMAG_CVT_GS_4G    = 0.00048828125f;    // Convert int16 to g's for +/- 4G range
+constexpr float ACCELMAG_CVT_GS_8G    = 0.0009765625f;     // Convert int16 to g's for +/- 8G range
+constexpr float ACCELMAG_CVT_UT       = 0.1f;         // Convert int16 to uT
 
 // ----------------------------------------------------------------------------
 // Accelerometer ranges

@@ -29,7 +29,7 @@ constexpr float CONSTS_2PI      = 6.28318530718f;  // 2 * PI
 
 // ----------------------------------------------------------------------------
 // WGS84 Standard (Earth) Ellipsoid Parameters
-// Parameters obtained from Principles of GNSS, Inertial, and Multisensor 
+// Parameters obtained from: Principles of GNSS, Inertial, and Multisensor 
 // Integrated Navigation Systems by Paul D. Groves (2008).
 // ----------------------------------------------------------------------------
 constexpr float CONSTS_GRAV = 9.80665f;  // WGS84 gravitational acceleration [m/s/s]
@@ -48,5 +48,10 @@ constexpr float CONSTS_ENV_TLAPSERATE  = 0.0065f;  // Standard atmospheric tempe
 constexpr float CONSTS_ENV_SLPRES   = 101325.0f;  // Standard atmospheric air pressure at sea-level [Pa]
 constexpr float CONSTS_ENV_SLTEMP   = 288.15f;  // Standard atmospheric air temperature at sea-level [K]
 constexpr float CONSTS_ENV_R        = 287.26f;  // Gas constant for air [J/kg.K]
+
+
+// ----------------------------------------------------------------------------
+// Geomagnetig constants
+// ----------------------------------------------------------------------------
 constexpr float CONSTS_ENV_MAGDECL  = -0.000602662f;  // Local magnetic field declination [rad] (in degrees: -0.03453deg)
 constexpr float CONSTS_ENV_MAGINCL  = 1.24428537f;  // Local magnetic field inclnation [rad] (in degrees: 71.2923deg)

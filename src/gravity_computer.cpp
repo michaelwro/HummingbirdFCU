@@ -61,20 +61,35 @@ float GravityComputer::GetGravity()
 /* Compute gravitational acceleration in [m/s/s] */
 void GravityComputer::_ComputeGravity(float lat, float alt)
 {
-    float term1;
-    float term2;
     float g0;
     float denom;
     float sinLat;
     float sin2Lat;
 
+    // Range check latitude
+    // Lat. must be between -90deg and +90deg
+    if (lat >= CONSTS_PIDIV2 || lat <= -CONSTS_PIDIV2)
+    {
+        this->_grav = CONSTS_GRAV;
+        return;
+    }
+        
+    
+    // Range check altitude
+    // Alt. should be greater than -400m MSL (lowest point on earth) and 
+    // less than +3400m above MSL (mean altitude of Nepal).
+    // Meh, these should be good enough for sanity checks :P
+    if (alt >= 3400.0f || alt <= -400.0f)
+    {
+        this->_grav = CONSTS_GRAV;
+        return;
+    }
+
     sinLat = sinf(lat);
     sin2Lat = sinf(2.0f * lat);
     
     // Compute sea-level gravity
-    term1 = 0.0053024f * sinLat * sinLat;
-    term2 = 0.0000059f * sin2Lat * sin2Lat;
-    g0 = 9.780318f * (1.0f + term1 - term2);  // Get grav. at sea level
+    g0 = 9.780318f * (1.0f + (0.0053024f * sinLat * sinLat) - (0.0000059f * sin2Lat * sin2Lat));  // Get grav. at sea level
 
     // Account for altitude
     denom = (1.0f + (alt / CONSTS_WGS84_A));

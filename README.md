@@ -9,6 +9,14 @@ Flight software for the Hummingbird Flight Control Unit quadcopter flight contro
 
 This project is very much a work in progress. Stop by every so often to see my progress!
 
+## Short-Term To-Do List
+
+* Determine timing scheme for reading GPS data
+* Check out task schedulers
+* Implement scheduled tasks to read IMU, baro, and GPS sensors
+* Finalize EKF equations
+* Develop EKF with help from SymPy's C-coder
+
 ## Sensors + Devices
 
 - Microcontroller/Computer: [PJRC Teensy 4.1](https://www.pjrc.com/store/teensy41.html)
@@ -18,6 +26,11 @@ This project is very much a work in progress. Stop by every so often to see my p
 - Telemetry Radio: [XBee 3 RP-SMA Module](https://www.sparkfun.com/products/15130)
 - Radio Transmitter: [Spektrum DX6i 6-Channel](https://www.spektrumrc.com/Products/Default.aspx?ProdId=SPM6600)
 - Radio Receiver: [Spektrum DSMX Remote Receiver](https://www.spektrumrc.com/Products/Default.aspx?ProdID=SPM9645)
+
+## Libraries Used
+
+- **TinyGPS++:** Parsing NMEA strings and extracting GPS data
+- **Adafruit BMP3XX:** Reading data from BMP388 pressure + temperature sensor
 
 ## Circuit Schematic
 

@@ -8,18 +8,32 @@
 // AltMSLParser(NMEAParser, "GNGGA", 9),
 // HDOPParser(NMEAParser, "GNGSA", 16),
 GNSSComputer::GNSSComputer(TwoWire *userWire)
-:GeoidSepParser(NMEAParser, "GNGGA", 11),
-// PDOPParser(NMEAParser, "GNGSA", 15),
+// :GeoidSepParser(NMEAParser, "GNGGA", 11),
+// PDOPParser(NMEAParser, "GNGSA", 15)
 // VDOPParser(NMEAParser, "GNGSA", 17),
-TrueTrackParser(NMEAParser, "GNVTG", 1),
-GroundSpeedParser(NMEAParser, "GNVTG", 5)
+// TrueTrackParser(NMEAParser, "GNVTG", 1),
+// GroundSpeedParser(NMEAParser, "GNVTG", 5)
 {
     isConfigured = false;
     gpsWire = userWire;
 }
 
 
-
+// ----------------------------------------------------------------------------
+// ConfigureDevice(GNSSNetworks_t userNetwork, GNSSDynamics_t userDynModel,
+//     GNSSNavRate_t userODR)
+// ----------------------------------------------------------------------------
+/**
+ * Configure the GPS sensor. Sends config. commands over I2C. Configures port 
+ * settings, satellite network/s, GPS dynamic model, enables/disables NMEA 
+ * messages, and sets output data rate.
+ * 
+ * @param userNetwork   Network to connect to. GPS, GLONASS, or GPS+GLONASS
+ * @param userDynModel  GPS's internal fusion algorithm dynamic model. Pedestrian, 
+ * portable, and airborne <1G.                     
+ * @param userODR   [Hz] Output navigation rate. 5Hz or 10Hz
+ * @returns True if successfully configured, false if not
+ */
 bool GNSSComputer::ConfigureDevice(
     GNSSNetworks_t userNetwork, GNSSDynamics_t userDynModel,
     GNSSNavRate_t userODR)
@@ -145,7 +159,17 @@ bool GNSSComputer::ConfigureDevice(
     SendUBXConfigMessage(UBX_CFG_MSG_DISABLE_GSV, 16);
     delay(pauseBetweenTasks);
 
-    SendUBXConfigMessage(UBX_CFG_MSG_DISABLE_RMC, 16);
+    // SendUBXConfigMessage(UBX_CFG_MSG_DISABLE_RMC, 16);
+    // delay(pauseBetweenTasks);
+    
+    // Disable GxGSA
+    uint8_t cfg1[16] = {0xB5,0x62,0x06,0x01,0x08,0x00,0xF0,0x02,0x00,0x00,0x01,0x01,0x01,0x00,0x04,0x3A};
+    SendUBXConfigMessage(cfg1, 16);
+    delay(pauseBetweenTasks);
+
+    // Disable GxVTG
+    uint8_t cfg2[16] = {0xB5,0x62,0x06,0x01,0x08,0x00,0xF0,0x05,0x00,0x00,0x01,0x01,0x01,0x00,0x07,0x4F};
+    SendUBXConfigMessage(cfg2, 16);
     delay(pauseBetweenTasks);
 
     #ifdef GNSS_DEBUG
@@ -180,13 +204,16 @@ bool GNSSComputer::ConfigureDevice(
     }
 
     navTs = 1.0f / navRate;
-    dataPollWait = 1000UL / (((uint32_t)navRate) * 4UL);
-    // dataPollWait = 20UL;
+    // dataPollWait = 1000UL / (((uint32_t)navRate) * 4UL);
+    dataPollWait = 20UL;
     delay(pauseBetweenTasks);
     #ifdef GNSS_DEBUG
     DEBUG_PORT.print("GNSSComputer::ConfigureDevice: Changed nav rate to ");
     DEBUG_PORT.print(navRate);
-    DEBUG_PORT.println("Hz");
+    DEBUG_PORT.print("Hz, poll time: ");
+    DEBUG_PORT.print(dataPollWait);
+    DEBUG_PORT.println("ms");
+    // DEBUG_PORT.println("Hz");
     #endif
 
     isConfigured = true;
@@ -194,103 +221,121 @@ bool GNSSComputer::ConfigureDevice(
 }
 
 
+// ----------------------------------------------------------------------------
+// GNSSComputer::WaitForSatellites(uint32_t minSats)
+// ----------------------------------------------------------------------------
+/**
+ * Wait for satellites to be received by the GPS. If the min. number of 
+ * satellies are not aquired by a certain time period, the function returns 
+ * false. Also contains aquisition checks.
+ * 
+ * @param minSats  Minimum number of satellites to signal a valiid fix.
+ * @returns  True if success, false if not
+ */
+bool GNSSComputer::WaitForSatellites(uint32_t minSats)
+{
+    char b;
+    uint32_t nSats;
+    uint32_t startMillis;
+    uint32_t currMillis;
+    uint16_t enoughSatsCounter;
 
-// bool GNSSComputer::WaitForSatellites(uint32_t minSats)
-// {
-//     char b;
-//     uint32_t nSats;
-//     uint32_t startMillis;
-//     uint32_t currMillis;
-//     uint16_t enoughSatsCounter;
+    #ifdef GNSS_DEBUG
+    uint32_t prevPrint;
+    uint32_t currPrint;
+    uint32_t printdt;
+    prevPrint = 0;
+    currPrint = millis();
+    printdt = (uint32_t)(navTs * 1000.0f);
+    DEBUG_PORT.println("GNSSComputer::WaitForSatellites: Waiting for SVs.");
+    DEBUG_PORT.print("    SVs: ");
+    #endif
 
-//     #ifdef GNSS_DEBUG
-//     uint32_t prevPrint;
-//     uint32_t currPrint;
-//     uint32_t printdt;
-//     prevPrint = 0;
-//     currPrint = millis();
-//     printdt = (uint32_t)(navTs * 1000.0f);
-//     DEBUG_PORT.println("GNSSComputer::WaitForSatellites: Waiting for SVs.");
-//     DEBUG_PORT.print("    SVs: ");
-//     #endif
+    // If we aren't configured, configure the GPS
+    if (isConfigured == false)
+    {
+        if (!ConfigureDevice())
+            return false;
+    }
 
-//     // If we aren't configured, configure the GPS
-//     if (isConfigured == false)
-//     {
-//         if (!ConfigureDevice())
-//             return false;
-//     }
+    // We will wait a minute or so to acquire a sufficient number of
+    // GNSS satellite signals to ensure a good fix.
+    nSats = 0;
+    enoughSatsCounter = 0;
+    startMillis = millis();
+    currMillis = millis();
+    while (currMillis - startMillis <= GNSS_POS_LOCK_TIMEOUT)
+    {
+        currMillis = millis();
 
-//     // We will wait a minute or so to acquire a sufficient number of
-//     // GNSS satellite signals to ensure a good fix.
-//     nSats = 0;
-//     enoughSatsCounter = 0;
-//     startMillis = millis();
-//     currMillis = millis();
-//     while (currMillis - startMillis <= GNSS_POS_LOCK_TIMEOUT)
-//     {
-//         currMillis = millis();
-
-//         while (GPS_PORT.available())
-//         {
-//             b = GPS_PORT.read();
-//             NMEAParser.encode(b);
-//         }
+        while (GPS_I2C.available())
+        {
+            b = GPS_I2C.read();
+            NMEAParser.encode(b);
+        }
     
-//         // if (NMEAParser.satellites.isUpdated() && NMEAParser.satellites.isValid())
-//         if (NMEAParser.satellites.isUpdated())
-//         {
-//             nSats = NMEAParser.satellites.value();  // Parse GxGGA message
+        // if (NMEAParser.satellites.isUpdated() && NMEAParser.satellites.isValid())
+        if (NMEAParser.satellites.isUpdated())
+        {
+            nSats = NMEAParser.satellites.value();  // Parse GxGGA message
 
-//             #ifdef GNSS_DEBUG
-//             DEBUG_PORT.print(nSats);
-//             DEBUG_PORT.print(",");
-//             #endif
+            #ifdef GNSS_DEBUG
+            DEBUG_PORT.print(nSats);
+            DEBUG_PORT.print(",");
+            #endif
             
-//             // We must be connected to enough sats. for a few readings to
-//             // ensure a good fix
-//             if (nSats >= minSats)
-//                 enoughSatsCounter++;
-//         }
+            // We must be connected to enough sats. for a few readings to
+            // ensure a good fix
+            if (nSats >= minSats)
+                enoughSatsCounter++;
+        }
 
-//         // Print status to debug port
-//         #ifdef GNSS_DEBUG
-//         currPrint = millis();
-//         if (currPrint - prevPrint >= printdt)
-//         {
-//             DEBUG_PORT.print(nSats);
-//             DEBUG_PORT.print(",");
-//             prevPrint = currPrint;
-//         }
-//         #endif
+        // Print status to debug port
+        #ifdef GNSS_DEBUG
+        currPrint = millis();
+        if (currPrint - prevPrint >= printdt)
+        {
+            DEBUG_PORT.print(nSats);
+            DEBUG_PORT.print(",");
+            prevPrint = currPrint;
+        }
+        #endif
 
-//         // If we've acquired enough sats. for at least 5 nav. updates,
-//         // it is safe to say that we are reliably connected to enough sats.
-//         if (enoughSatsCounter >= 5)
-//         {
-//             #ifdef GNSS_DEBUG
-//             DEBUG_PORT.println(" Sufficient SVs. acq.");
-//             #endif
-//             return true;
-//         }
+        // If we've acquired enough sats. for at least 5 nav. updates,
+        // it is safe to say that we are reliably connected to enough sats.
+        if (enoughSatsCounter >= 5)
+        {
+            #ifdef GNSS_DEBUG
+            DEBUG_PORT.println(" Sufficient SVs. acq.");
+            #endif
+            return true;
+        }
 
-//     }
+    }
 
-//     // If our code gets to this point, we've waited too long to connect to 
-//     // enough sats. Something might not be right or sat. orbits aren't in our 
-//     // favor :(
-//     #ifdef GNSS_DEBUG
-//     DEBUG_PORT.println();
-//     DEBUG_PORT.print("GNSSComputer::WaitForSatellites ERROR: Took too long to find ");
-//     DEBUG_PORT.print(minSats);
-//     DEBUG_PORT.println(" SVs.");
-//     #endif
+    // If our code gets to this point, we've waited too long to connect to 
+    // enough sats. Something might not be right or sat. orbits aren't in our 
+    // favor :(
+    #ifdef GNSS_DEBUG
+    DEBUG_PORT.println();
+    DEBUG_PORT.print("GNSSComputer::WaitForSatellites ERROR: Took too long to find ");
+    DEBUG_PORT.print(minSats);
+    DEBUG_PORT.println(" SVs.");
+    #endif
 
-//     return false;
-// }
+    return false;
+}
 
 
-
+// ----------------------------------------------------------------------------
+// GNSSComputer::ListenForData()
+// ----------------------------------------------------------------------------
+/**
+ * Read data from GPS I2C port and feed the TinyGPS NMEA parser data. Also 
+ * includes checks to ensure data integrity.
+ * 
+ * @returns True if success, false if not.
+ */
 // https://github.com/sparkfun/SparkFun_Ublox_Arduino_Library/blob/1e70755453a898d8267ced641500c33d377409b7/src/SparkFun_Ublox_Arduino_Library.cpp#L347
 bool GNSSComputer::ListenForData()
 {
@@ -387,7 +432,7 @@ bool GNSSComputer::ListenForData()
              */
             bytesToRead = (bytesAvail > GNSS_I2C_BUFFSIZE) ? GNSS_I2C_BUFFSIZE : bytesAvail;
         
-            // TRY_AGAIN:  // Checkpoint for when we encounter the 0x7F thingy
+            TRY_AGAIN:  // Checkpoint for when we encounter the 0x7F thingy
 
             // Grab some bytes to eat
             gpsWire->requestFrom(GNSS_I2C_ADDR, (uint8_t)bytesToRead);
@@ -400,17 +445,17 @@ bool GNSSComputer::ListenForData()
                     // Check for 0x7F error-thing outlined in Sparkfun's code
                     // I'm not sure if we need to check for this, but I put in in, just
                     // in case. Otherwise, we can comment it out
-                    // if (i == 0 && byteFromGps == 0x7F)
-                    // {
-                    //     #ifdef GNSS_DEBUG
-                    //     DEBUG_PORT.println("GNSSComputer::ListenForData WARNING: Encountered 0x7F error");
-                    //     #endif
+                    if (i == 0 && byteFromGps == 0x7F)
+                    {
+                        #ifdef GNSS_DEBUG
+                        DEBUG_PORT.println("GNSSComputer::ListenForData WARNING: Encountered 0x7F error");
+                        #endif
 
-                    //     // This delay() probs isn't good to have in final flight code, but we might need it if this 
-                    //     // error is frequent
-                    //     delay(3);  // Sparkfun has 5ms, imma use 3ms
-                    //     goto TRY_AGAIN;
-                    // }
+                        // This delay() probs isn't good to have in final flight code, but we might need it if this 
+                        // error is frequent
+                        delay(3);  // Sparkfun has 5ms, imma use 3ms
+                        goto TRY_AGAIN;
+                    }
 
                     /* Pass the received byte on to TinyGPS to form and parse NMEA data */
                     NMEAParser.encode((char)byteFromGps);
@@ -445,7 +490,15 @@ bool GNSSComputer::ListenForData()
 
 
 
-// Send I2C message to gps
+// ----------------------------------------------------------------------------
+// GNSSComputer::SendUBXConfigMessage(const uint8_t *msg, size_t len)
+// ----------------------------------------------------------------------------
+/**
+ * Send UBX configuration message over I2C.
+ * 
+ * @param msg  uint8_t array of bytes to send.
+ * @param  len  Length of message
+ */
 void GNSSComputer::SendUBXConfigMessage(const uint8_t *msg, size_t len)
 {
     gpsWire->beginTransmission(GNSS_I2C_ADDR);

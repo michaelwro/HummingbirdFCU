@@ -122,6 +122,7 @@ public:
     bool ListenForData();
 
     TinyGPSPlus NMEAParser;          // TinyGPS++ GPS object
+    // TinyGPSCustom PDOPParser;  // Parse GxGSA for PDOP
 
 protected:
 private:
@@ -130,7 +131,7 @@ private:
     // ortho. height
     // geoid sep.
     // gps quality/fix type?
-    TinyGPSCustom GeoidSepParser;  // Parse GxGGA for geoid separation [m] (Sep = AltWGS84 - AltMSL)
+    // TinyGPSCustom GeoidSepParser;  // Parse GxGGA for geoid separation [m] (Sep = AltWGS84 - AltMSL)
 
     // GSA
     // pdop
@@ -145,8 +146,8 @@ private:
     // true track/cog
     // speed, kts
     // speed over gnd, kph
-    TinyGPSCustom TrueTrackParser;  // Parse GxVTG for true track [deg]
-    TinyGPSCustom GroundSpeedParser;  // Parse GxVTG for ground speed [kts]
+    // TinyGPSCustom TrueTrackParser;  // Parse GxVTG for true track [deg]
+    // TinyGPSCustom GroundSpeedParser;  // Parse GxVTG for ground speed [kts]
 
     Vectord PosLLA;     // [rad, rad, m] Lat, lon, altitude
     Vectorf PosECEF;    // [m, m, m] ECEF position

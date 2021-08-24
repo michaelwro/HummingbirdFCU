@@ -29,19 +29,16 @@
  * accelID = 0x8700A
  * magID = 0x8700B
  * 
- * @param accelID  I2C address of the accelerometer
- * @param magID    I2C address of the magnetometer
+ * @param wireInput I2C bus/wire interface that the device is connected to
  */
 FXOS8700AccelMag::FXOS8700AccelMag(TwoWire *wireInput)
 {
     this->_ax = 0.0f;  // Zero out variables
     this->_ay = 0.0f;
-    this->_az = -CONSTS_GRAV;
+    this->_az = 0.0f;
     this->_mx = 0.0f;
     this->_my = 0.0f;
     this->_mz = 0.0f;
-    // this->accelRangeCheck = 0.0f;
-    // this->magRangeCheck = 1200.0f;  // 1200uT from datasheet
     this->prevMeasMicros = micros();
     this->_SensorWire = wireInput;
 }
@@ -120,13 +117,21 @@ bool FXOS8700AccelMag::Initialize(AccelRanges_t accRange)
  */
 bool FXOS8700AccelMag::ReadSensor()
 {
+    // Raw measurements
+    int16_t axRaw = 0;
+    int16_t ayRaw = 0;
+    int16_t azRaw = 0;
+    int16_t mxRaw = 0;
+    int16_t myRaw = 0;
+    int16_t mzRaw = 0;
+
     // Read 13 bytes from sensor
     this->_SensorWire->beginTransmission((uint8_t)FXOS8700_ADDRESS);
     this->_SensorWire->write(ACCELMAG_REG_STATUS | 0x80);
     this->_SensorWire->endTransmission();
     this->_SensorWire->requestFrom((uint8_t)FXOS8700_ADDRESS, (uint8_t)13);
 
-    
+    // Read the registers
     uint8_t status = this->_SensorWire->read();
     uint8_t axhi = this->_SensorWire->read();
     uint8_t axlo = this->_SensorWire->read();
@@ -144,71 +149,43 @@ bool FXOS8700AccelMag::ReadSensor()
 
     /* Read and shift values from registers into integers.
     Accelerometer data is 14-bit and left-aligned. Shift two bits right. */
-    this->_ax = (int16_t)((axhi << 8) | axlo) >> 2;
-    this->_ay = (int16_t)((ayhi << 8) | aylo) >> 2;
-    this->_az = (int16_t)((azhi << 8) | azlo) >> 2;
+    axRaw = (int16_t)((axhi << 8) | axlo) >> 2;
+    ayRaw = (int16_t)((ayhi << 8) | aylo) >> 2;
+    azRaw = (int16_t)((azhi << 8) | azlo) >> 2;
 
-    this->_mx = (int16_t)((mxhi << 8) | mxlo);
-    this->_my = (int16_t)((myhi << 8) | mylo);
-    this->_mz = (int16_t)((mzhi << 8) | mzlo);
+    mxRaw = (int16_t)((mxhi << 8) | mxlo);
+    myRaw = (int16_t)((myhi << 8) | mylo);
+    mzRaw = (int16_t)((mzhi << 8) | mzlo);
 
     this->prevMeasMicros = micros();
 
-    // Convert acceleration from int16_t to float in units of [G's]
+    // Convert acceleration from int16_t to float in units of [g's]
     switch (this->accelRange)
     {
         case (ACCEL_RNG_2G):
-            this->_ax *= ACCEL_MSS_LSB_2G;
-            this->_ay *= ACCEL_MSS_LSB_2G;
-            this->_az *= ACCEL_MSS_LSB_2G;
+            this->_ax = (float)axRaw * ACCELMAG_CVT_GS_2G;
+            this->_ay = (float)ayRaw * ACCELMAG_CVT_GS_2G;
+            this->_az = (float)azRaw * ACCELMAG_CVT_GS_2G;
             break;
         case (ACCEL_RNG_4G):
-            this->_ax *= ACCEL_MSS_LSB_4G;
-            this->_ay *= ACCEL_MSS_LSB_4G;
-            this->_az *= ACCEL_MSS_LSB_4G;
+            this->_ax = (float)axRaw * ACCELMAG_CVT_GS_4G;
+            this->_ay = (float)ayRaw * ACCELMAG_CVT_GS_4G;
+            this->_az = (float)azRaw * ACCELMAG_CVT_GS_4G;
             break;
         case (ACCEL_RNG_8G):
-            this->_ax *= ACCEL_MSS_LSB_8G;
-            this->_ay *= ACCEL_MSS_LSB_8G;
-            this->_az *= ACCEL_MSS_LSB_8G;
+            this->_ax = (float)axRaw * ACCELMAG_CVT_GS_8G;
+            this->_ay = (float)ayRaw * ACCELMAG_CVT_GS_8G;
+            this->_az = (float)azRaw * ACCELMAG_CVT_GS_8G;
             break;
         default:
-            return false;
+            return false;  // return false if not recognized
             break;
     }
 
-    // #ifdef FX0S8700_ACCEL_RANGE_CHECK
-    //     if (this->ax > this->accelRangeCheck || this->ax < (-1.0f * this->accelRangeCheck))
-    //     {
-    //         this->ax = 0.0f;
-    //         return -1;
-    //     }
-    //     else if (this->ay > this->accelRangeCheck || this->ay < (-1.0f * this->accelRangeCheck))
-    //     {
-    //         this->ay = 0.0f;
-    //         return -2;
-    //     }
-    //     else if (this->az > this->accelRangeCheck || this->az < (-1.0f * this->accelRangeCheck))
-    //     {
-    //         this->az = 1.0f;
-    //         return -3;
-    //     }
-    // #endif
-
-
     // Convert magnetometer to uT
-    this->_mx *= MAG_UT_LSB;
-    this->_my *= MAG_UT_LSB;
-    this->_mz *= MAG_UT_LSB;
-
-    // #ifdef FXOS8700_MAG_RANGE_CHECK
-    //     if (this->mx > this->magRangeCheck || this->mx < (-1.0f * this->magRangeCheck))
-    //         return -4;
-    //     else if ((this->my > this->magRangeCheck || this->my < (-1.0f * this->magRangeCheck)))
-    //         return -5;
-    //     else if (this->mz > this->magRangeCheck || this->mz < (-1.0f * this->magRangeCheck))
-    //         return -6;
-    // #endif
+    this->_mx = (float)mxRaw * ACCELMAG_CVT_UT;
+    this->_my = (float)myRaw * ACCELMAG_CVT_UT;
+    this->_mz = (float)mzRaw * ACCELMAG_CVT_UT;
 
     return true;
 }

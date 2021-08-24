@@ -48,6 +48,9 @@ jobs:
         run: |
           python -m pip install pip wheel --upgrade
           python -m pip install platformio --upgrade
+      
+      -name: Install device platforms
+        run: pio platform install atmelavr teensy
 
       - name: Test PlatformIO
         run: pio test --environment teensy41 --verbose

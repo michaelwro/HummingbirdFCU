@@ -48,10 +48,11 @@ jobs:
         with:
           python-version: "3.9"
 
-      - name: Install PlatformIO
+      - name: Install PlatformIO and deps
         run: |
           python -m pip install pip wheel --upgrade
           python -m pip install platformio --upgrade
+          python -m pip install cryptography --upgrade
       
       - name: Install device platforms
         run: |

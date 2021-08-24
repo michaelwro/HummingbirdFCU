@@ -50,7 +50,10 @@ jobs:
           python -m pip install platformio --upgrade
       
       - name: Install device platforms
-        run: pio platform install atmelavr teensy
+        run: |
+          pio platform install atmelavr
+          pio platform install teensy
+
 
       - name: Test PlatformIO
         run: pio test --environment teensy41 --verbose

@@ -13,7 +13,7 @@
 #include <Arduino.h>
 #include <math.h>
 #include <float.h>
-#include "Constants.h"
+#include "constants.h"
 #include "hummingbird_config.h"
 
 

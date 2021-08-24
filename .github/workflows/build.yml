@@ -61,4 +61,6 @@ jobs:
       - name: Run remote tests on the embedded target
         env:
           PLATFORMIO_AUTH_TOKEN: ${{ secrets.PLATFORMIO_AUTH_TOKEN }}
-        run: pio remote test --environment teensy41 --verbose
+        run: |
+          pio remote update
+          pio remote test --environment teensy41 --verbose

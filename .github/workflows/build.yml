@@ -29,7 +29,7 @@ jobs:
           python -m pip install platformio --upgrade
 
       - name: Run PlatformIO
-        run: pio run --environment teensy41_hfcu --verbose
+        run: pio run --environment teensy41 --verbose
 
   test:
     runs-on: ubuntu-latest
@@ -49,5 +49,5 @@ jobs:
           python -m pip install pip wheel --upgrade
           python -m pip install platformio --upgrade
 
-      - name: Run PlatformIO
-        run: pio test --environment teensy41_hfcu --verbose
+      - name: Test PlatformIO
+        run: pio test --environment teensy41 --verbose

@@ -9,7 +9,6 @@
  */
 
 
-
 #include "vector_tests.h"
 
 // default vector's length

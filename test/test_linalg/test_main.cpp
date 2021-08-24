@@ -23,10 +23,9 @@
 #define TEST_MATRIX_MATH  // Test matrix math functions
 
 
-void setup()
+void run_tests()
 {
     delay(5000);  // service delay
-
     UNITY_BEGIN();
 
     // Vectorf tests
@@ -36,13 +35,26 @@ void setup()
     #endif
 
     UNITY_END();
-
 }
 
+
+#ifdef ARDUINO
+#include <Arduino.h>
+void setup()
+{
+    run_tests();
+}
 
 void loop()
 {
     //
 }
 
+#else
+int main(int argc, char **argv)
+{
+    run_tests();
+    return 0;
+}
 
+#endif

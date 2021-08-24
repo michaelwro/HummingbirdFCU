@@ -16,4 +16,9 @@
 #include "maths/vectors.h"
 
 void test_vectorf_default_len(void);
+void test_vectord_default_len(void);
 void test_vectorf_default_vals(void);
+void test_vectord_default_vals(void);
+void test_vectorf_norm(void);
+void test_vectord_norm(void);
+

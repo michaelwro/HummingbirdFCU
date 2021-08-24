@@ -13,14 +13,14 @@
 #include <unity.h>
 #include <Arduino.h>
 #include "vector_tests.h"
+#include "matrix_tests.h"
 
 
 /* Enable/disable certain tests (comment/uncomment) */
 #define TEST_VECTORF  // Test float vector class
 #define TEST_VECTORD  // Test double vector class
-#define TEST_MATRIXF  // Test float matrix class
-#define TEST_MATRIXD  // Test double matrix class
-#define TEST_MATRIX_MATH  // Test matrix math functions
+#define TEST_MATRIX  // Test float matrix class
+// #define TEST_MATRIX_MATH  // Test matrix math functions
 
 
 void run_tests()
@@ -32,6 +32,22 @@ void run_tests()
     #ifdef TEST_VECTORF
     RUN_TEST(test_vectorf_default_len);
     RUN_TEST(test_vectorf_default_vals);
+    RUN_TEST(test_vectorf_norm);
+    #endif
+
+    // Vectord tests
+    #ifdef TEST_VECTORD
+    RUN_TEST(test_vectord_default_len);
+    RUN_TEST(test_vectord_default_vals);
+    RUN_TEST(test_vectord_norm);
+    #endif
+
+    // Matrix tests
+    #ifdef TEST_MATRIX
+    RUN_TEST(test_matrix_default_rows);
+    RUN_TEST(test_matrix_default_rows);
+    RUN_TEST(test_matrix_default_cols);
+    RUN_TEST(test_matrix_default_vals);
     #endif
 
     UNITY_END();

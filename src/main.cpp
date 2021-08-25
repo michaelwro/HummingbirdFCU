@@ -22,7 +22,7 @@
 
 
 
-
+#ifndef UNIT_TEST  // Use this main function if not unit testing
 #include <Arduino.h>
 #include <math.h>
 #include <Wire.h>
@@ -233,3 +233,4 @@ void loop()
 //       gps.encode(GPSSerial.read());
 //   } while (millis() - start < ms);
 // }
+#endif

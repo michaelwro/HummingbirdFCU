@@ -9,6 +9,7 @@
  */
 
 
+#ifdef UNIT_TEST
 #include "vector_tests.h"
 
 // default vector's length
@@ -61,3 +62,5 @@ void test_vectord_norm(void)
     vec.vec[3] = 5.0;
     TEST_ASSERT_EQUAL_FLOAT(10.0, vec.GetNorm());
 }
+
+#endif

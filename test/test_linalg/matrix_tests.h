@@ -9,6 +9,7 @@
  */
 
 
+#ifdef UNIT_TEST
 #pragma once
 
 #include <unity.h>
@@ -18,3 +19,5 @@
 void test_matrix_default_rows(void);
 void test_matrix_default_cols(void);
 void test_matrix_default_vals(void);
+
+#endif

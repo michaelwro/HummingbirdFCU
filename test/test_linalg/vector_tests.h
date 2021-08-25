@@ -9,6 +9,7 @@
  */
 
 
+#ifdef UNIT_TEST
 #pragma once
 
 #include <unity.h>
@@ -22,3 +23,4 @@ void test_vectord_default_vals(void);
 void test_vectorf_norm(void);
 void test_vectord_norm(void);
 
+#endif

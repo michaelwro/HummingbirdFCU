@@ -8,6 +8,8 @@
  * These are unit tests for matrix objects.
  */
 
+
+#ifdef UNIT_TEST
 #include "matrix_tests.h"
 
 // Default matrix shape
@@ -50,3 +52,5 @@ void test_matrix_default_vals(void)
     
     TEST_ASSERT_EQUAL_FLOAT_ARRAY(testMat, mat.mat, 9);
 }
+
+#endif

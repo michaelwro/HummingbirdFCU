@@ -9,18 +9,21 @@
  */
 
 
-
+#ifdef UNIT_TEST  // Use this if running unit tests and 'disable' src/main.cpp
 #include <unity.h>
 #include <Arduino.h>
+#include "hummingbird_config.h"
 #include "vector_tests.h"
 #include "matrix_tests.h"
+#include "matrix_math_tests.h"
+#include "maths/matrix_math.h"
 
 
 /* Enable/disable certain tests (comment/uncomment) */
 #define TEST_VECTORF  // Test float vector class
 #define TEST_VECTORD  // Test double vector class
 #define TEST_MATRIX  // Test float matrix class
-// #define TEST_MATRIX_MATH  // Test matrix math functions
+#define TEST_MATRIX_MATH  // Test matrix math functions
 
 
 void run_tests()
@@ -50,6 +53,21 @@ void run_tests()
     RUN_TEST(test_matrix_default_vals);
     #endif
 
+    // Matrix math & linear algebra lib tests
+    #ifdef TEST_MATRIX_MATH
+    RUN_TEST(test_linalg_VectorfFill);
+    RUN_TEST(test_linalg_VectorfAdd);
+    RUN_TEST(test_linalg_VectorfAccumulate);
+    RUN_TEST(test_linalg_VectorfSubtract);
+    RUN_TEST(test_linalg_MatrixFill);
+    RUN_TEST(test_linalg_MatrixAdd);
+    RUN_TEST(test_linalg_MatrixSubtract);
+    RUN_TEST(test_linalg_MatrixVectorfMult);
+    RUN_TEST(test_linalg_MatrixMultiply);
+    RUN_TEST(test_linalg_MatrixCholeskyDecomp);
+    RUN_TEST(test_linalg_MatrixInverseCholesky);
+    #endif
+
     UNITY_END();
 }
 
@@ -58,12 +76,24 @@ void run_tests()
 #include <Arduino.h>
 void setup()
 {
+    pinMode(RED_LED, OUTPUT);
+    pinMode(GRN_LED, OUTPUT);
+    
+    // Red during tests
+    digitalWrite(GRN_LED, LOW);
+    digitalWrite(RED_LED, HIGH);
+
     run_tests();
+
+    // green after tests
+    digitalWrite(RED_LED, LOW);
+    digitalWrite(GRN_LED, HIGH);
+
 }
 
 void loop()
 {
-    //
+    // code
 }
 
 #else
@@ -73,4 +103,5 @@ int main(int argc, char **argv)
     return 0;
 }
 
+#endif
 #endif

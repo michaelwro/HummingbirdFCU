@@ -57,6 +57,7 @@ typedef enum
     GYRO_REG_ZOUT_MSB = 0x05,
     GYRO_REG_ZOUT_LSB = 0x06,
     GYRO_REG_ID       = 0x0C,  // GYRO_REGISTER_WHO_AM_I
+    GYRO_REG_TEMP     = 0x12,  // Temperature sensor register (p.45)
     GYRO_REG_CTRL0    = 0x0D,  // GYRO_REGISTER_CTRL_REG0
     GYRO_REG_CTRL1    = 0x13,
     GYRO_REG_CTRL2    = 0x14
@@ -84,6 +85,7 @@ public:
 //        ~FXAS21002Gyro();
     bool Initialize(GyroRanges_t rng = GYRO_RNG_1000DPS);
     bool ReadSensor();
+    float GetTemperature();
     float GetGx();
     float GetGy();
     float GetGz();  

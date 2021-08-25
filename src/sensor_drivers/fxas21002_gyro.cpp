@@ -175,6 +175,20 @@ bool FXAS21002Gyro::ReadSensor()
 }
 
 
+/* Read temperature register and return in [C] */
+float FXAS21002Gyro::GetTemperature()
+{
+    int8_t tempRead;
+    float scaling;
+    float tempC;
+
+    scaling = 1.0f;  // [deg.C / LSB]
+    tempRead = this->I2Cread8(GYRO_REG_TEMP);
+    tempC = (float)tempRead * scaling;
+    return tempC;
+}
+
+
 /* Return gyro x-measurement in [rad/s] */
 float FXAS21002Gyro::GetGx()
 {

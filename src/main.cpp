@@ -51,35 +51,13 @@
 
 
 
-FXAS21002Gyro gyro;
+LIS3MDL_Mag mag(&SENSOR_I2C);
 
-
-
-
-
-
-
-/* CREATE GLOBAL SENSOR OBJECTS */
-// BaroAltimeter Altimeter;
-// Adafruit_BMP3XX BaroTemp;
-// FXOS8700AccelMag AccelMag(&Wire2);
-// FXAS21002Gyro Gyro(&Wire2);
-// Conversions Convert;
-
-// #define GPSSerial Serial7
-// TinyGPSPlus gps;
-// static void smartDelay(unsigned long ms);
 
 
 unsigned long prev = 0;
 unsigned long now = 0;
-unsigned long gpstimer1 = 0;
-unsigned long gpstimer2 = 0;
 
-
-uint8_t b;
-
-TinyGPSPlus gps;
 
 
 void setup()
@@ -103,7 +81,11 @@ void setup()
     digitalWrite(RED_LED, HIGH);  // Start off LOW
     digitalWrite(GRN_LED, LOW);  // digitalWrite(GRN_LED, LOW);
 
-    gyro.Initialize(GYRO_RNG_1000DPS);
+    if (!mag.Initialize(LIS3MDL_RANGE_4G))
+    {
+        DEBUG_PORT.println("ERROR INIT. SENSOR!");
+        return;
+    }
 
 
     // if (!INS.Initialize())
@@ -160,11 +142,6 @@ void setup()
 
     digitalWrite(RED_LED, LOW);
     digitalWrite(GRN_LED, HIGH);
-
-
-    gpstimer1 = millis();
-    // GPS_PORT.begin(115200);
-    // GPS_I2C.begin();
 }
 
 
@@ -172,31 +149,26 @@ void loop()
 {
 
     now = millis();
-    if (now - prev >= 200)
+    if (now - prev >= 100)
     {
-        float temp = gyro.GetTemperature();
-        DEBUG_PORT.print("Temp [C]: ");
+        if (!mag.ReadSensor())
+        {
+            DEBUG_PORT.println("ERROR READING SENSOR!");
+            return;
+        }
+
+        // float x = mag.GetMx();
+        // float y = mag.GetMy();
+        // float z = mag.GetMz();
+        // DEBUG_PORT.print(x, 2); DEBUG_PORT.print(",");
+        // DEBUG_PORT.print(y, 2); DEBUG_PORT.print(",");
+        // DEBUG_PORT.println(z, 2);
+
+        float temp = mag.GetTemperature();
+        // DEBUG_PORT.print("Temp [C]: ");
         DEBUG_PORT.println(temp, 3);
         prev = now;
     }
-    // // gpstimer2 = millis();
-    // GPS.ListenForData();
-    // // gpstimer1 = millis();
-
-    // gpstimer2 = millis();
-
-    
-    
-    // // (GPS.NMEAParser.location.isUpdated()
-    // if (GPS.NMEAParser.time.isUpdated())
-    // {
-    //     // DEBUG_PORT.print("Lat: "); DEBUG_PORT.println(GPS.NMEAParser.location.rawLat().billionths);
-    //     // DEBUG_PORT.print(" Lon: "); DEBUG_PORT.print(GPS.NMEAParser.location.rawLng().billionths);
-    //     // DEBUG_PORT.print("Val: "); DEBUG_PORT.print(GPS.NMEAParser.time.value());
-    //     // DEBUG_PORT.print(" TimeBetween: "); DEBUG_PORT.println(gpstimer2 - gpstimer1);
-    //     // DEBUG_PORT.print(" TimeBetween: "); DEBUG_PORT.println(gpstimer1 - gpstimer2);
-    //     gpstimer1 = gpstimer2;
-    // }
 
 
 
@@ -218,31 +190,7 @@ void loop()
     //     }
     // }
     // while (true);
-    
 
-
-    // now = millis();
-    // if (now - prev > 100)
-    // {
-    //     INS.Update();
-    //     Compass.Update();
-    //     float h = Compass.GetHeading(INS.Accel);
-    //     DEBUG_PORT.print("Heading: "); DEBUG_PORT.print(h*RAD2DEG, 2); DEBUG_PORT.println(" deg.");
-    //     prev = now;
-    // }
-
-    // smartDelay(1000);
 }
 
-// // This custom version of delay() ensures that the gps object
-// // is being "fed".
-// static void smartDelay(unsigned long ms)
-// {
-//   unsigned long start = millis();
-//   do 
-//   {
-//     while (GPSSerial.available())
-//       gps.encode(GPSSerial.read());
-//   } while (millis() - start < ms);
-// }
 #endif

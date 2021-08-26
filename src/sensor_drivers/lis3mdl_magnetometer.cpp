@@ -243,24 +243,22 @@ float LIS3MDL_Mag::GetTemperature()
     uint8_t tlo;
     uint8_t thi;
     int16_t tempRaw;
-    float scaling;
     float tempC;
-
-    scaling = 0.125f;  // Temperature scaling, 1 / (8 degC/LSB) (see p.9)
 
     // Request over i2c bus
     this->_SensorWire->beginTransmission((uint8_t)LIS3MDL_ADDR);
-    this->_SensorWire->write(LIS3MDL_OUT_TEMP_L | 0x80);
+    this->_SensorWire->write(LIS3MDL_OUT_TEMP_L);
     this->_SensorWire->endTransmission();
 
     // Read bytes
     this->_SensorWire->requestFrom((uint8_t)LIS3MDL_ADDR, (uint8_t)2);
     tlo = this->_SensorWire->read();
-    thi - this->_SensorWire->read();
+    thi = this->_SensorWire->read();
 
     // Convert to float
-    tempRaw = (int16_t)((thi << 8) | tlo);  // temperature as a signed int
-    tempC = (float)tempRaw * scaling;
+    // https://electronics.stackexchange.com/questions/292863/magnetometer-lis3mdl-temperature-reading-changes-with-orientation
+    tempRaw = (int16_t)((tlo << 8) | thi);  // temperature as a signed int
+    tempC =  0.125f * ((float)tempRaw / 256.0f) + 25.0f;  // Temperature scaling: 8 degC/LSB (see p.9). Offset from application note
     return tempC;
 }
 

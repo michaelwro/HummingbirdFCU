@@ -44,8 +44,6 @@
 #define LIS3MDL_CTRL_REG3 0x22  // Control register 3
 #define LIS3MDL_CTRL_REG4 0x23  // Control register 4
 #define LIS3MDL_CTRL_REG5 0x24  // Control register 5
-#define LIS3MDL_OUT_TEMP_L 0x2E  // Low-byte for temperature sensor. Stores as twos-compliment.
-#define LIS3MDL_OUT_TEMP_H 0x2F  // High-byte for temperature sensor. Stores as twos-compliment.
 
 
 // ------------------------------------
@@ -57,7 +55,9 @@ typedef enum {
     LIS3MDL_OUT_Y_L = 0x2A,
     LIS3MDL_OUT_Y_H = 0X2B,
     LIS3MDL_OUT_Z_L = 0x2C,
-    LIS3MDL_OUT_Z_H = 0x2D
+    LIS3MDL_OUT_Z_H = 0x2D,
+    LIS3MDL_OUT_TEMP_L = 0x2E,  // Low-byte for temperature sensor. Stores as twos-compliment.
+    LIS3MDL_OUT_TEMP_H = 0x2F  // High-byte for temperature sensor. Stores as twos-compliment.
 } LIS3MDL_DataReg_t;
 
 

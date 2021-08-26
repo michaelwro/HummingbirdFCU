@@ -1,29 +1,26 @@
 // ----------------------------------------------------------------------------
-// FXAS21002C GYROSCOPE SENSOR LIBRARY
-// A custom sensor library for the FXAS21002C I2C gyroscope sensor. Inspired by
-// Adafruit's FXAS21002C Library (see Resources).
+// FXAS21002C GYROSCOPE SENSOR I2C DRIVER CODE
 // 
-// Code By: Michael Wrona | B.S. Aerospace Engineering
+// Code By: Michael Wrona
 // Created: 25 July 2020
+// Modified: 26 Aug 2021
 // ----------------------------------------------------------------------------
 /**
- * This is the sensor library for the FXAS21002C 3-axis gyroscope sensor. This
- * library was inspired by Adafruit's FXAS21002C Library (see Resources). Tested
- * and verified with Adafruit's FXAS21002C/FXOS8700 9-DOF IMU and an Arduino Uno.
+ * This is the sensor library for the FXAS21002C 3-axis gyroscope sensor in 
+ * I2C mode.
  * 
- * Resources
- * ---------
- * ~ Adafruit FXAS21002C Sensor Library (GitHub):
- *     https://github.com/adafruit/Adafruit_FXAS21002C
- * ~ FXOX8700 + FXAS21002 9-DOF IMU (Adafruit):
- *     https://www.adafruit.com/product/3463
+ * Datasheet Specs:
+ * ~ 16-bit ADC
+ * ~ +/- 250dps to 2000dps measurement ranges
+ * ~ Integrated LPF
+ * ~ 8-bit temperature sensor
+ * ~ Temperature sensitivity of +/- 0.08 %/degC (max)
+ * ~ Nonlinearity of +/- 0.5 %FSR
+ * ~ 0.025 dps/sqrt(Hz) noise density (FS=200Hz, CTRL_REG0[FS] = 00, CTRL_REG0[BW] = 00)
  */
 
-#include "Arduino.h"
-#include <Wire.h>
-#include <limits.h>
-#include "sensor_drivers/fxas21002_gyro.h"
 
+#include "sensor_drivers/fxas21002_gyro.h"
 
 
 // ------------------------------------
@@ -181,9 +178,9 @@ bool FXAS21002Gyro::ReadSensor()
     }
 
    // Convert [dps] to [rad/s]
-   this->_gx *= DEG2RAD;
-   this->_gy *= DEG2RAD;
-   this->_gz *= DEG2RAD;
+   this->_gx *= 0.01745329251994329576923690768489f;
+   this->_gy *= 0.01745329251994329576923690768489f;
+   this->_gz *= 0.01745329251994329576923690768489f;
 
     return true;
 }

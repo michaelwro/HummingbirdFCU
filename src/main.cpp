@@ -51,7 +51,7 @@
 
 
 
-
+FXAS21002Gyro gyro;
 
 
 
@@ -103,6 +103,9 @@ void setup()
     digitalWrite(RED_LED, HIGH);  // Start off LOW
     digitalWrite(GRN_LED, LOW);  // digitalWrite(GRN_LED, LOW);
 
+    gyro.Initialize(GYRO_RNG_1000DPS);
+
+
     // if (!INS.Initialize())
     // {
     //     DEBUG_PORT.println("Could not init. INS...");
@@ -114,10 +117,10 @@ void setup()
     //     DEBUG_PORT.println("Could not init. compass...");
     // }
 
-    if (!GPS.ConfigureDevice())
-    {
-        DEBUG_PORT.println("ERROR CONFIGGING!");
-    }
+    // if (!GPS.ConfigureDevice())
+    // {
+    //     DEBUG_PORT.println("ERROR CONFIGGING!");
+    // }
 
 
 
@@ -167,24 +170,33 @@ void setup()
 
 void loop()
 {
-    // gpstimer2 = millis();
-    GPS.ListenForData();
-    // gpstimer1 = millis();
 
-    gpstimer2 = millis();
-
-    
-    
-    // (GPS.NMEAParser.location.isUpdated()
-    if (GPS.NMEAParser.time.isUpdated())
+    now = millis();
+    if (now - prev >= 200)
     {
-        // DEBUG_PORT.print("Lat: "); DEBUG_PORT.println(GPS.NMEAParser.location.rawLat().billionths);
-        // DEBUG_PORT.print(" Lon: "); DEBUG_PORT.print(GPS.NMEAParser.location.rawLng().billionths);
-        // DEBUG_PORT.print("Val: "); DEBUG_PORT.print(GPS.NMEAParser.time.value());
-        // DEBUG_PORT.print(" TimeBetween: "); DEBUG_PORT.println(gpstimer2 - gpstimer1);
-        // DEBUG_PORT.print(" TimeBetween: "); DEBUG_PORT.println(gpstimer1 - gpstimer2);
-        gpstimer1 = gpstimer2;
+        float temp = gyro.GetTemperature();
+        DEBUG_PORT.print("Temp [C]: ");
+        DEBUG_PORT.println(temp, 3);
+        prev = now;
     }
+    // // gpstimer2 = millis();
+    // GPS.ListenForData();
+    // // gpstimer1 = millis();
+
+    // gpstimer2 = millis();
+
+    
+    
+    // // (GPS.NMEAParser.location.isUpdated()
+    // if (GPS.NMEAParser.time.isUpdated())
+    // {
+    //     // DEBUG_PORT.print("Lat: "); DEBUG_PORT.println(GPS.NMEAParser.location.rawLat().billionths);
+    //     // DEBUG_PORT.print(" Lon: "); DEBUG_PORT.print(GPS.NMEAParser.location.rawLng().billionths);
+    //     // DEBUG_PORT.print("Val: "); DEBUG_PORT.print(GPS.NMEAParser.time.value());
+    //     // DEBUG_PORT.print(" TimeBetween: "); DEBUG_PORT.println(gpstimer2 - gpstimer1);
+    //     // DEBUG_PORT.print(" TimeBetween: "); DEBUG_PORT.println(gpstimer1 - gpstimer2);
+    //     gpstimer1 = gpstimer2;
+    // }
 
 
 

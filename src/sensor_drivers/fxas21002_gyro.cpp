@@ -95,7 +95,14 @@ bool FXAS21002Gyro::Initialize(GyroRanges_t rng)
             break;
     }
 
-    /* Reset sensor, then switch to active mode to configure */
+    /**
+     * Reset sensor, then switch to active mode to configure.
+     * EXAMPLE: setting GYRO_REG_CTRL0 to 0x01 and GYRO_REG_CTRL1 to 0x06 yields:
+     *   FS = 400Hz
+     *   FS range = +/- 1000dps
+     *   HPF disabled
+     *   LFP bandwidth = 128Hz
+    */
     this->I2Cwrite8(GYRO_REG_CTRL1, 0x00);  // Stby
     this->I2Cwrite8(GYRO_REG_CTRL1, (1 << 6));  // Reset
     this->I2Cwrite8(GYRO_REG_CTRL0, ctrlReg0);  // Set sensitivity
@@ -117,6 +124,10 @@ bool FXAS21002Gyro::Initialize(GyroRanges_t rng)
  */
 bool FXAS21002Gyro::ReadSensor()
 {
+    int16_t gxRaw;
+    int16_t gyRaw;
+    int16_t gzRaw;
+
     // Read 7 bytes from sensor
     this->_SensorWire->beginTransmission((uint8_t)FXAS21002C_ADDRESS);
     this->_SensorWire->write(GYRO_REG_STATUS | 0x80);
@@ -131,14 +142,17 @@ bool FXAS21002Gyro::ReadSensor()
     uint8_t zhi = this->_SensorWire->read();
     uint8_t zlo = this->_SensorWire->read();
 
-    // Shift values to make proper integer
-    this->_gx = (int16_t)((xhi << 8) | xlo);
-    this->_gy = (int16_t)((yhi << 8) | ylo);
-    this->_gz = (int16_t)((zhi << 8) | zlo);
+    // Shift values to make proper integer, then cast int to float (with no decimals)
+    gxRaw = (int16_t)((xhi << 8) | xlo);
+    gyRaw = (int16_t)((yhi << 8) | ylo);
+    gzRaw = (int16_t)((zhi << 8) | zlo);
+    this->_gx = (float)gxRaw;  // units of LSB
+    this->_gy = (float)gyRaw;
+    this->_gz = (float)gzRaw;
 
     this->prevMeasMicros = micros();
 
-    // Convert int readings to floats [dps] depending on sensitivity
+    // Convert int readings to floats [dps] depending on sensitivity (deg/LSB)
     switch (this->gyroRange)
     {
         case GYRO_RNG_250DPS:
@@ -175,7 +189,16 @@ bool FXAS21002Gyro::ReadSensor()
 }
 
 
-/* Read temperature register and return in [C] */
+// ----------------------------------------------------------------------------
+// FXAS21002Gyro::GetTemperature()
+// ----------------------------------------------------------------------------
+/**
+ * Read temperature register and return in [C]. Temperature will not have
+ * any decimals, as it is an 8-bit signed int (-127C to 127C). Note that the 
+ * temperature is not factory calibrated!
+ * 
+ * @returns Temperature in [C]
+ */
 float FXAS21002Gyro::GetTemperature()
 {
     int8_t tempRead;

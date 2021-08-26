@@ -2,10 +2,36 @@
 // FXOS8700 ACCELEROMETER & MAGNETOMETER SENSOR LIBRARY
 // 
 // Code By: Michael Wrona
-// Created: 31 Jan 2021
+// Created: 26 Aug 2021
 // ----------------------------------------------------------------------------
 /**
  * Source code for the FXOS8700 accelerometer and magnetometer sensor library.
+ * 
+ * IMPORTANT NOTES
+ * - Hybrid mode is needed because the magnetometer and accelerometer USE THE 
+ * SAME ADC! See p.22 for more.
+ * - Because we are using the LIS3MDL compass in the GPS, I chose to disable 
+ * hybrid mode and only use the FXOS8700's accelerometer (8/26/2021).
+ * 
+ * Accelerometer Datsheet Specs
+ * ----------------------------
+ * ~ 14-bit ADC
+ * ~ +/- 2g to 8g accel. range
+ * ~ Temperature sensitivity: +/- 0.01 %/degC
+ * ~ Nonlinearity: +/- 0.5 %FSR
+ * ~ 126 ug/sqrt(Hz) noise density
+ * ~ Up to 800Hz FS in single sensor mode
+ * ~ Up to 400Hz FS in hybrid mode
+ * 
+ * Magnetometer Datsheet Specs
+ * ----------------------------
+ * ~ 16-bit magnetometer ADC
+ * ~ +/- 1200uT mag. range
+ * ~ Temperature sensitivity: +/- 0.1 %/degC
+ * ~ Nonlinearity: +/- 1 %FSR
+ * ~ 1.5uT RMS noise (max)
+ * ~ Up to 800Hz FS in single sensor mode
+ * ~ Up to 400Hz FS in hybrid mode
  */
 
 
@@ -36,9 +62,6 @@ FXOS8700AccelMag::FXOS8700AccelMag(TwoWire *wireInput)
     this->_ax = 0.0f;  // Zero out variables
     this->_ay = 0.0f;
     this->_az = 0.0f;
-    this->_mx = 0.0f;
-    this->_my = 0.0f;
-    this->_mz = 0.0f;
     this->prevMeasMicros = micros();
     this->_SensorWire = wireInput;
 }
@@ -78,15 +101,12 @@ bool FXOS8700AccelMag::Initialize(AccelRanges_t accRange)
     {
         case (ACCEL_RNG_2G):
             this->I2Cwrite8(ACCELMAG_REG_XYZ_CFG, 0x00);
-            // this->accelRangeCheck = 2.0f;
             break;
         case (ACCEL_RNG_4G):
             this->I2Cwrite8(ACCELMAG_REG_XYZ_CFG, 0x01);
-            // this->accelRangeCheck = 4.0f;
             break;
         case (ACCEL_RNG_8G):
             this->I2Cwrite8(ACCELMAG_REG_XYZ_CFG, 0x02);
-            // this->accelRangeCheck = 8.0f;
             break;
         default:
             return false;
@@ -94,13 +114,25 @@ bool FXOS8700AccelMag::Initialize(AccelRanges_t accRange)
     }
 
     // Configure accel.
-    this->I2Cwrite8(ACCELMAG_REG_CTRL2, 0x12);  // High resolution
-    // this->I2Cwrite8(ACCELMAG_REG_CTRL1, 0x15);  // Active, Normal Mode, Low Noise, 100Hz in Hybrid Mode
-    this->I2Cwrite8(ACCELMAG_REG_CTRL1, 0x05);  // Active, Normal Mode, Low Noise, 200Hz in Hybrid Mode
+    this->I2Cwrite8(ACCELMAG_REG_CTRL2, 0x12);  // Self-test disabled. Reset disabled. Sleep mode OSR mode = hi. rez. Wake mode OSR mode = hi. rez.
 
-    // Configure magnetometer
-    this->I2Cwrite8(ACCELMAG_REG_MCTRL1, 0x13);  // Hybrid Mode, Over Sampling Rate = 1
-    this->I2Cwrite8(ACCELMAG_REG_MCTRL2, 0x20);  // Jump to reg 0x33 after reading 0x06
+    // Low-noise mode only works for +/- 2g and 4g modes. Change bit values according to the measurement range
+    if (this->accelRange == ACCEL_RNG_8G)
+    {
+        // normal mode instead of low-noise
+        // Sleep mode ODR = 50Hz. Sensor ODR = 400Hz single sensor = 200Hz hybrid mode. Full-scale range mode = normal mode. Fast read mode = normal. Active mode.
+        this->I2Cwrite8(ACCELMAG_REG_CTRL1, 0x09);
+    }
+    else
+    {
+        // Sleep mode ODR = 50Hz. Sensor ODR = 400Hz single sensor = 200Hz hybrid mode. Full-scale range mode = low-noise mode. Fast read mode = normal. Active mode.
+        this->I2Cwrite8(ACCELMAG_REG_CTRL1, 0x0D);
+    }
+
+    // Configure magnetometer and disable hybrid mode (accel. only)
+    this->I2Cwrite8(ACCELMAG_REG_MCTRL1, 0x10);  // Auto-calib. disabled. m_rst = 0. m_ost = 0. Mag. oversampling = 0b100. Accelerometer active, mag. disabled (no hybrid mode).
+    this->I2Cwrite8(ACCELMAG_REG_MCTRL2, 0x30);  // Auto-jump to 0x33 (see p.98). Disable mag. min/max detection. (0x20 is known to work fine if this doesn't work properly).
+    delay(100);  // Slight delay after configuring. P.45 says to wait at least 1ms after issuing a reset command.
 
     return true;
 }
@@ -129,7 +161,7 @@ bool FXOS8700AccelMag::ReadSensor()
     this->_SensorWire->beginTransmission((uint8_t)FXOS8700_ADDRESS);
     this->_SensorWire->write(ACCELMAG_REG_STATUS | 0x80);
     this->_SensorWire->endTransmission();
-    this->_SensorWire->requestFrom((uint8_t)FXOS8700_ADDRESS, (uint8_t)13);
+    this->_SensorWire->requestFrom((uint8_t)FXOS8700_ADDRESS, (uint8_t)13);  // status plus 6 channels = 13 bytes
 
     // Read the registers
     uint8_t status = this->_SensorWire->read();
@@ -147,8 +179,11 @@ bool FXOS8700AccelMag::ReadSensor()
     uint8_t mzlo = this->_SensorWire->read();
 
 
-    /* Read and shift values from registers into integers.
-    Accelerometer data is 14-bit and left-aligned. Shift two bits right. */
+    /**
+     * Read and shift values from registers into integers.
+     * Accelerometer data is 14-bit and left-aligned. Shift two bits right.
+     * See p.28 for datasheet's code example.
+     */
     axRaw = (int16_t)((axhi << 8) | axlo) >> 2;
     ayRaw = (int16_t)((ayhi << 8) | aylo) >> 2;
     azRaw = (int16_t)((azhi << 8) | azlo) >> 2;
@@ -182,11 +217,6 @@ bool FXOS8700AccelMag::ReadSensor()
             break;
     }
 
-    // Convert magnetometer to uT
-    this->_mx = (float)mxRaw * ACCELMAG_CVT_UT;
-    this->_my = (float)myRaw * ACCELMAG_CVT_UT;
-    this->_mz = (float)mzRaw * ACCELMAG_CVT_UT;
-
     return true;
 }
 
@@ -209,26 +239,6 @@ float FXOS8700AccelMag::GetAy()
 float FXOS8700AccelMag::GetAz()
 {
     return this->_az;
-}
-
-
-/* Return x-magnetometer measurement in [uT] */
-float FXOS8700AccelMag::GetMx()
-{
-    return this->_mx;
-}
-
-
-/* Return y-magnetometer measurement in [uT] */
-float FXOS8700AccelMag::GetMy()
-{
-    return this->_my;
-}
-
-/* Return z-magnetometer measurement in [uT] */
-float FXOS8700AccelMag::GetMz()
-{
-    return this->_mz;
 }
 
 

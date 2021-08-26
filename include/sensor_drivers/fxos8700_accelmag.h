@@ -2,11 +2,38 @@
 // FXOS8700 ACCELEROMETER & MAGNETOMETER SENSOR LIBRARY
 // 
 // Code By: Michael Wrona
-// Created: 31 Jan 2021
+// Created: 26 Aug 2021
 // ----------------------------------------------------------------------------
 /**
  * Source code for the FXOS8700 accelerometer and magnetometer sensor library.
+ * 
+ * IMPORTANT NOTES
+ * - Hybrid mode is needed because the magnetometer and accelerometer USE THE 
+ * SAME ADC! See p.22 for more.
+ * - Because we are using the LIS3MDL compass in the GPS, I chose to disable 
+ * hybrid mode and only use the FXOS8700's accelerometer (8/26/2021).
+ * 
+ * Accelerometer Datsheet Specs
+ * ----------------------------
+ * ~ 14-bit ADC
+ * ~ +/- 2g to 8g accel. range
+ * ~ Temperature sensitivity: +/- 0.01 %/degC
+ * ~ Nonlinearity: +/- 0.5 %FSR
+ * ~ 126 ug/sqrt(Hz) noise density
+ * ~ Up to 800Hz FS in single sensor mode
+ * ~ Up to 400Hz FS in hybrid mode
+ * 
+ * Magnetometer Datsheet Specs
+ * ----------------------------
+ * ~ 16-bit magnetometer ADC
+ * ~ +/- 1200uT mag. range
+ * ~ Temperature sensitivity: +/- 0.1 %/degC
+ * ~ Nonlinearity: +/- 1 %FSR
+ * ~ 1.5uT RMS noise (max)
+ * ~ Up to 800Hz FS in single sensor mode
+ * ~ Up to 400Hz FS in hybrid mode
  */
+
 
 #pragma once
 
@@ -78,21 +105,12 @@ public:
     float GetAx();
     float GetAy();
     float GetAz();
-    float GetMx();
-    float GetMy();
-    float GetMz();
-
-    // float accelRangeCheck;  // For checking the measrement range. Should fall within configured range.
-    // float magRangeCheck;
     AccelRanges_t accelRange;
 protected:
 private:
     float _ax;  // X-acceleration [G's]
     float _ay;  // Y-acceleration [G's]
     float _az;  // Z-acceleration [G's]
-    float _mx;  // X-magnetometer reading [uT]
-    float _my;  // Y-magnetometer reading [uT]
-    float _mz;  // Z-magnetometer reading [uT]
     TwoWire *_SensorWire;  // I2C bus that the sensor is on
     uint8_t I2Cread8(uint8_t regOfInterest);
     void I2Cwrite8(uint8_t regOfInterest, uint8_t valToWrite);

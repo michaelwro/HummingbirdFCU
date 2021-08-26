@@ -8,8 +8,13 @@
  * Created: 17 Jan 2021
  * 
  * Resources:
- * GitHub Code Repository: https://github.com/michaelwro/Arduino-LIS3MDL
  * LIS3MDL Datasheet: https://www.st.com/resource/en/datasheet/lis3mdl.pdf
+ * 
+ * Datasheet Specs
+ * ---------------
+ * ~ +/- 4 Gauss to 16 Gauss measurement range
+ * ~ 4.1 mgauss RMS noise (max)
+ * ~ Nonlinearity: +/- 0.12 %FSR
  */
 
 #include <Wire.h>
@@ -74,48 +79,32 @@ bool LIS3MDL_Mag::Initialize(LIS3MDL_MeasRange_t measRange)
         return false;
     }
 
-    /**
-     * Set Control Register 1 params (No temp. sensor):
-     * XY AXIS PERFORMANCE MODE AND ODR
-     * 
-     * 0b (TEMP_EN) (OM1) (OM0) (DO2) (DO1) (DO0) (FAST_ODR) (ST)
-     * 
-     * 0b01100010  *Ultra-high performance, FAST_ODR=true, 155Hz
-     * 0b01000110  High performance mode, FAST_ODR=true, 300Hz
-     * 0b01111100  Ultra-high performance, FAST_ODR=false, 80Hz
-     */
-    uint8_t ctrlReg1Config = 0b01100010;
+    /* Set Control Register 1 params */
+    // uint8_t ctrlReg1Config = 0b01100010;
+    // Enable temp. sensor. XY operative mode = ultra-high performance. ODR = 0b100 (10Hz). Enable fast ODR. Disable self-test.
+    // With fast-ODR mode enabled and ultra-high performance mode selected, this yields a final ODR of 155Hz.
+    uint8_t ctrlReg1Config = 0xF2;  // 0b11110010
 
 
-    /**
-     * Set Control Register 2 params:
-     * MEASUREMENT RANGE, REBOOT, SOFT RESET
-     * Remember to set range in constructor!
-     * 
-     * 0b (0) (FS1) (FS0) (0) (REBOOT) (SOFT_RS) (0) (0)
-     * 
-     * 0b00000000  *+/- 4 gauss range
-     * 0b00100000  +/- 8 gauss range
-     * 0b01000000  +/- 12 gauss range
-     * 0b01100000  +/- 16 gauss range
-     */
+    /* Set Control Register 2 params */
+    // This sets the data range
     uint8_t ctrlReg2Config;
     switch (this->_range)
     {
         case LIS3MDL_RANGE_4G:
-            ctrlReg2Config = 0b00000000;
+            ctrlReg2Config = 0x00;  // 0b00000000
             break;
         case LIS3MDL_RANGE_8G:
-            ctrlReg2Config = 0b00100000;
+            ctrlReg2Config = 0x20;  // 0b00100000
             break;
         case LIS3MDL_RANGE_12G:
-            ctrlReg2Config = 0b01000000;
+            ctrlReg2Config = 0x40;  // 0b01000000
             break;
         case LIS3MDL_RANGE_16G:
-            ctrlReg2Config = 0b01100000;
+            ctrlReg2Config = 0x60;  // 0b01100000
             break;
         default:
-            ctrlReg2Config = 0b00000000;
+            ctrlReg2Config = 0x00;
             #if defined(LIS3MDL_DEBUG)
             DEBUG_PORT.println("LIS3MDL:Initialize WARNING: Invalid measurement range. Check code.");
             #endif
@@ -123,35 +112,18 @@ bool LIS3MDL_Mag::Initialize(LIS3MDL_MeasRange_t measRange)
             break;
     }
 
-    /**
-     * Set Control Register 3 params:
-     * SYSTEM OPERATION MODE
-     * 
-     * 0b (0) (0) (LP) (0) (0) (SIM) (MD1) (MD0)
-     * 
-     * 0b00000000  LP=0, SIM=0, continuous mode
-     */
-    uint8_t ctrlReg3Config = 0b00000000;
+    /* Set Control Register 3 params */
+    // Low-power disable. 4-wire SPI interface. Continuous conversion mode.
+    uint8_t ctrlReg3Config = 0x00;  // 0b00000000
 
-    /**
-     * Set Control Register 4 params:
-     * Z AXIS OPERATION MODE, ENDIANESS
-     * 
-     * 0b (0) (0) (0) (0) (OMZ1) (OMZ0) (BLE) (0)
-     * 
-     * 0b00001100  *Ultra-high performance mode, lsb at lower address
-     * 0b00001000  High performance mode
-     */
-    uint8_t ctrlReg4Config = 0b00001100;
+    /* Set Control Register 4 params */
+    // Ultra-high performance mode for Z-axis. LSb at lower address.
+    uint8_t ctrlReg4Config = 0x0C;  // 0b00001100
 
-    /**
-     * Set Control Register 5 params
-     * 
-     * 0b (FAST_READ) (BDU) (0) (0) (0) (0) (0) (0)
-     * 
-     * 0b00000000  *FAST_READ=false, continuous update
-     */
-    uint8_t ctrlReg5Config = 0b00000000;
+    /* Set Control Register 5 params */
+    // Disable fast-read. Continuous update.
+    uint8_t ctrlReg5Config = 0x00;  // 0b00000000
+
 
     // Send config commands
     this->I2Cwrite8(LIS3MDL_CTRL_REG1, ctrlReg1Config);
@@ -254,6 +226,42 @@ float LIS3MDL_Mag::GetMy()
 float LIS3MDL_Mag::GetMz()
 {
     return this->_mz;
+}
+
+
+// ----------------------------------------------------------------------------
+// GetTemperature()
+// ----------------------------------------------------------------------------
+/**
+ * Read temperature from the magnetometer sensor and return as float in units 
+ * of [C]. Temperature ranges from -40C to +85C. ODR is the same as the mag's ODR.
+ * 
+ * @returns Floating-point temperature in [C].
+ */
+float LIS3MDL_Mag::GetTemperature()
+{
+    uint8_t tlo;
+    uint8_t thi;
+    int16_t tempRaw;
+    float scaling;
+    float tempC;
+
+    scaling = 0.125f;  // Temperature scaling, 1 / (8 degC/LSB) (see p.9)
+
+    // Request over i2c bus
+    this->_SensorWire->beginTransmission((uint8_t)LIS3MDL_ADDR);
+    this->_SensorWire->write(LIS3MDL_OUT_TEMP_L | 0x80);
+    this->_SensorWire->endTransmission();
+
+    // Read bytes
+    this->_SensorWire->requestFrom((uint8_t)LIS3MDL_ADDR, (uint8_t)2);
+    tlo = this->_SensorWire->read();
+    thi - this->_SensorWire->read();
+
+    // Convert to float
+    tempRaw = (int16_t)((thi << 8) | tlo);  // temperature as a signed int
+    tempC = (float)tempRaw * scaling;
+    return tempC;
 }
 
 

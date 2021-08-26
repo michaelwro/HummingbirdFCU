@@ -8,8 +8,13 @@
  * Created: 17 Jan 2021
  * 
  * Resources:
- * GitHub Code Repository: https://github.com/michaelwro/Arduino-LIS3MDL
  * LIS3MDL Datasheet: https://www.st.com/resource/en/datasheet/lis3mdl.pdf
+ * 
+ * Datasheet Specs
+ * ---------------
+ * ~ +/- 4 Gauss to 16 Gauss measurement range
+ * ~ 4.1 mgauss RMS noise (max)
+ * ~ Nonlinearity: +/- 0.12 %FSR
  */
 
 #pragma once
@@ -39,6 +44,8 @@
 #define LIS3MDL_CTRL_REG3 0x22  // Control register 3
 #define LIS3MDL_CTRL_REG4 0x23  // Control register 4
 #define LIS3MDL_CTRL_REG5 0x24  // Control register 5
+#define LIS3MDL_OUT_TEMP_L 0x2E  // Low-byte for temperature sensor. Stores as twos-compliment.
+#define LIS3MDL_OUT_TEMP_H 0x2F  // High-byte for temperature sensor. Stores as twos-compliment.
 
 
 // ------------------------------------
@@ -77,6 +84,7 @@ public:
     float GetMx();
     float GetMy();
     float GetMz();
+    float GetTemperature();
     uint32_t prevMeasMicros;  // Previous measurement micros()
 protected:
 private:

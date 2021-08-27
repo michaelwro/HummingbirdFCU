@@ -19,21 +19,31 @@
 #include <Arduino.h>
 #include "hummingbird_config.h"
 #include "fxas21002_gyro_tests.h"
+#include "fxos8700_accel_tests.h"
 
 /* Set tests to run */
-// #define TEST_GYRO_SENSOR
-
+#define TEST_SENSOR_FXAS21002  // gyro
+#define TEST_SENSOR_FXOS8700  // accelerometer
 
 void run_tests()
 {
     delay(5000);
     UNITY_BEGIN();
 
+    #ifdef TEST_SENSOR_GYRO
     RUN_TEST(test_fxas21002_init_250dps);
     RUN_TEST(test_fxas21002_init_500dps);
     RUN_TEST(test_fxas21002_init_1000dps);
     RUN_TEST(test_fxas21002_init_2000dps);
     RUN_TEST(test_fxas21002_self_test);
+    #endif
+
+    #ifdef TEST_SENSOR_FXOS8700
+    RUN_TEST(test_fxos8700_init_2g);
+    RUN_TEST(test_fxos8700_init_4g);
+    RUN_TEST(test_fxos8700_init_8g);
+    RUN_TEST(test_fxos8700_self_test);
+    #endif
 
     UNITY_END();
 }
@@ -44,7 +54,18 @@ void run_tests()
 #ifdef ARDUINO
 void setup()
 {
+    pinMode(RED_LED, OUTPUT);
+    pinMode(GRN_LED, OUTPUT);
+    
+    // Red during tests
+    digitalWrite(GRN_LED, LOW);
+    digitalWrite(RED_LED, HIGH);
+
     run_tests();
+
+    // green after tests
+    digitalWrite(RED_LED, LOW);
+    digitalWrite(GRN_LED, HIGH);
 }
 
 

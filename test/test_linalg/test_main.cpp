@@ -73,7 +73,6 @@ void run_tests()
 
 
 #ifdef ARDUINO
-#include <Arduino.h>
 void setup()
 {
     pinMode(RED_LED, OUTPUT);

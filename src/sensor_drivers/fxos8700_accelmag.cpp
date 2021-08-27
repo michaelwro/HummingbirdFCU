@@ -188,9 +188,9 @@ bool FXOS8700AccelMag::ReadSensor()
     ayRaw = (int16_t)((ayhi << 8) | aylo) >> 2;
     azRaw = (int16_t)((azhi << 8) | azlo) >> 2;
 
-    mxRaw = (int16_t)((mxhi << 8) | mxlo);
-    myRaw = (int16_t)((myhi << 8) | mylo);
-    mzRaw = (int16_t)((mzhi << 8) | mzlo);
+    // mxRaw = (int16_t)((mxhi << 8) | mxlo);
+    // myRaw = (int16_t)((myhi << 8) | mylo);
+    // mzRaw = (int16_t)((mzhi << 8) | mzlo);
 
     this->prevMeasMicros = micros();
 

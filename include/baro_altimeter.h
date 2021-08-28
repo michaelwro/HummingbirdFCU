@@ -32,6 +32,7 @@
 #include <Wire.h>
 #include <math.h>
 #include "hummingbird_config.h"
+#include "debugging.h"
 #include "Adafruit_BMP3XX.h"
 #include "filters/median_filter.h"
 #include "filters/low_pass_filter.h"

@@ -15,11 +15,12 @@
 #include <Arduino.h>
 #include <Wire.h>
 #include "hummingbird_config.h"
+#include "debugging.h"
 // #include "constants.h"
 #include "Adafruit_Sensor.h"
 #include "Adafruit_BMP3XX.h"
 
-#if defined(DEBUG) && defined(DEBUG_PORT)
+#if defined(DEBUG)
     #define BMP388_DEBUG  // Enable/disable debug print messages
 #endif
 

@@ -26,19 +26,18 @@
 #include <Arduino.h>
 #include <math.h>
 #include <Wire.h>
-#include "hummingbird_config.h"  // Custom config settings
-#include "sensor_drivers/fxos8700_accelmag.h"  // [] COMPLETED
-#include "sensor_drivers/fxas21002_gyro.h"  // [] COMPLETED?
-#include "Adafruit_Sensor.h"
-#include "Adafruit_BMP3XX.h"
+#include "hummingbird_config.h"
+#include "sensor_drivers/fxos8700_accelmag.h"
+#include "sensor_drivers/fxas21002_gyro.h"
+#include "sensor_drivers/bmp388_barometer.h"
 // #include "baro_altimeter.h"
-#include "maths/math_functs.h"  // [] COMPLETED TODO: Check for ISNAN
+#include "maths/math_functs.h"
 #include "maths/matrix_math.h"
 #include "maths/matrices.h"
 #include "maths/vectors.h"
 // #include "Conversions.h"
-#include "filters/median_filter.h"  // [] COMPLETED
-#include "filters/low_pass_filter.h"  // [] COMPLETED
+#include "filters/median_filter.h"
+#include "filters/low_pass_filter.h"
 #include "sensor_systems/inertial_nav_system.h"
 #include "sensor_systems/compass.h"
 
@@ -51,7 +50,10 @@
 
 
 
-LIS3MDL_Mag mag(&SENSOR_I2C);
+BMP388Baro baro(&SENSOR_I2C);
+Conversions cvt;
+
+
 
 
 
@@ -81,7 +83,7 @@ void setup()
     digitalWrite(RED_LED, HIGH);  // Start off LOW
     digitalWrite(GRN_LED, LOW);  // digitalWrite(GRN_LED, LOW);
 
-    if (!mag.Initialize(LIS3MDL_RANGE_4G))
+    if (!baro.Initialize(BMP3_NO_OVERSAMPLING, BMP3_NO_OVERSAMPLING, BMP3_IIR_FILTER_COEFF_3, BMP3_ODR_100_HZ))
     {
         DEBUG_PORT.println("ERROR INIT. SENSOR!");
         return;
@@ -149,9 +151,9 @@ void loop()
 {
 
     now = millis();
-    if (now - prev >= 100)
+    if (now - prev >= 10)
     {
-        if (!mag.ReadSensor())
+        if (!baro.ReadSensor())
         {
             DEBUG_PORT.println("ERROR READING SENSOR!");
             return;
@@ -164,9 +166,12 @@ void loop()
         // DEBUG_PORT.print(y, 2); DEBUG_PORT.print(",");
         // DEBUG_PORT.println(z, 2);
 
-        float temp = mag.GetTemperature();
-        // DEBUG_PORT.print("Temp [C]: ");
-        DEBUG_PORT.println(temp, 3);
+        float p = baro.GetPressure();
+        float t = baro.GetTemperature();
+        DEBUG_PORT.print("Pres [hPa]: ");
+        DEBUG_PORT.print(p, 3);
+        DEBUG_PORT.print("   Temp [F]: ");
+        DEBUG_PORT.println(cvt.C2F(t), 3);
         prev = now;
     }
 

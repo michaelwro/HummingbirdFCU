@@ -69,7 +69,12 @@ bool FXAS21002Gyro::Initialize(GyroRanges_t rng)
     expected FXAS21002C ID. */
     connectedSensorID = this->I2Cread8(GYRO_REG_ID);
     if (connectedSensorID != FXAS21002C_ID)
-        return false;  // ID's dont match!
+    {
+        #ifdef FXAS21002_DEBUG
+        DEBUG_PRINTLN("FXAS21002::Initialize ERROR: Received gyro ID does not match expected.");
+        #endif
+        return false;
+    }
     
     /* Set sensor configuration parameters */
     ctrlReg0 = 0x00;
@@ -88,7 +93,10 @@ bool FXAS21002Gyro::Initialize(GyroRanges_t rng)
             ctrlReg0 = 0x00;
             break;
         default:
-            return false;  // TODO: Raise error?
+            #ifdef FXAS21002_DEBUG
+            DEBUG_PRINTLN("FXAS21002::Initialize ERROR: Unknown gyro range specified.");
+            #endif
+            return false;
             break;
     }
 
@@ -115,7 +123,7 @@ bool FXAS21002Gyro::Initialize(GyroRanges_t rng)
 // ReadSensor()
 // ----------------------------------------------------------------------------
 /**
- * Read gyroscope data from device registers. Computes gyro readings in [rad/s]
+ * Read gyroscope data from device registers. Computes gyro readings in [deg/s]
  * 
  * @return  True if successful, false if failed.
  */
@@ -177,10 +185,10 @@ bool FXAS21002Gyro::ReadSensor()
             break;
     }
 
-   // Convert [dps] to [rad/s]
-   this->_gx *= 0.01745329251994329576923690768489f;
-   this->_gy *= 0.01745329251994329576923690768489f;
-   this->_gz *= 0.01745329251994329576923690768489f;
+//    // Convert [dps] to [rad/s]
+//    this->_gx *= 0.01745329251994329576923690768489f;
+//    this->_gy *= 0.01745329251994329576923690768489f;
+//    this->_gz *= 0.01745329251994329576923690768489f;
 
     return true;
 }
@@ -209,21 +217,21 @@ float FXAS21002Gyro::GetTemperature()
 }
 
 
-/* Return gyro x-measurement in [rad/s] */
+/* Return gyro x-measurement in [deg/s] */
 float FXAS21002Gyro::GetGx()
 {
     return this->_gx;
 }
 
 
-/* Return gyro y-measurement in [rad/s] */
+/* Return gyro y-measurement in [deg/s] */
 float FXAS21002Gyro::GetGy()
 {
     return this->_gy;
 }
 
 
-/* Return gyro z-measurement in [rad/s] */
+/* Return gyro z-measurement in [deg/s] */
 float FXAS21002Gyro::GetGz()
 {
     return this->_gz;

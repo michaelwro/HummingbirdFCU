@@ -25,8 +25,15 @@
 #include <Wire.h>
 // #include <limits.h>
 #include "constants.h"
+#include "debugging.h"
 #include "conversions.h"
 #include "hummingbird_config.h"
+
+
+#ifdef DEBUG
+#define FXAS21002_DEBUG  // Toggle FXAS21002 gyro debug messages
+#endif
+
 
 
 // ----------------------------------------------------------------------------
@@ -96,9 +103,9 @@ protected:
 private:
     void I2Cwrite8(uint8_t regOfInterest, uint8_t valToWrite);
     uint8_t I2Cread8(uint8_t regOfInterest);
-    float _gx;  // Gyro x reading, [rad/s]
-    float _gy;  // Gyro y reading, [rad/s]
-    float _gz;  // Gyro z reading, [rad/s]
+    float _gx;  // Gyro x reading, [deg/s]
+    float _gy;  // Gyro y reading, [deg/s]
+    float _gz;  // Gyro z reading, [deg/s]
     GyroRanges_t gyroRange;
     TwoWire *_SensorWire;
 };

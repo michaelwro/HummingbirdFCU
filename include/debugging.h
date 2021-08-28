@@ -5,6 +5,8 @@
 // Created: 28 Aug 2021
 // ----------------------------------------------------------------------------
 /**
+ * UBER-EXTREME CAUTION SHOULD BE USED CHANGING PARAMETERS IN THIS FILE!
+ * 
  * These are debugging variables and macros used to print debugging 
  * information to the serial terminal.
  */

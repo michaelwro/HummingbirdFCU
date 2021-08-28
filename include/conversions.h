@@ -14,8 +14,8 @@
 #include "hummingbird_config.h"
 
 
-constexpr float DEG2RAD  = 0.0174532925f;  // PI / 180, convert degrees to radians
-constexpr float RAD2DEG  = 57.29577951f;  // 180 / PI, convert radians to degrees
+constexpr float DEG2RAD  = 0.01745329251994329576923690768489f;  // PI / 180, convert degrees to radians
+constexpr float RAD2DEG  = 57.295779513082320876798154814105f;  // 180 / PI, convert radians to degrees
 
 // --------------------------------------
 // Conversion factors and equations

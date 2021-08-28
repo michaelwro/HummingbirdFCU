@@ -25,6 +25,7 @@
 GravityComputer::GravityComputer()
 {
     this->_grav = CONSTS_GRAV;
+    this->errCount = 0;
 }
 
 
@@ -34,12 +35,23 @@ GravityComputer::GravityComputer()
 /**
  * Recompute gravity with updated latitude and altitude.
  * 
- * @param lat_rad   [rad] Latitude, default 45deg = PI/4
- * @param alt_msl   [m] Altitude above MSL, default 200m.
+ * @param lat_rad   [rad] Geodetic latitude.
+ * @param lon_rad   [rad] Geodetic longitude.
+ * @param alt_msl   [m] Altitude above MSL.
+ * @returns True if everything is good, false if there was an error.
  */
-void GravityComputer::UpdatePosition(float lat_rad, float alt_msl)
+bool GravityComputer::Update(float lat_rad, float lon_rad, float alt_msl)
 {
-    this->_ComputeGravity(lat_rad, alt_msl);
+    if (!this->_ComputeGravity(lat_rad, lon_rad, alt_msl))
+    {
+        #ifdef DEBUG
+        DEBUG_PRINTLN("GravityComputer::Update WARNING: Error encountered in gravity calculation. Defaulting to WGS84 gravity");
+        #endif
+        this->_grav = CONSTS_GRAV;
+        this->errCount++;
+        return false;
+    }
+    return true;
 }
 
 
@@ -48,7 +60,7 @@ void GravityComputer::UpdatePosition(float lat_rad, float alt_msl)
 // --------------------------------------------------------------
 /**
  * Returns gravitational acceleration in [m/s/s]. Down is 
- * positive. Be sure to periodically call UpdateGravity().
+ * positive. Be sure to periodically call Update().
  * 
  * @return      Gravity in [m/s/s]
  */
@@ -59,19 +71,26 @@ float GravityComputer::GetGravity()
 
 
 /* Compute gravitational acceleration in [m/s/s] */
-void GravityComputer::_ComputeGravity(float lat, float alt)
+bool GravityComputer::_ComputeGravity(float lat, float lon, float alt)
 {
-    float g0;
-    float denom;
-    float sinLat;
-    float sin2Lat;
-
     // Range check latitude
     // Lat. must be between -90deg and +90deg
     if (lat >= CONSTS_PIDIV2 || lat <= -CONSTS_PIDIV2)
     {
-        this->_grav = CONSTS_GRAV;
-        return;
+        #ifdef DEBUG
+        DEBUG_PRINTLN("GravityComputer::_ComputeGravity ERROR: Latitude is out of bounds.");
+        #endif
+        return false;
+    }
+
+    // Range check longitude
+    // Long. must be between -180deg and +180deg
+    if (lon >= CONSTS_PI || lon <= -CONSTS_PI)
+    {
+        #ifdef DEBUG
+        DEBUG_PRINTLN("GravityComputer::_ComputeGravity ERROR: Longitude is out of bounds.");
+        #endif
+        return false;
     }
         
     
@@ -81,19 +100,35 @@ void GravityComputer::_ComputeGravity(float lat, float alt)
     // Meh, these should be good enough for sanity checks :P
     if (alt >= 3400.0f || alt <= -400.0f)
     {
-        this->_grav = CONSTS_GRAV;
-        return;
+        #ifdef DEBUG
+        DEBUG_PRINTLN("GravityComputer::_ComputeGravity ERROR: Altitude is out of reasonable bounds for a quadcopter.");
+        #endif
+        return false;
     }
 
-    sinLat = sinf(lat);
-    sin2Lat = sinf(2.0f * lat);
-    
-    // Compute sea-level gravity
-    g0 = 9.780318f * (1.0f + (0.0053024f * sinLat * sinLat) - (0.0000059f * sin2Lat * sin2Lat));  // Get grav. at sea level
+    #ifdef GRAV_COMPUTER_WGS84_MODEL
+    // WGS84 gravity equation
+    float sinLatSq = sinf(lat) * sinf(lat);
+    this->_grav = 9.780327f * ((1.0f + (0.00193185138639f * sinLatSq) / sqrtf(1.0f - (0.006694379990141318f * sinLatSq)));  // Grav. at sea level
+    #else
+    // Helmert's equation
+    float sinLat = sinf(lat);
+    float sin2Lat = sinf(2.0f * lat);
+    this->_grav = 9.780327f * (1.0f + (0.0053024f * sinLat * sinLat) - (0.0000058f * sin2Lat * sin2Lat));  // Grav. at sea level
+    #endif
 
     // Account for altitude
-    denom = (1.0f + (alt / CONSTS_WGS84_A));
-    this->_grav = g0 / (denom * denom);
+    #ifdef GRAV_COMPUTER_NONLINEAR_FAC
+    // Nonlinear free-air correction
+    this->_grav += (3.986004418E14f / ((CONSTS_WGS84_A + alt) * (CONSTS_WGS84_A + alt))) - (3.986004418E14f / (CONSTS_WGS84_A * CONSTS_WGS84_A))
+    // float denom = (1.0f + (alt / CONSTS_WGS84_A));
+    // this->_grav = g0 / (denom * denom);
+    #else
+    // Linearized free-air correction (a good approx. for low altitudes)
+    this->_grav -= 0.000003085f * alt;  // (GM * 2) / Re**3 = 0.000003072460023730221f 
+    #endif
+
+    return true;
 }
 
 

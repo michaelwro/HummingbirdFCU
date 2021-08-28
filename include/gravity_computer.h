@@ -18,7 +18,15 @@
 #include <math.h>
 #include "hummingbird_config.h"
 #include "conversions.h"
+#include "debugging.h"
 #include "constants.h"
+
+
+// Use the WGS84 gravity formula (https://en.wikipedia.org/wiki/Gravity_of_Earth#:~:text=various%20cities%20show-,Mathematical%20models,-%5Bedit%5D)
+// #define GRAV_COMPUTER_WGS84_MODEL
+
+// Use the full Free-Air Correction model. Uses the linearized one by default.
+// #define GRAV_COMPUTER_NONLINEAR_FAC
 
 
 // --------------------------------------------------------------
@@ -38,13 +46,13 @@ public:
     GravityComputer(const GravityComputer &) = delete;
     GravityComputer &operator=(const GravityComputer &) = delete;
 
-    void UpdatePosition(float lat_rad = CONSTS_PIDIV4, float alt_msl = 280.0f);
+    bool Update(float lat_rad = CONSTS_PIDIV4, float lon_rad = 0.0f, float alt_msl = 280.0f);
     float GetGravity();
+    uint32_t errCount;  // Number of errors or invalid inputs to the code.
 
 private:
-    void _ComputeGravity(float lat, float alt);
-
-    /* Private Variables */
+    bool _ComputeGravity(float lat, float lon, float alt);
+    
     float _grav;  // Computed gravitational acceleration in [m/s/s]
 };
 

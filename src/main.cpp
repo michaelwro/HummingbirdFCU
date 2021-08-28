@@ -31,16 +31,12 @@
 #include "sensor_drivers/fxos8700_accelmag.h"
 #include "sensor_drivers/fxas21002_gyro.h"
 #include "sensor_drivers/bmp388_barometer.h"
-// #include "baro_altimeter.h"
 #include "maths/math_functs.h"
-#include "maths/matrix_math.h"
 #include "maths/matrices.h"
 #include "maths/vectors.h"
-// #include "Conversions.h"
 #include "filters/median_filter.h"
 #include "filters/low_pass_filter.h"
 #include "sensor_systems/inertial_nav_system.h"
-#include "sensor_systems/compass.h"
 
 
 

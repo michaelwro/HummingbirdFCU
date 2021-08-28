@@ -29,27 +29,8 @@ InertialNavSystem::InertialNavSystem()
 Accel(3), AccelRaw(3), AccelTOBias(3), 
 AccelMagSensor(&SENSOR_I2C), GyroSensor(&SENSOR_I2C)
 {
-    fs = 200.0f;  // Default, just in case
-    ts = 1.0f / fs;
-    tsMillis = (uint32_t)(ts * 1000.0f);
     prevUpdateMicros = micros();
 
-}
-
-
-// ----------------------------------------------------------------------------
-// SetSampleRate(float fs_hz)
-// ----------------------------------------------------------------------------
-/**
- * Set the INS sample rate.
- * 
- * @param fs_hz Sample rate in [Hz]
- */
-void InertialNavSystem::SetSampleRate(float fs_hz)
-{
-    fs = fs_hz;
-    ts = 1.0f / fs_hz;
-    tsMillis = (uint32_t)(ts * 1000.0f);
 }
 
 
@@ -65,7 +46,7 @@ void InertialNavSystem::SetSampleRate(float fs_hz)
  */
 bool InertialNavSystem::Initialize()
 {
-    size_t n;
+    uint32_t initBiasTS = 20;  // Sample period for measuring init. IMU biases.
 
     #ifdef INS_DEBUG
     DEBUG_PORT.print("INERTIALNAVSYSTEM:Initialize: Connecting to sensors... ");
@@ -106,8 +87,7 @@ bool InertialNavSystem::Initialize()
     DEBUG_PORT.print("INERTIALNAVSYSTEM:Initialize: Measuring gyro turn-on biases... ");
     #endif
 
-    n = (size_t)(fs * INS_BIAS_INIT_TIME);  // Number of readings
-    if (!ComputeInitGyroBiases(n))
+    if (!MeasureInitGyroBiases(initBiasTS))
     {
         #ifdef INS_DEBUG
         DEBUG_PORT.println("INERTIALNAVSYSTEM:Initialize ERROR: Error computing gyro turn-on biases.");
@@ -269,36 +249,49 @@ void InertialNavSystem::UpdateAccelAngles()
 
 
 // ----------------------------------------------------------------------------
-// ComputeInitGyroBiases(size_t n)
+// InertialNavSystem::MeasureInitGyroBiases(uint32_t samplePeriod)
 // ----------------------------------------------------------------------------
 /**
- * Measure initial gyro turn-on bias.
+ * Measure initial gyro turn-on biases.
  * 
- * @param n Number of measurements to take
+ * @param samplePeriod  [ms] Sample period/delay between samples. Use this to 
+ * set sample rate for recording turn-on biases.
  * @returns True if successful, false if not
  */
-bool InertialNavSystem::ComputeInitGyroBiases(size_t n)
+bool InertialNavSystem::MeasureInitGyroBiases(uint32_t samplePeriod)
 {
-    size_t i;
     float x = 0.0f;
     float y = 0.0f;
     float z = 0.0f;
+    uint32_t n = 0;  // number of measurements
+    uint32_t now = millis();
+    uint32_t prev;  // previous measurement millis()
+    uint32_t start;  // starting millis()
 
-    for (i = 0; i < n; i++)
+    prev = now;
+    start = now;
+    while (now - start <= INS_BIAS_INIT_TIME)
     {
-        if (!Update())
+        now = millis();
+        if (now - prev >= samplePeriod)  // Take a measurement
         {
-            #ifdef INS_DEBUG
-            DEBUG_PORT.println("INERTIALNAVSYSTEM:ComputeInitGyroBiases ERROR: Could not read sensors.");
-            #endif
-            return false;
+            if (!Update())  // Take IMU measurements
+            {
+                #ifdef INS_DEBUG
+                DEBUG_PORT.println("INERTIALNAVSYSTEM:ComputeInitGyroBiases ERROR: Could not read sensors.");
+                #endif
+                return false;
+            }
+            x += Gyro.vec[0];  // Increase average counter
+            y += Gyro.vec[1];
+            z += Gyro.vec[2];
+            n++;  // number of measurements
+
+            prev = now;  // update measurement timers
         }
-        x += Gyro.vec[0];
-        y += Gyro.vec[1];
-        z += Gyro.vec[2];
-        delay(tsMillis);
     }
 
+    // Compute averages
     GyroTOBias.vec[0] = x / (float)n;
     GyroTOBias.vec[1] = y / (float)n;
     GyroTOBias.vec[2] = z / (float)n;
@@ -308,17 +301,17 @@ bool InertialNavSystem::ComputeInitGyroBiases(size_t n)
 
 
 // ----------------------------------------------------------------------------
-// ComputeInitAccelBiases(size_t n)
+// InertialNavSystem::MeasureInitAccelBiases(uint32_t samplePeriod)
 // ----------------------------------------------------------------------------
 /**
  * Measure initial accelerometer turn-on bias.
  * 
- * @param n Number of measurements to take
+ * @param samplePeriod  [ms] Sample period/delay between samples. Use this to 
+ * set sample rate for recording turn-on biases.
  * @returns True if successful, false if not
  */
-bool InertialNavSystem::ComputeInitAccelBiases(size_t n)
+bool InertialNavSystem::MeasureInitAccelBiases(uint32_t samplePeriod)
 {
-    size_t i;
     float g;
     float x = 0.0f;
     float y = 0.0f;
@@ -326,24 +319,35 @@ bool InertialNavSystem::ComputeInitAccelBiases(size_t n)
     float sroll, croll;
     float spitch, cpitch;
     float axNED, ayNED, azNED;
+    uint32_t n = 0;  // number of measurements
+    uint32_t now = millis();
+    uint32_t prev;  // previous measurement millis()
+    uint32_t start;  // starting millis()
 
-
-    // Compute average accel values
-    for (i = 0; i < n; i++)
+    prev = now;
+    start = now;
+    while (now - start <= INS_BIAS_INIT_TIME)
     {
-        if (!Update())
+        now = millis();
+        if (now - prev >= samplePeriod)  // Take a measurement
         {
-            #ifdef INS_DEBUG
-            DEBUG_PORT.println("INERTIALNAVSYSTEM:ComputeInitAccelBiases ERROR: Could not read sensors.");
-            #endif
-            return false;
+            if (!Update())  // Take IMU measurements
+            {
+                #ifdef INS_DEBUG
+                DEBUG_PORT.println("INERTIALNAVSYSTEM:ComputeInitGyroBiases ERROR: Could not read sensors.");
+                #endif
+                return false;
+            }
+            x += Accel.vec[0];  // Increase average counter
+            y += Accel.vec[1];
+            z += Accel.vec[2];
+            n++;  // number of measurements
+
+            prev = now;  // update measurement timers
         }
-        x += Accel.vec[0];
-        y += Accel.vec[1];
-        z += Accel.vec[2];
-        delay(tsMillis);
     }
 
+    // Compute averages
     x /= (float)n;
     y /= (float)n;
     z /= (float)n;

@@ -36,10 +36,10 @@
 
 /* Filters */
 constexpr float INS_ACCEL_LPF_SF = 0.98f;  // Smoothing factor (alpha) of accelerometer low-pass filter, [0, 1]
-constexpr float INS_GYRO_LPF_SF = 0.99f;  // Gyro low pass filter smoothing factor [0, 1]
+constexpr float INS_GYRO_LPF_SF = 0.98f;  // Gyro low pass filter smoothing factor [0, 1]
 
 /* Turn-on biases */
-constexpr float INS_BIAS_INIT_TIME = 1.0f;  // [sec] Amount of time taken to determine accel. and gyro turn-on bias
+constexpr uint32_t INS_BIAS_INIT_TIME = 1000;  // [millisec] Amount of time taken to determine accel. and gyro turn-on bias
 
 /* Measurement ranges */
 constexpr GyroRanges_t INS_GYRO_RANGE = GYRO_RNG_1000DPS;  // Gyro measurement range
@@ -81,14 +81,11 @@ public:
 protected:
 private:
     void UpdateAccelAngles();
-    bool ComputeInitGyroBiases(size_t n);
-    bool ComputeInitAccelBiases(size_t n);
+    bool MeasureInitGyroBiases(uint32_t samplePeriod);
+    bool MeasureInitAccelBiases(uint32_t samplePeriod);
 
-    uint32_t tsMillis;          // [ms] INS sample period
     float roll;     // [rad] Accelerometer roll angle (NED)
     float pitch;    // [rad] Accelerometer pitch angle (NED)
-    float fs;       // [Hz] INS sample rate
-    float ts;       // [sec] INS sample period
     
     FXOS8700AccelMag AccelMagSensor;  // Accelerometer/magnetometer sensor class
     FXAS21002Gyro GyroSensor;  // Gyroscope sensor class

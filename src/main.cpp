@@ -27,6 +27,7 @@
 #include <math.h>
 #include <Wire.h>
 #include "hummingbird_config.h"
+#include "debugging.h"
 #include "sensor_drivers/fxos8700_accelmag.h"
 #include "sensor_drivers/fxas21002_gyro.h"
 #include "sensor_drivers/bmp388_barometer.h"
@@ -168,10 +169,10 @@ void loop()
 
         float p = baro.GetPressure();
         float t = baro.GetTemperature();
-        DEBUG_PORT.print("Pres [hPa]: ");
-        DEBUG_PORT.print(p, 3);
-        DEBUG_PORT.print("   Temp [F]: ");
-        DEBUG_PORT.println(cvt.C2F(t), 3);
+        // DEBUG_PORT.print("");
+        DEBUG_PORT.println(p, 3);
+        // DEBUG_PORT.print(",");
+        // DEBUG_PORT.println(cvt.C2F(t), 3);
         prev = now;
     }
 

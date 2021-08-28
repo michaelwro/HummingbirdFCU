@@ -14,24 +14,6 @@
 
 #pragma once
 
-/**
- * ====================================
- * ENABLE/DISABLE DEBUG MESSAGES
- * ====================================
- * ~~ SUPRESS DEBUG MESSAGES BEFORE FLIGHT! ~~
- * Uncomment to print debug statements. Comment out to supress messages. 
- * Found in hummingbird_config.h
- */
-#define DEBUG
-
-/**
- * ====================================
- * DEBUG SERIAL/UART INTERFACE
- * ====================================
- * Use the Teensy 4.1's primary serial interface for printing debug messages. 
- * Found in hummingbird_config.h
- */
-#define DEBUG_PORT Serial
 
 /**
  * ====================================

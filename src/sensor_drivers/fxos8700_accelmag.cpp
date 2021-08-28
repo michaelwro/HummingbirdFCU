@@ -90,7 +90,12 @@ bool FXOS8700AccelMag::Initialize(AccelRanges_t accRange)
     connectedSensorID = this->I2Cread8(ACCELMAG_REG_ID);
     
     if (connectedSensorID != FXOS8700_ID)
+    {
+        #ifdef FXOS8700_DEBUG
+        DEBUG_PRINTLN("FXOS8700ACCELMAG::Initialize ERROR: Received sensor ID does not match expected.");
+        #endif
         return false;
+    }
     
     /* Set sensor to STANDBY MODE in order to make changes to/configure
     a few registers. */
@@ -109,6 +114,9 @@ bool FXOS8700AccelMag::Initialize(AccelRanges_t accRange)
             this->I2Cwrite8(ACCELMAG_REG_XYZ_CFG, 0x02);
             break;
         default:
+            #ifdef FXOS8700_DEBUG
+            DEBUG_PRINTLN("FXOS8700ACCELMAG::Initialize ERROR: Unknown accelerometer range specified.");
+            #endif
             return false;
             break;
     }

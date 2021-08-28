@@ -40,7 +40,12 @@
 #include <Wire.h>
 #include <Arduino.h>
 #include "hummingbird_config.h"
-#include "constants.h"
+#include "debugging.h"
+
+#ifdef DEBUG
+#define FXOS8700_DEBUG  // Toggle printing FXOS8700 debug messages to the debug port
+#endif
+
 
 constexpr uint8_t FXOS8700_ID       = 0xC7;  // Unique ID
 constexpr uint8_t FXOS8700_ADDRESS  = 0x1F;  // I2C address

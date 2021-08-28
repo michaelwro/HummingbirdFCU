@@ -22,11 +22,12 @@
 
 #include <Arduino.h>
 #include <Wire.h>
+#include "debugging.h"
 #include "hummingbird_config.h"
 
 
-#if defined(DEBUG) && defined(DEBUG_PORT)
-    #define LIS3MDL_DEBUG  // For printing magnetometer debug messages
+#ifdef DEBUG
+#define LIS3MDL_DEBUG  // For printing magnetometer debug messages
 #endif
 
 

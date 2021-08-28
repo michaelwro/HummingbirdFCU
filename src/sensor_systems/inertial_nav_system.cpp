@@ -179,7 +179,7 @@ bool InertialNavSystem::Update()
     AccelRaw.vec[1] = ayRaw;
     AccelRaw.vec[2] = azRaw;
 
-    /* Apply calibration */
+    /* Apply calibration (in g's)*/
     bax = axRaw - SENSCALIB_ACCEL_BX;
     bay = ayRaw - SENSCALIB_ACCEL_BY;
     baz = azRaw - SENSCALIB_ACCEL_BZ;
@@ -187,7 +187,7 @@ bool InertialNavSystem::Update()
     Accel.vec[1] = (SENSCALIB_ACCEL_S12 * bax) + (SENSCALIB_ACCEL_S22 * bay) + (SENSCALIB_ACCEL_S23 * baz);
     Accel.vec[2] = (SENSCALIB_ACCEL_S13 * bax) + (SENSCALIB_ACCEL_S23 * bay) + (SENSCALIB_ACCEL_S33 * baz);
 
-    /* Convert from G's to m/s/s */
+    /* Convert from g's to m/s/s */
     g = GravComputer.GetGravity();
     Accel.vec[0] *= g;
     Accel.vec[1] *= g;
@@ -208,13 +208,13 @@ bool InertialNavSystem::Update()
 
 
 
-/* Return the accelerometer pitch (phi) angle in [rad] */
+/* Return the accelerometer NED pitch (phi) angle in [rad] */
 float InertialNavSystem::GetAccelPitch()
 {
     return pitch;
 }
 
-/* Return the accelerometer roll (theta) angle in [rad] */
+/* Return the accelerometer NED roll (theta) angle in [rad] */
 float InertialNavSystem::GetAccelRoll()
 {
     return roll;
@@ -261,10 +261,10 @@ bool InertialNavSystem::MeasureInitGyroBiases(uint32_t samplePeriod)
     float y = 0.0f;
     float z = 0.0f;
     uint32_t n = 0;  // number of measurements
-    uint32_t now = millis();
     uint32_t prev;  // previous measurement millis()
     uint32_t start;  // starting millis()
 
+    uint32_t now = millis();
     prev = now;
     start = now;
     while (now - start <= INS_BIAS_INIT_TIME)
@@ -280,7 +280,7 @@ bool InertialNavSystem::MeasureInitGyroBiases(uint32_t samplePeriod)
                 return false;
             }
             x += Gyro.vec[0];  // Increase average counter
-            y += Gyro.vec[1];
+            y += Gyro.vec[1];  // [rad]
             z += Gyro.vec[2];
             n++;  // number of measurements
 
@@ -317,10 +317,10 @@ bool InertialNavSystem::MeasureInitAccelBiases(uint32_t samplePeriod)
     float spitch, cpitch;
     float axNED, ayNED, azNED;
     uint32_t n = 0;  // number of measurements
-    uint32_t now = millis();
     uint32_t prev;  // previous measurement millis()
     uint32_t start;  // starting millis()
 
+    uint32_t now = millis();
     prev = now;
     start = now;
     while (now - start <= INS_BIAS_INIT_TIME)
@@ -336,7 +336,7 @@ bool InertialNavSystem::MeasureInitAccelBiases(uint32_t samplePeriod)
                 return false;
             }
             x += Accel.vec[0];  // Increase average counter
-            y += Accel.vec[1];
+            y += Accel.vec[1];  // [m/s/s]
             z += Accel.vec[2];
             n++;  // number of measurements
 

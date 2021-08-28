@@ -17,13 +17,13 @@
 #include <Wire.h>
 #include <Arduino.h>
 #include <math.h>
+#include "debugging.h"
 #include "maths/vectors.h"
 #include "gravity_computer.h"
 #include "hummingbird_config.h"
 #include "sensor_drivers/fxas21002_gyro.h"
 #include "sensor_drivers/fxos8700_accelmag.h"
 #include "sensor_drivers/sensor_calib_params.h"
-#include "filters/median_filter.h"
 #include "filters/low_pass_filter.h"
 
 
@@ -69,10 +69,10 @@ public:
     float GetAccelRoll();
     
     Vectorf Gyro;        // [rad/s], [gx, gy, gz] Gyro measurements (filtered) 
-    Vectorf GyroRaw;     // [rad/s], [gx, gy, gz] Raw gyro measurements
+    Vectorf GyroRaw;     // [deg/s], [gx, gy, gz] Raw gyro measurements
     Vectorf GyroTOBias;  // [rad/s], [bgx, bgy, bgz] Measured gyro turn-on biases
     Vectorf Accel;       // [m/s/s], [ax, ay, az] Accelerometer measurements (filtered)
-    Vectorf AccelRaw;    // [m/s/s], [ax, ay, az] Raw accelerometer measurements
+    Vectorf AccelRaw;    // [g's], [ax, ay, az] Raw accelerometer measurements
     Vectorf AccelTOBias; // [m/s/s], [bax, bay, baz] Measured accelerometer turn-on biases
     uint32_t prevUpdateMicros;  // [us] Previous INS update micros()
 protected:

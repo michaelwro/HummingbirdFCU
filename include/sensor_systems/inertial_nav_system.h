@@ -27,16 +27,13 @@
 #include "filters/low_pass_filter.h"
 
 
-/* Print INS debug messages to the debug port. Both DEBUG and DEBUG_PORT in 
- * hummingbird_config.h must be defined.
- */
-#if defined(DEBUG) && defined(DEBUG_PORT)
-    #define INS_DEBUG
+#ifdef DEBUG
+    #define INS_DEBUG  // Print INS debug messages to the debug port.
 #endif
 
 /* Filters */
-constexpr float INS_ACCEL_LPF_SF = 0.98f;  // Smoothing factor (alpha) of accelerometer low-pass filter, [0, 1]
-constexpr float INS_GYRO_LPF_SF = 0.98f;  // Gyro low pass filter smoothing factor [0, 1]
+constexpr float INS_ACCEL_LPF_SF = 0.95f;  // Smoothing factor (alpha) of accelerometer low-pass filter, [0, 1]
+// constexpr float INS_GYRO_LPF_SF = 0.98f;  // Gyro low pass filter smoothing factor [0, 1]
 
 /* Turn-on biases */
 constexpr uint32_t INS_BIAS_INIT_TIME = 1000;  // [millisec] Amount of time taken to determine accel. and gyro turn-on bias

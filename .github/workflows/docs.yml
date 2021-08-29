@@ -17,15 +17,19 @@ jobs:
     steps:
       - name: Checkout Code
         uses: actions/checkout@v2
+        with:
+          persist-credentials: false
       
       - name: Set Up Doxygen
         uses: mattnotmitt/doxygen-action@v1.3.1
         with:
-          doxyfile-path: docs/doxyfile
+          doxyfile-path: ./doxyfile
+          working-directory: .
+          enable-latex: false
       
       - name: Deploy
         uses: peaceiris/actions-gh-pages@v3
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           publish_branch: gh-pages
-          publish_dir: docs/html
+          publish_dir: ./docs/html

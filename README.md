@@ -9,6 +9,8 @@ Flight software for the Hummingbird Flight Control Unit quadcopter flight contro
 * Blog: [mwrona.com](https://mwrona.com/)
 * YouTube: [@MicWro Engr](https://www.youtube.com/channel/UCIeZzuXHGm7zqSFvT8xGoIQ)
 
+![HFCU logo](images/hummingbird-logo.png)
+
 This project is very much a work in progress. Stop by every so often to see my progress!
 
 ## Short-Term To-Do List

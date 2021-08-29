@@ -1,5 +1,7 @@
 # Hummingbird FCU Quadcopter Flight Software
 
+[![Build](https://github.com/michaelwro/HummingbirdFCU/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/michaelwro/HummingbirdFCU/actions/workflows/build.yml)
+
 Flight software for the Hummingbird Flight Control Unit quadcopter flight controller. Designed to run on the Teensy 4.1. Developed with VSCode+PlatformIO.
 
 **Developed By:** Michael Wrona, *B.S. Aerospace Engineering*

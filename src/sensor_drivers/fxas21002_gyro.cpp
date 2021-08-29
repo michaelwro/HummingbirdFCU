@@ -5,35 +5,26 @@
 // Created: 25 July 2020
 // Modified: 26 Aug 2021
 // ----------------------------------------------------------------------------
-/**
- * This is the sensor library for the FXAS21002C 3-axis gyroscope sensor in 
- * I2C mode.
- * 
- * Datasheet Specs:
- * ~ 16-bit ADC
- * ~ +/- 250dps to 2000dps measurement ranges
- * ~ Integrated LPF
- * ~ 8-bit temperature sensor
- * ~ Temperature sensitivity of +/- 0.08 %/degC (max)
- * ~ Nonlinearity of +/- 0.5 %FSR
- * ~ 0.025 dps/sqrt(Hz) noise density (FS=200Hz, CTRL_REG0[FS] = 00, CTRL_REG0[BW] = 00)
- */
+// This is the sensor library for the FXAS21002C 3-axis gyroscope sensor in 
+// I2C mode.
+// Datasheet Specs:
+//   16-bit ADC
+//   +/- 250dps to 2000dps measurement ranges
+//   Integrated LPF
+//   8-bit temperature sensor
+//   Temperature sensitivity of +/- 0.08 %/degC (max)
+//   Nonlinearity of +/- 0.5 %FSR
+//   0.025 dps/sqrt(Hz) noise density (FS=200Hz, CTRL_REG0[FS] = 00, CTRL_REG0[BW] = 00)
 
 
 #include "sensor_drivers/fxas21002_gyro.h"
 
 
-// ------------------------------------
-// Public methods
-// ------------------------------------
-
-// ----------------------------------------------------------------------------
-// FXAS21002Gyro(TwoWire *wireInput)
-// ----------------------------------------------------------------------------
 /**
- * Constructor for FXAS21002C gyro sensor.
+ * FXAS21002 Constructor.
+ * Constructor for the FXAS21002 gyro sensor.
  * 
- * @param gyroID  ID for sensor, 0x0021002C
+ * @param wireInput  I2C/Wire interface the device is connected to.
  */
 FXAS21002Gyro::FXAS21002Gyro(TwoWire *wireInput)
 {
@@ -46,14 +37,12 @@ FXAS21002Gyro::FXAS21002Gyro(TwoWire *wireInput)
 }
 
 
-// ----------------------------------------------------------------------------
-// InitializeSensor(GyroRanges_t range)
-// ----------------------------------------------------------------------------
 /**
- * Initialize and configure gyroscope sensor. If unspecified, the default gyro
- * measurement rage is GYRO_RNG_1000DPS. Options include: GYRO_RNG_250DPS,
- * GYRO_RNG_500DPS, GYRO_RNG_1000DPS, and GYRO_RNG_2000DPS
+ * Initialize and configure gyroscope sensor.
+ * If unspecified, the default gyro measurement rage is GYRO_RNG_1000DPS
  * 
+ * @param rng Gyro measurement range.
+ * @see GyroRanges_t
  * @return  True if successful, false if failed.
  */
 bool FXAS21002Gyro::Initialize(GyroRanges_t rng)
@@ -65,8 +54,7 @@ bool FXAS21002Gyro::Initialize(GyroRanges_t rng)
     this->gyroRange = rng;  // Set range
     
 
-    /* Check to make sure the ID register on the sensor matches the
-    expected FXAS21002C ID. */
+    // Check to make sure the ID register on the sensor matches the expected FXAS21002C ID.
     connectedSensorID = this->I2Cread8(GYRO_REG_ID);
     if (connectedSensorID != FXAS21002C_ID)
     {
@@ -76,7 +64,7 @@ bool FXAS21002Gyro::Initialize(GyroRanges_t rng)
         return false;
     }
     
-    /* Set sensor configuration parameters */
+    // Set sensor configuration parameters
     ctrlReg0 = 0x00;
     switch (this->gyroRange)
     {
@@ -100,14 +88,14 @@ bool FXAS21002Gyro::Initialize(GyroRanges_t rng)
             break;
     }
 
-    /**
-     * Reset sensor, then switch to active mode to configure.
-     * EXAMPLE: setting GYRO_REG_CTRL0 to 0x01 and GYRO_REG_CTRL1 to 0x06 yields:
-     *   FS = 400Hz
-     *   FS range = +/- 1000dps
-     *   HPF disabled
-     *   LFP bandwidth = 128Hz
-    */
+    
+    // Reset sensor, then switch to active mode to configure.
+    // EXAMPLE: setting GYRO_REG_CTRL0 to 0x01 and GYRO_REG_CTRL1 to 0x06 yields:
+    //   FS = 400Hz
+    //   FS range = +/- 1000dps
+    //   HPF disabled
+    //   LFP bandwidth = 128Hz
+
     this->I2Cwrite8(GYRO_REG_CTRL1, 0x00);  // Stby
     this->I2Cwrite8(GYRO_REG_CTRL1, (1 << 6));  // Reset
     this->I2Cwrite8(GYRO_REG_CTRL0, ctrlReg0);  // Set sensitivity
@@ -119,11 +107,9 @@ bool FXAS21002Gyro::Initialize(GyroRanges_t rng)
 }
 
 
-// ----------------------------------------------------------------------------
-// ReadSensor()
-// ----------------------------------------------------------------------------
 /**
- * Read gyroscope data from device registers. Computes gyro readings in [deg/s]
+ * Read gyroscope data from device registers.
+ * Raw gyro readings are in [deg/s].
  * 
  * @return  True if successful, false if failed.
  */
@@ -194,13 +180,10 @@ bool FXAS21002Gyro::ReadSensor()
 }
 
 
-// ----------------------------------------------------------------------------
-// FXAS21002Gyro::GetTemperature()
-// ----------------------------------------------------------------------------
 /**
- * Read temperature register and return in [C]. Temperature will not have
- * any decimals, as it is an 8-bit signed int (-127C to 127C). Note that the 
- * temperature is not factory calibrated!
+ * Read device's 8-bit temperature register and return in degrees C.
+ * Temperature will not have any decimals, as it is an 8-bit signed int (-127C 
+ * to 127C). Note that the temperature is not factory calibrated!
  * 
  * @returns Temperature in [C]
  */
@@ -217,36 +200,35 @@ float FXAS21002Gyro::GetTemperature()
 }
 
 
-/* Return gyro x-measurement in [deg/s] */
+/**
+ * Return gyro x-measurement in [deg/s]
+ */
 float FXAS21002Gyro::GetGx()
 {
     return this->_gx;
 }
 
 
-/* Return gyro y-measurement in [deg/s] */
+/**
+ * Return gyro y-measurement in [deg/s]
+ */
 float FXAS21002Gyro::GetGy()
 {
     return this->_gy;
 }
 
 
-/* Return gyro z-measurement in [deg/s] */
+/**
+ * Return gyro z-measurement in [deg/s]
+ */
 float FXAS21002Gyro::GetGz()
 {
     return this->_gz;
 }
 
 
-// ------------------------------------
-// Private methods
-// ------------------------------------
-
-// ----------------------------------------------------------------------------
-// I2Cwrite8(byte regOfInterest, byte valToWrite)
-// ----------------------------------------------------------------------------
 /**
- * Write to device register over I2C.
+ * Write to FXAS21002 device register over I2C.
  * 
  * @param regOfInterest  Register address on device.
  * @param valToWrite     Value to write to register.
@@ -261,14 +243,11 @@ void FXAS21002Gyro::I2Cwrite8(uint8_t regOfInterest, uint8_t valToWrite)
 }
 
 
-// ----------------------------------------------------------------------------
-// I2Cread8(byte regOfInterest)
-// ----------------------------------------------------------------------------
 /**
- * Read register value from I2C device.
+ * Read FXAS21002 register value over I2C.
  * 
- * @param regOfInterest  Register address on device.
- * @return               Value/data in register.
+ * @param regOfInterest Register address on device.
+ * @return Value stored in the register.
  */
 uint8_t FXAS21002Gyro::I2Cread8(uint8_t regOfInterest)
 {

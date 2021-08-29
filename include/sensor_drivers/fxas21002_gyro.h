@@ -5,19 +5,17 @@
 // Created: 25 July 2020
 // Modified: 26 Aug 2021
 // ----------------------------------------------------------------------------
-/**
- * This is the sensor library for the FXAS21002C 3-axis gyroscope sensor in 
- * I2C mode.
- * 
- * Datasheet Specs:
- * ~ 16-bit ADC
- * ~ +/- 250dps to 2000dps measurement ranges
- * ~ Integrated LPF
- * ~ 8-bit temperature sensor
- * ~ Temperature sensitivity of +/- 0.08 %/degC (max)
- * ~ Nonlinearity of +/- 0.5 %FSR
- * ~ 0.025 dps/sqrt(Hz) noise density (FS=200Hz, CTRL_REG0[FS] = 00, CTRL_REG0[BW] = 00)
- */
+// This is the sensor library for the FXAS21002C 3-axis gyroscope sensor in 
+// I2C mode.
+// Datasheet Specs:
+//   16-bit ADC
+//   +/- 250dps to 2000dps measurement ranges
+//   Integrated LPF
+//   8-bit temperature sensor
+//   Temperature sensitivity of +/- 0.08 %/degC (max)
+//   Nonlinearity of +/- 0.5 %FSR
+//   0.025 dps/sqrt(Hz) noise density (FS=200Hz, CTRL_REG0[FS] = 00, CTRL_REG0[BW] = 00)
+
 
 #pragma once
 
@@ -42,38 +40,40 @@
 constexpr uint8_t FXAS21002C_ADDRESS  = 0x21;  // 7-bit address
 constexpr uint8_t FXAS21002C_ID       = 0xD7;  // Device ID
 
-// ----------------------------------------------------------------------------
-// Gyro measurement sensitivity settings
-// ----------------------------------------------------------------------------
 
+/**
+ * Gyro measurement sensitivities.
+ * Conversion factors to convert between LSB and deg/sec.
+ */
 constexpr float GYRO_SENS_250   = 0.0078125f; // 250dps sensitivity [dps/LSB]
 constexpr float GYRO_SENS_500   = 0.015625f;  // 500dps sensitivity [dps/LSB]
 constexpr float GYRO_SENS_1000  = 0.03125f;  // 1000dps sensitivity [dps/LSB]
 constexpr float GYRO_SENS_2000  = 0.0625f;  // 2000dps sensitivity [dps/LSB]
 
-// ----------------------------------------------------------------------------
-// Device registers
-// ----------------------------------------------------------------------------
+
+/**
+ * FXAS21002 device registers
+ */
 typedef enum
 {
-    GYRO_REG_STATUS   = 0x00,  //GYRO_REGISTER_STATUS 
-    GYRO_REG_XOUT_MSB = 0x01,  // GYRO_REGISTER_OUT_X_MSB
+    GYRO_REG_STATUS   = 0x00,
+    GYRO_REG_XOUT_MSB = 0x01,
     GYRO_REG_XOUT_LSB = 0x02,
     GYRO_REG_YOUT_MSB = 0x03,
     GYRO_REG_YOUT_LSB = 0x04,
     GYRO_REG_ZOUT_MSB = 0x05,
     GYRO_REG_ZOUT_LSB = 0x06,
-    GYRO_REG_ID       = 0x0C,  // GYRO_REGISTER_WHO_AM_I
-    GYRO_REG_TEMP     = 0x12,  // Temperature sensor register (p.45)
-    GYRO_REG_CTRL0    = 0x0D,  // GYRO_REGISTER_CTRL_REG0 (p.38)
+    GYRO_REG_ID       = 0x0C,
+    GYRO_REG_TEMP     = 0x12,  //  (p.45)
+    GYRO_REG_CTRL0    = 0x0D,  // (p.38)
     GYRO_REG_CTRL1    = 0x13,
     GYRO_REG_CTRL2    = 0x14
-
 } GyroRegisters_t;
 
-// ----------------------------------------------------------------------------
-// Gyro measurement range
-// ----------------------------------------------------------------------------
+
+/**
+ * Gyro measurement ranges.
+ */
 typedef enum
 {
     GYRO_RNG_250DPS = 250,  // 250dps range
@@ -82,30 +82,29 @@ typedef enum
     GYRO_RNG_2000DPS = 2000  // 2000dps range
 } GyroRanges_t;
 
-// ----------------------------------------------------------------------------
-// Gyro sensor class
-// ----------------------------------------------------------------------------
+
+/**
+ * NXP FXAS21002 gyro sensor driver.
+ */
 class FXAS21002Gyro
 {
 public:
     FXAS21002Gyro(TwoWire *wireInput = &SENSOR_I2C);
-//        ~FXAS21002Gyro();
+    ~FXAS21002Gyro() {};
     bool Initialize(GyroRanges_t rng = GYRO_RNG_1000DPS);
     bool ReadSensor();
     float GetTemperature();
     float GetGx();
     float GetGy();
     float GetGz();  
-    uint32_t prevMeasMicros;  // [us] Previous measurement micros()
-
-
+    uint32_t prevMeasMicros;  ///< Previous measurement micros()
 protected:
 private:
     void I2Cwrite8(uint8_t regOfInterest, uint8_t valToWrite);
     uint8_t I2Cread8(uint8_t regOfInterest);
-    float _gx;  // Gyro x reading, [deg/s]
-    float _gy;  // Gyro y reading, [deg/s]
-    float _gz;  // Gyro z reading, [deg/s]
-    GyroRanges_t gyroRange;
-    TwoWire *_SensorWire;
+    float _gx;  ///< Gyro x reading, [deg/s]
+    float _gy;  ///< Gyro y reading, [deg/s]
+    float _gz;  ///< Gyro z reading, [deg/s]
+    GyroRanges_t gyroRange;  ///< Selected gyro measurement range.
+    TwoWire *_SensorWire;  ///< I2C bus the sensor is connected to.
 };

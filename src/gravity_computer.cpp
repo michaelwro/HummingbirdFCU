@@ -4,44 +4,35 @@
 // Code By: Michael Wrona
 // Created: 20 Feb 2021
 // ----------------------------------------------------------------------------
-/**
- * Compute the gravitational acceleration while in flight. Computes gravity as 
- * a function of latitude, and altitude above mean sea level. Uses 
- * a simple gravity model found in:
- * Titterton, D. H. Weston, J. L. "Strapdown Inertial Navigation Technology," 
- * 2nd ed. The Institution of Electrical Engineers, 2004. (pg. 57)
- */
+// Compute the gravitational acceleration while in flight. Computes gravity as 
+// a function of latitude, longitude, and altitude above mean sea level.
 
 #include "gravity_computer.h"
 
 
-// --------------------------------------------------------------
-// GravityComputer()
-// --------------------------------------------------------------
 /**
  * Compute gravitational acceleration as a function of latitude 
  * and altitude above mean sea level. Down is positive!
  */
 GravityComputer::GravityComputer()
+: GravSmoother(5)
 {
-    this->_grav = CONSTS_GRAV;
+    this->_grav = GravSmoother.Filter(CONSTS_GRAV);  // Fill with this to begin
     this->errCount = 0;
 }
 
 
-// --------------------------------------------------------------
-// UpdatePosition(float lat_rad, float alt_msl)
-// --------------------------------------------------------------
 /**
- * Recompute gravity with updated latitude and altitude.
+ * Use a gravitymodel to compute gravity at a given latitude, longitude, and altitude.
  * 
- * @param lat_rad   [rad] Geodetic latitude.
- * @param lon_rad   [rad] Geodetic longitude.
- * @param alt_msl   [m] Altitude above MSL.
+ * @param lat_rad [rad] Geodetic latitude.
+ * @param lon_rad [rad] Geodetic longitude.
+ * @param alt_msl [m] Altitude above MSL.
  * @returns True if everything is good, false if there was an error.
  */
 bool GravityComputer::Update(float lat_rad, float lon_rad, float alt_msl)
 {
+    // If we for whatever reason get a false, default to WGS84 gravity.
     if (!this->_ComputeGravity(lat_rad, lon_rad, alt_msl))
     {
         #ifdef DEBUG
@@ -55,14 +46,12 @@ bool GravityComputer::Update(float lat_rad, float lon_rad, float alt_msl)
 }
 
 
-// --------------------------------------------------------------
-// GetGravity()
-// --------------------------------------------------------------
 /**
- * Returns gravitational acceleration in [m/s/s]. Down is 
- * positive. Be sure to periodically call Update().
+ * Returns gravitational acceleration in [m/s/s].
  * 
- * @return      Gravity in [m/s/s]
+ * @returns Gravitational acceleration in [m/s/s]
+ * @see Update()
+ * @warning Be sure to periodically call Update().
  */
 float GravityComputer::GetGravity()
 {
@@ -70,7 +59,14 @@ float GravityComputer::GetGravity()
 }
 
 
-/* Compute gravitational acceleration in [m/s/s] */
+/**
+ * Compute gravitational acceleration in [m/s/s] using a gravity model
+ * 
+ * @param lat Geodetic latitude in [rad].
+ * @param lon Geodetic longitude in [rad].
+ * @param alt Altitude above MSL in [m].
+ * @returns True if good calculation, false if an error was encountered.
+ */
 bool GravityComputer::_ComputeGravity(float lat, float lon, float alt)
 {
     // Range check latitude
@@ -128,14 +124,23 @@ bool GravityComputer::_ComputeGravity(float lat, float lon, float alt)
     this->_grav -= 0.000003085f * alt;  // (GM * 2) / Re**3 = 0.000003072460023730221f 
     #endif
 
+    // Range check computed gravity
+    if (this->_grav >= 10.0f || this->_grav <= 9.5)
+    {
+        #ifdef DEBUG
+        DEBUG_PRINTLN("GravityComputer::_ComputeGravity ERROR: Computed gravity is out of specified bounds.");
+        #endif
+        return false;
+    }
+
+    // Smooth out sharp changes
+    this->_grav = GravSmoother.Filter(this->_grav);
+
     return true;
 }
 
 
-/* Deconstructor */
-GravityComputer::~GravityComputer() {}
-
-/* GetInstance() function for singleton. Don't use as a user. */
+// GetInstance() function for singleton. Don't use as a user.
 GravityComputer &GravityComputer::GetInstance()
 {
     static GravityComputer instance;

@@ -4,35 +4,14 @@
 // Code By: Michael Wrona
 // Created: 26 Aug 2021
 // ----------------------------------------------------------------------------
-/**
- * Source code for the FXOS8700 accelerometer and magnetometer sensor library.
- * 
- * IMPORTANT NOTES
- * - Hybrid mode is needed because the magnetometer and accelerometer USE THE 
- * SAME ADC! See p.22 for more.
- * - Because we are using the LIS3MDL compass in the GPS, I chose to disable 
- * hybrid mode and only use the FXOS8700's accelerometer (8/26/2021).
- * 
- * Accelerometer Datsheet Specs
- * ----------------------------
- * ~ 14-bit ADC
- * ~ +/- 2g to 8g accel. range
- * ~ Temperature sensitivity: +/- 0.01 %/degC
- * ~ Nonlinearity: +/- 0.5 %FSR
- * ~ 126 ug/sqrt(Hz) noise density
- * ~ Up to 800Hz FS in single sensor mode
- * ~ Up to 400Hz FS in hybrid mode
- * 
- * Magnetometer Datsheet Specs
- * ----------------------------
- * ~ 16-bit magnetometer ADC
- * ~ +/- 1200uT mag. range
- * ~ Temperature sensitivity: +/- 0.1 %/degC
- * ~ Nonlinearity: +/- 1 %FSR
- * ~ 1.5uT RMS noise (max)
- * ~ Up to 800Hz FS in single sensor mode
- * ~ Up to 400Hz FS in hybrid mode
- */
+// Source code for the FXOS8700 accelerometer and magnetometer sensor library.
+// IMPORTANT NOTES:
+// - Hybrid mode is needed because the magnetometer and accelerometer USE THE 
+// SAME ADC! See p.22 for more.
+// - Because we are using the LIS3MDL compass in the GPS, I chose to disable 
+// hybrid mode and only use the FXOS8700's accelerometer (8/26/2021).
+
+
 
 
 #pragma once
@@ -58,9 +37,9 @@ constexpr float ACCELMAG_CVT_GS_4G    = 0.00048828125f;    // Convert int16 to g
 constexpr float ACCELMAG_CVT_GS_8G    = 0.0009765625f;     // Convert int16 to g's for +/- 8G range
 constexpr float ACCELMAG_CVT_UT       = 0.1f;         // Convert int16 to uT
 
-// ----------------------------------------------------------------------------
-// Accelerometer ranges
-// ----------------------------------------------------------------------------
+/**
+ * Accelerometer measurement ranges.
+ */
 typedef enum
 {
     ACCEL_RNG_2G = 0x00,
@@ -68,9 +47,9 @@ typedef enum
     ACCEL_RNG_8G = 0x02
 } AccelRanges_t;
 
-// ----------------------------------------------------------------------------
-// Accelerometer & magnetometer registers
-// ----------------------------------------------------------------------------
+/**
+ * Accelerometer & magnetometer registers.
+ */
 typedef enum
 {
     ACCELMAG_REG_STATUS     = 0x00,          
@@ -100,24 +79,27 @@ typedef enum
 } MagAccelRegisters_t;
 
 
+/**
+ * NXP Semiconductor FXOS8700 accelerometer/magnetometer sensor class.
+ */
 class FXOS8700AccelMag
 {
 public:
     FXOS8700AccelMag(TwoWire *wireInput = &SENSOR_I2C);
+    ~FXOS8700AccelMag() {};
     bool Initialize(AccelRanges_t accRange = ACCEL_RNG_4G);
     bool ReadSensor();
-    uint32_t prevMeasMicros;  // [us] Previous measurement micros()
     float GetAx();
     float GetAy();
     float GetAz();
-    AccelRanges_t accelRange;
+    uint32_t prevMeasMicros;  ///< Previous measurement micros()
+    AccelRanges_t accelRange;  ///< Measurement range
 protected:
 private:
-    float _ax;  // X-acceleration [G's]
-    float _ay;  // Y-acceleration [G's]
-    float _az;  // Z-acceleration [G's]
-    TwoWire *_SensorWire;  // I2C bus that the sensor is on
+    float _ax;  ///< X-acceleration [G's]
+    float _ay;  ///< Y-acceleration [G's]
+    float _az;  ///< Z-acceleration [G's]
+    TwoWire *_SensorWire;  ///< I2C bus that the sensor is on
     uint8_t I2Cread8(uint8_t regOfInterest);
     void I2Cwrite8(uint8_t regOfInterest, uint8_t valToWrite);
-
 };

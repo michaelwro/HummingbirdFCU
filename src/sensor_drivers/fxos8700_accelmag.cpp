@@ -4,56 +4,23 @@
 // Code By: Michael Wrona
 // Created: 26 Aug 2021
 // ----------------------------------------------------------------------------
-/**
- * Source code for the FXOS8700 accelerometer and magnetometer sensor library.
- * 
- * IMPORTANT NOTES
- * - Hybrid mode is needed because the magnetometer and accelerometer USE THE 
- * SAME ADC! See p.22 for more.
- * - Because we are using the LIS3MDL compass in the GPS, I chose to disable 
- * hybrid mode and only use the FXOS8700's accelerometer (8/26/2021).
- * 
- * Accelerometer Datsheet Specs
- * ----------------------------
- * ~ 14-bit ADC
- * ~ +/- 2g to 8g accel. range
- * ~ Temperature sensitivity: +/- 0.01 %/degC
- * ~ Nonlinearity: +/- 0.5 %FSR
- * ~ 126 ug/sqrt(Hz) noise density
- * ~ Up to 800Hz FS in single sensor mode
- * ~ Up to 400Hz FS in hybrid mode
- * 
- * Magnetometer Datsheet Specs
- * ----------------------------
- * ~ 16-bit magnetometer ADC
- * ~ +/- 1200uT mag. range
- * ~ Temperature sensitivity: +/- 0.1 %/degC
- * ~ Nonlinearity: +/- 1 %FSR
- * ~ 1.5uT RMS noise (max)
- * ~ Up to 800Hz FS in single sensor mode
- * ~ Up to 400Hz FS in hybrid mode
- */
+// Source code for the FXOS8700 accelerometer and magnetometer sensor library.
+// IMPORTANT NOTES:
+// - Hybrid mode is needed because the magnetometer and accelerometer USE THE 
+// SAME ADC! See p.22 for more.
+// - Because we are using the LIS3MDL compass in the GPS, I chose to disable 
+// hybrid mode and only use the FXOS8700's accelerometer (8/26/2021).
 
 
 
 #include <Arduino.h>
 #include <Wire.h>
-// #include <limits.h>
 #include "sensor_drivers/fxos8700_accelmag.h"
 
 
-// ------------------------------------
-// Public methods
-// ------------------------------------
 
-// ----------------------------------------------------------------------------
-// FXOS8700AccelMag(int32_t accelID, int32_t magID)
-// ----------------------------------------------------------------------------
 /**
- * Constructor for the FXOS8700 Accelerometer/Magnetometer class. Be sure to
- * specify the sensor ID's.
- * accelID = 0x8700A
- * magID = 0x8700B
+ * Constructor for the FXOS8700 Accelerometer/Magnetometer class.
  * 
  * @param wireInput I2C bus/wire interface that the device is connected to
  */
@@ -67,16 +34,11 @@ FXOS8700AccelMag::FXOS8700AccelMag(TwoWire *wireInput)
 }
 
 
-// ----------------------------------------------------------------------------
-// Initialize(AccelRanges_t accRange)
-// ----------------------------------------------------------------------------
 /**
- * Initialize accelerometer, set accel. measurement range, configure
- * magnetometer. ACCEL_RNG_2G is default if the accelerometer measurement range
- * is not specified.
+ * Initialize accelerometer, set accel. measurement range, configure magnetometer.
  * 
- * @param accRange  Desired accelerometer measurement range (ACCEL_RNG_2G,
- *                  ACCEL_RNG_4G, ACCEL_RNG_8G)
+ * @param accRange  Desired accelerometer measurement range.
+ * @see AccelRanges_t
  */
 bool FXOS8700AccelMag::Initialize(AccelRanges_t accRange)
 {
@@ -85,8 +47,7 @@ bool FXOS8700AccelMag::Initialize(AccelRanges_t accRange)
     this->_SensorWire->begin();  // Init. communication
     this->accelRange = accRange; // Set accelerometer range
     
-    /* Check to make sure the ID register on the sensor matches the
-    expected FXOS8700 ID. */
+    // Check to make sure the ID register on the sensor matches the expected FXOS8700 ID.
     connectedSensorID = this->I2Cread8(ACCELMAG_REG_ID);
     
     if (connectedSensorID != FXOS8700_ID)
@@ -97,8 +58,7 @@ bool FXOS8700AccelMag::Initialize(AccelRanges_t accRange)
         return false;
     }
     
-    /* Set sensor to STANDBY MODE in order to make changes to/configure
-    a few registers. */
+    // Set sensor to STANDBY MODE in order to make changes to/configure a few registers.
     this->I2Cwrite8(ACCELMAG_REG_CTRL1, 0);
     
     // Begin configuration
@@ -146,12 +106,8 @@ bool FXOS8700AccelMag::Initialize(AccelRanges_t accRange)
 }
 
 
-// ----------------------------------------------------------------------------
-// ReadSensor(void)
-// ----------------------------------------------------------------------------
 /**
- * Read acceleration and magnetometer data from the FXOS8700 sensor registers.
- * If defined, apply sensor calibration paramerters.
+ * Read acceleration data from the FXOS8700 sensor.
  * 
  * @return  True if successful
  */
@@ -229,35 +185,32 @@ bool FXOS8700AccelMag::ReadSensor()
 }
 
 
-/* Return x-acceleromter measurement in [G's] */
+/**
+ * Return x-acceleromter measurement in [G's]
+ */
 float FXOS8700AccelMag::GetAx()
 {
     return this->_ax;
 }
 
 
-/* Return y-acceleromter measurement in [G's] */
+/**
+ * Return y-acceleromter measurement in [G's]
+ */
 float FXOS8700AccelMag::GetAy()
 {
     return this->_ay;
 }
 
 
-/* Return z-acceleromter measurement in [G's] */
+/**Return z-acceleromter measurement in [G's]
+ */
 float FXOS8700AccelMag::GetAz()
 {
     return this->_az;
 }
 
 
-// ------------------------------------
-// Private methods
-// ------------------------------------
-
-
-// ----------------------------------------------------------------------------
-// I2Cwrite8(byte regOfInterest, byte valToWrite)
-// ----------------------------------------------------------------------------
 /**
  * Write to FXOS8700 register over I2C.
  * 
@@ -274,14 +227,11 @@ void FXOS8700AccelMag::I2Cwrite8(uint8_t regOfInterest, uint8_t valToWrite)
 }
 
 
-// ----------------------------------------------------------------------------
-// I2Cread8(byte regOfInterest)
-// ----------------------------------------------------------------------------
 /**
  * Read FXOS8700 register value over I2C.
  * 
- * @param regOfInterest  Register address on device.
- * @return               Value/data in register.
+ * @param regOfInterest Register address on device.
+ * @return Value/data in register.
  */
 uint8_t FXOS8700AccelMag::I2Cread8(uint8_t regOfInterest)
 {

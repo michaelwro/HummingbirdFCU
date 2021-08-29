@@ -19,9 +19,14 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v2
       
-      - name: Setup Doxygen
+      - name: Set Up Doxygen
         uses: mattnotmitt/doxygen-action@v1.3.1
         with:
           doxyfile-path: docs/doxyfile
       
-      - name: 
+      - name: Deploy
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: docs/html

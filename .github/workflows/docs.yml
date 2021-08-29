@@ -1,0 +1,27 @@
+name: Doxygen Documentation
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    pull_request:
+      branches:
+        - main
+
+jobs:
+  build-docs:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, 'docs skip')"
+
+    steps:
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v2
+      
+      - name: Setup Doxygen
+        uses: mattnotmitt/doxygen-action@v1.3.1
+        with:
+          doxyfile-path: docs/doxyfile
+      
+      - name: 

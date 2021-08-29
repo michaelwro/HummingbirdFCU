@@ -6,7 +6,7 @@
 DOXYFILE_ENCODING      = UTF-8
 PROJECT_NAME           = "Hummingbird Flight Software"
 PROJECT_NUMBER         =
-PROJECT_BRIEF          = "Flight software for the Hummingbird FCU quadcopter flight controller."
+PROJECT_BRIEF          = "Flight software for the Hummingbird FCU quadcopter flight controller. Designed to run on the Teensy 4.1. Developed with VSCode+PlatformIO."
 PROJECT_LOGO           = "./images/hummingbird-logo.png"
 OUTPUT_DIRECTORY       = "./docs"
 CREATE_SUBDIRS         = NO
@@ -119,7 +119,7 @@ WARN_LOGFILE           =
 #---------------------------------------------------------------------------
 # Configuration options related to the input files
 #---------------------------------------------------------------------------
-INPUT                  = "C:\Users\micha\OneDrive\Documents\01 Documents Sync\UAV Project\Hummingbird Flight Code V1"
+INPUT                  = 
 INPUT_ENCODING         = UTF-8
 FILE_PATTERNS          = *.c \
                          *.cc \

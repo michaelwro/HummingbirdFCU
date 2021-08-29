@@ -1,36 +1,21 @@
-/**
- * LIS3MDL 3-AXIS MAGNETOMETER SENSOR LIBRARY
- * 
- * Used to communicate with the STMicroelectronic's LIS3MDL magnetometer
- * sensor over I2C.
- * 
- * Code By: Michael Wrona
- * Created: 17 Jan 2021
- * 
- * Resources:
- * LIS3MDL Datasheet: https://www.st.com/resource/en/datasheet/lis3mdl.pdf
- * 
- * Datasheet Specs
- * ---------------
- * ~ +/- 4 Gauss to 16 Gauss measurement range
- * ~ 4.1 mgauss RMS noise (max)
- * ~ Nonlinearity: +/- 0.12 %FSR
- */
+// LIS3MDL 3-AXIS MAGNETOMETER SENSOR LIBRARY
+//
+// Used to communicate with the STMicroelectronic's LIS3MDL magnetometer
+// sensor over I2C.
+//
+// Code By: Michael Wrona
+// Created: 17 Jan 2021
+//
+// LIS3MDL Datasheet: https://www.st.com/resource/en/datasheet/lis3mdl.pdf
 
-#include <Wire.h>
-#include <Arduino.h>
+
 #include "sensor_drivers/lis3mdl_magnetometer.h"
 
 
-
-
-// ----------------------------------------------------------------------------
-// LIS3MDL_Mag(TwoWire *userWire)
-// ----------------------------------------------------------------------------
 /**
- * @brief I2C Sensor class for the LIS3MDL magnetometer.
+ * I2C Sensor class for the LIS3MDL magnetometer.
  * 
- * @param userthis->_SensorWire-> I2C bus that the sensor is attached to. Default this->_SensorWire->
+ * @param userWire I2C bus that the sensor is attached to.
  */
 LIS3MDL_Mag::LIS3MDL_Mag(TwoWire *userWire)
 {
@@ -42,16 +27,11 @@ LIS3MDL_Mag::LIS3MDL_Mag(TwoWire *userWire)
 }
 
 
-
-// ----------------------------------------------------------------------------
-// LIS3MDL_Mag()
-// ----------------------------------------------------------------------------
 /**
- * Inityialize the LIS3MDL magnetometer and specify the measurement range.
+ * Initialize the LIS3MDL magnetometer and specify the measurement range.
  * 
- * @param measRange     Magnetometer measurement range Choose between 
- *                      LIS3MDL_RANGE_4G, LIS3MDL_RANGE_8G,
- *                      LIS3MDL_RANGE_12G, LIS3MDL_RANGE_16G.
+ * @param measRange Magnetometer measurement range.
+ * @see LIS3MDL_MeasRange_t
  */
 bool LIS3MDL_Mag::Initialize(LIS3MDL_MeasRange_t measRange)
 {
@@ -79,14 +59,14 @@ bool LIS3MDL_Mag::Initialize(LIS3MDL_MeasRange_t measRange)
         return false;
     }
 
-    /* Set Control Register 1 params */
+    // Set Control Register 1 params
     // uint8_t ctrlReg1Config = 0b01100010;
     // Enable temp. sensor. XY operative mode = ultra-high performance. ODR = 0b100 (10Hz). Enable fast ODR. Disable self-test.
     // With fast-ODR mode enabled and ultra-high performance mode selected, this yields a final ODR of 155Hz.
     uint8_t ctrlReg1Config = 0xF2;  // 0b11110010
 
 
-    /* Set Control Register 2 params */
+    // Set Control Register 2 params
     // This sets the data range
     uint8_t ctrlReg2Config;
     switch (this->_range)
@@ -112,11 +92,11 @@ bool LIS3MDL_Mag::Initialize(LIS3MDL_MeasRange_t measRange)
             break;
     }
 
-    /* Set Control Register 3 params */
+    // Set Control Register 3 params
     // Low-power disable. 4-wire SPI interface. Continuous conversion mode.
     uint8_t ctrlReg3Config = 0x00;  // 0b00000000
 
-    /* Set Control Register 4 params */
+    // Set Control Register 4 params
     // Ultra-high performance mode for Z-axis. LSb at lower address.
     uint8_t ctrlReg4Config = 0x0C;  // 0b00001100
 
@@ -136,12 +116,9 @@ bool LIS3MDL_Mag::Initialize(LIS3MDL_MeasRange_t measRange)
 }
 
 
-// ----------------------------------------------------------------------------
-// ReadSensor()
-// ----------------------------------------------------------------------------
 /**
- * @brief Read magnetometer registers and extract measurements. Converts raw 
- * readings in Gauss [G] to microtesla [uT].
+ * Read magnetometer registers and extract measurements.
+ * Converts raw readings in Gauss [G] to microtesla [uT].
  * 
  * @returns true if successful, false if invalid measurement range.
  */
@@ -206,32 +183,34 @@ bool LIS3MDL_Mag::ReadSensor()
 }
 
 
-/* Return X-magnetometer reading in [uT] */
+/**
+ * Return X-magnetometer reading in [uT]
+ */
 float LIS3MDL_Mag::GetMx()
 {
     return this->_mx;
 }
 
 
-/* Return Y-magnetometer reading in [uT] */
+/** Return Y-magnetometer reading in [uT]
+ */
 float LIS3MDL_Mag::GetMy()
 {
     return this->_my;
 }
 
-/* Return Z-magnetometer reading in [uT] */
+/**
+ * Return Z-magnetometer reading in [uT]
+ */
 float LIS3MDL_Mag::GetMz()
 {
     return this->_mz;
 }
 
 
-// ----------------------------------------------------------------------------
-// GetTemperature()
-// ----------------------------------------------------------------------------
 /**
- * Read temperature from the magnetometer sensor and return as float in units 
- * of [C]. Temperature ranges from -40C to +85C. ODR is the same as the mag's ODR.
+ * Read temperature from the magnetometer sensor.
+ * Return as float in degrees C. Temperature ranges from -40C to +85C. ODR is the same as the mag's ODR.
  * 
  * @returns Floating-point temperature in [C].
  */
@@ -260,18 +239,11 @@ float LIS3MDL_Mag::GetTemperature()
 }
 
 
-// ------------------------------------
-// PRIVATE METHODS
-// ------------------------------------
-
-// ----------------------------------------------------------------------------
-// I2Cwrite8(byte regOfInterest, byte valToWrite)
-// ----------------------------------------------------------------------------
 /**
  * Write to device register over I2C.
  * 
- * @param regOfInterest  Register address on device.
- * @param valToWrite     Value to write to register.
+ * @param regOfInterest Register address on device.
+ * @param valToWrite Value to write to register.
  */
 void LIS3MDL_Mag::I2Cwrite8(uint8_t regOfInterest, uint8_t valToWrite)
 {
@@ -284,14 +256,11 @@ void LIS3MDL_Mag::I2Cwrite8(uint8_t regOfInterest, uint8_t valToWrite)
 }
 
 
-// ----------------------------------------------------------------------------
-// I2Cread8(byte regOfInterest)
-// ----------------------------------------------------------------------------
 /**
  * Read register value from I2C device.
  * 
- * @param regOfInterest  Register address on device.
- * @return               Value/data in register.
+ * @param regOfInterest Register address on device.
+ * @return Value/data in register.
  */
 uint8_t LIS3MDL_Mag::I2Cread8(uint8_t regOfInterest)
 {

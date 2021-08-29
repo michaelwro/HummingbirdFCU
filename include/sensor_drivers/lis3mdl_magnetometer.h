@@ -1,24 +1,16 @@
-/**
- * LIS3MDL 3-AXIS MAGNETOMETER SENSOR LIBRARY
- * 
- * Used to communicate with the STMicroelectronic's LIS3MDL magnetometer
- * sensor over I2C.
- * 
- * Code By: Michael Wrona
- * Created: 17 Jan 2021
- * 
- * Resources:
- * LIS3MDL Datasheet: https://www.st.com/resource/en/datasheet/lis3mdl.pdf
- * 
- * Datasheet Specs
- * ---------------
- * ~ +/- 4 Gauss to 16 Gauss measurement range
- * ~ 4.1 mgauss RMS noise (max)
- * ~ Nonlinearity: +/- 0.12 %FSR
- */
+// LIS3MDL 3-AXIS MAGNETOMETER SENSOR LIBRARY
+//
+// Used to communicate with the STMicroelectronic's LIS3MDL magnetometer
+// sensor over I2C.
+//
+// Code By: Michael Wrona
+// Created: 17 Jan 2021
+//
+// LIS3MDL Datasheet: https://www.st.com/resource/en/datasheet/lis3mdl.pdf
+
+
 
 #pragma once
-
 
 #include <Arduino.h>
 #include <Wire.h>
@@ -47,9 +39,9 @@
 #define LIS3MDL_CTRL_REG5 0x24  // Control register 5
 
 
-// ------------------------------------
-// Data Registers
-// ------------------------------------
+/**
+ * LIS3MDL data registers
+ */
 typedef enum {
     LIS3MDL_OUT_X_L = 0x28,
     LIS3MDL_OUT_X_H = 0x29,
@@ -62,9 +54,9 @@ typedef enum {
 } LIS3MDL_DataReg_t;
 
 
-// ------------------------------------
-// Data Ranges
-// ------------------------------------
+/**
+ * LIS3MDL measurement ranges (gauss)
+ */
 typedef enum {
     LIS3MDL_RANGE_4G = 4,  // +/- 4 G range
     LIS3MDL_RANGE_8G = 8,  // +/- 8 G range
@@ -73,27 +65,28 @@ typedef enum {
 } LIS3MDL_MeasRange_t;
 
 
-// ------------------------------------
-// LIS3MDL Magnetometer Sensor Object
-// ------------------------------------
+/**
+ * STMicroelectronics LIS3MDL magnetometer sensor class
+ */
 class LIS3MDL_Mag
 {
 public:
     LIS3MDL_Mag(TwoWire *userWire = &SENSOR_I2C);
+    ~LIS3MDL_Mag() {};
     bool Initialize(LIS3MDL_MeasRange_t measRange = LIS3MDL_RANGE_4G);
     bool ReadSensor();
     float GetMx();
     float GetMy();
     float GetMz();
     float GetTemperature();
-    uint32_t prevMeasMicros;  // Previous measurement micros()
+    uint32_t prevMeasMicros;  ///< Previous measurement micros()
 protected:
 private:
-    float _mx;  // x-magnetometer reading [uT]
-    float _my;  // y-magnetometer reading [uT]
-    float _mz;  // z-magnetometer reading [uT]
-    TwoWire *_SensorWire;
-    LIS3MDL_MeasRange_t _range;  // Set meas. range
+    float _mx;  ///< x-magnetometer reading [uT]
+    float _my;  ///< y-magnetometer reading [uT]
+    float _mz;  ///< z-magnetometer reading [uT]
+    TwoWire *_SensorWire;  ///< I2C/wire interface the sensor is on.
+    LIS3MDL_MeasRange_t _range;  ///< Sensor measurement range.
     void I2Cwrite8(uint8_t regOfInterest, uint8_t valToWrite);
     uint8_t I2Cread8(uint8_t regOfInterest);
 };

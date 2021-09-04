@@ -1095,14 +1095,14 @@ Functions</h2></td></tr>
 <p> How to Allocate and Access a 1D Array (vector):</p>
 <p>float *b = new float[rows]; // Allocate 1D aray/vector</p>
 <p>for (size_t i = 0; i &lt; rows; i++) </p>
-<h2><a class="anchor" id="autotoc_md45"></a>
+<h2><a class="anchor" id="autotoc_md47"></a>
 b[i] = 0.0f;  // Or, use: *(b + i)</h2>
 <p>How to Allocate and Access a 2D Array:</p>
 <p>float *A = new float[rows * cols]; // Allocate 2D array</p>
 <p>for (size_t i = 0; i &lt; rows; i++) // Set value for (size_t j = 0; j &lt; cols; j++) </p>
-<h2><a class="anchor" id="autotoc_md46"></a>
+<h2><a class="anchor" id="autotoc_md48"></a>
 *(A + i*cols + j) = 0.0f;  // Row-major</h2>
-<h2><a class="anchor" id="autotoc_md47"></a>
+<h2><a class="anchor" id="autotoc_md49"></a>
 Resources</h2>
 <p><a href="https://www.techiedelight.com/dynamic-memory-allocation-in-c-for-2d-3d-array/">https://www.techiedelight.com/dynamic-memory-allocation-in-c-for-2d-3d-array/</a> <a href="https://eli.thegreenplace.net/2015/memory-layout-of-multi-dimensional-arrays">https://eli.thegreenplace.net/2015/memory-layout-of-multi-dimensional-arrays</a> Fill a vector with a specified value. Use this to initialize arrays before they're used.</p>
 <dl class="params"><dt>Parameters</dt><dd>

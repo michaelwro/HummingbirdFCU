@@ -8,9 +8,14 @@ var searchData=
   ['baro_5faltimeter_5ftemp_5fmax_90',['BARO_ALTIMETER_TEMP_MAX',['../baro__altimeter_8h.html#a4310782b9b653bb151b774c9e0f38f77',1,'baro_altimeter.h']]],
   ['baro_5faltimeter_5ftemp_5fmin_91',['BARO_ALTIMETER_TEMP_MIN',['../baro__altimeter_8h.html#a8ac40f90ddc6f886e23bed2e20f28043',1,'baro_altimeter.h']]],
   ['baroaltimeter_92',['BaroAltimeter',['../class_baro_altimeter.html',1,'BaroAltimeter'],['../class_baro_altimeter.html#a4baa6b3e07ec35234b65eb9472e06898',1,'BaroAltimeter::BaroAltimeter()']]],
-  ['bmp388_5fbarometer_2ecpp_93',['bmp388_barometer.cpp',['../bmp388__barometer_8cpp.html',1,'']]],
-  ['bmp388_5fbarometer_2eh_94',['bmp388_barometer.h',['../bmp388__barometer_8h.html',1,'']]],
-  ['bmp388baro_95',['BMP388Baro',['../class_b_m_p388_baro.html',1,'BMP388Baro'],['../class_b_m_p388_baro.html#a0c19332a6c4daa4243cd3da04f378968',1,'BMP388Baro::BMP388Baro()']]],
-  ['build_5fdelay_5fscript_96',['build_delay_script',['../namespacebuild__delay__script.html',1,'']]],
-  ['build_5fdelay_5fscript_2epy_97',['build_delay_script.py',['../build__delay__script_8py.html',1,'']]]
+  ['battery_5fmonitor_2ecpp_93',['battery_monitor.cpp',['../battery__monitor_8cpp.html',1,'']]],
+  ['battery_5fmonitor_2eh_94',['battery_monitor.h',['../battery__monitor_8h.html',1,'']]],
+  ['battmonitor_95',['BattMonitor',['../battery__monitor_8cpp.html#ad0acc9ee41ed9523182f140060d6929d',1,'BattMonitor():&#160;battery_monitor.cpp'],['../battery__monitor_8h.html#ad0acc9ee41ed9523182f140060d6929d',1,'BattMonitor():&#160;battery_monitor.cpp']]],
+  ['battmonitor_5foffset_96',['BATTMONITOR_OFFSET',['../battery__monitor_8h.html#aab905c8d14d2cb42073c9d59f6ec1674',1,'battery_monitor.h']]],
+  ['battmonitor_5fsf_97',['BATTMONITOR_SF',['../battery__monitor_8h.html#a133124f3135621e5f54ad6c7d9face08',1,'battery_monitor.h']]],
+  ['bmp388_5fbarometer_2ecpp_98',['bmp388_barometer.cpp',['../bmp388__barometer_8cpp.html',1,'']]],
+  ['bmp388_5fbarometer_2eh_99',['bmp388_barometer.h',['../bmp388__barometer_8h.html',1,'']]],
+  ['bmp388baro_100',['BMP388Baro',['../class_b_m_p388_baro.html#a0c19332a6c4daa4243cd3da04f378968',1,'BMP388Baro::BMP388Baro()'],['../class_b_m_p388_baro.html',1,'BMP388Baro']]],
+  ['build_5fdelay_5fscript_101',['build_delay_script',['../namespacebuild__delay__script.html',1,'']]],
+  ['build_5fdelay_5fscript_2epy_102',['build_delay_script.py',['../build__delay__script_8py.html',1,'']]]
 ];

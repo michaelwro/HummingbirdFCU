@@ -81,15 +81,13 @@ $(function() {
 <code>#include &quot;<a class="el" href="debugging_8h_source.html">debugging.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="fxos8700__accelmag_8h_source.html">sensor_drivers/fxos8700_accelmag.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="fxas21002__gyro_8h_source.html">sensor_drivers/fxas21002_gyro.h</a>&quot;</code><br />
-<code>#include &quot;<a class="el" href="bmp388__barometer_8h_source.html">sensor_drivers/bmp388_barometer.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="math__functs_8h_source.html">maths/math_functs.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="matrices_8h_source.html">maths/matrices.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="vectors_8h_source.html">maths/vectors.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="median__filter_8h_source.html">filters/median_filter.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="low__pass__filter_8h_source.html">filters/low_pass_filter.h</a>&quot;</code><br />
 <code>#include &quot;<a class="el" href="inertial__nav__system_8h_source.html">sensor_systems/inertial_nav_system.h</a>&quot;</code><br />
-<code>#include &quot;TinyGPS++.h&quot;</code><br />
-<code>#include &quot;<a class="el" href="gnss__computer_8h_source.html">sensor_systems/gnss_computer.h</a>&quot;</code><br />
+<code>#include &quot;<a class="el" href="battery__monitor_8h_source.html">sensor_systems/battery_monitor.h</a>&quot;</code><br />
 </div><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="func-members"></a>
 Functions</h2></td></tr>
@@ -100,15 +98,17 @@ Functions</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
-<tr class="memitem:a67788fa0b8a9f47b255c1891cd744a70"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_b_m_p388_baro.html">BMP388Baro</a> baro &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cpp.html#a67788fa0b8a9f47b255c1891cd744a70">SENSOR_I2C</a></td></tr>
-<tr class="memdesc:a67788fa0b8a9f47b255c1891cd744a70"><td class="mdescLeft">&#160;</td><td class="mdescRight">DEV'S TO-DO ITEMS [] Range checks on accelerometer and magnetometer measurements [] Error handling for sensor initializations [] Range checks on gyro measurements [] Range checks on barometer measurements [x] Finalize median filter class [] Finalize low-pass filter class [] Investigate computing vertical speed with baro.  <a href="main_8cpp.html#a67788fa0b8a9f47b255c1891cd744a70">More...</a><br /></td></tr>
-<tr class="separator:a67788fa0b8a9f47b255c1891cd744a70"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a59275d53040475cdded19890789f1cea"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_conversions.html">Conversions</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cpp.html#a59275d53040475cdded19890789f1cea">cvt</a></td></tr>
-<tr class="separator:a59275d53040475cdded19890789f1cea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad4b3dacd3c44ffe9c5c8e302219aa9fa"><td class="memItemLeft" align="right" valign="top">unsigned long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cpp.html#ad4b3dacd3c44ffe9c5c8e302219aa9fa">prev</a> = 0</td></tr>
+<tr class="memdesc:ad4b3dacd3c44ffe9c5c8e302219aa9fa"><td class="mdescLeft">&#160;</td><td class="mdescRight">DEV'S TO-DO ITEMS [] Range checks on accelerometer and magnetometer measurements [] Error handling for sensor initializations [] Range checks on gyro measurements [] Range checks on barometer measurements [x] Finalize median filter class [] Finalize low-pass filter class [] Investigate computing vertical speed with baro.  <a href="main_8cpp.html#ad4b3dacd3c44ffe9c5c8e302219aa9fa">More...</a><br /></td></tr>
 <tr class="separator:ad4b3dacd3c44ffe9c5c8e302219aa9fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a80aa342992beb6ef7366b09f1fb4d5ad"><td class="memItemLeft" align="right" valign="top">unsigned long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cpp.html#a80aa342992beb6ef7366b09f1fb4d5ad">prev2</a> = 0</td></tr>
+<tr class="separator:a80aa342992beb6ef7366b09f1fb4d5ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a398e545edbb7126eb4c219453a8ce64d"><td class="memItemLeft" align="right" valign="top">unsigned long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cpp.html#a398e545edbb7126eb4c219453a8ce64d">now</a> = 0</td></tr>
 <tr class="separator:a398e545edbb7126eb4c219453a8ce64d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d4ebf80d3ebab9c895cf987941eb907"><td class="memItemLeft" align="right" valign="top"><a class="el" href="class_median_filter.html">MedianFilter</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cpp.html#a4d4ebf80d3ebab9c895cf987941eb907">Filt</a> (20, 500.0f)</td></tr>
+<tr class="separator:a4d4ebf80d3ebab9c895cf987941eb907"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a48d9522e58fa05906c6dba23e5745a72"><td class="memItemLeft" align="right" valign="top">float&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cpp.html#a48d9522e58fa05906c6dba23e5745a72">v</a> = 0.0f</td></tr>
+<tr class="separator:a48d9522e58fa05906c6dba23e5745a72"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Function Documentation</h2>
 <a id="afe461d27b9c48d5921c00d521181f12f"></a>
@@ -146,14 +146,28 @@ Variables</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Variable Documentation</h2>
-<a id="a59275d53040475cdded19890789f1cea"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a59275d53040475cdded19890789f1cea">&#9670;&nbsp;</a></span>cvt</h2>
+<a id="a4d4ebf80d3ebab9c895cf987941eb907"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a4d4ebf80d3ebab9c895cf987941eb907">&#9670;&nbsp;</a></span>Filt</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_conversions.html">Conversions</a> cvt</td>
+          <td class="memname"><a class="el" href="class_median_filter.html">MedianFilter</a> Filt(20, 500.0f) </td>
+          <td>(</td>
+          <td class="paramtype">20&#160;</td>
+          <td class="paramname">, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">500.&#160;</td>
+          <td class="paramname"><em>0f</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -186,22 +200,36 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
+<p>DEV'S TO-DO ITEMS [] Range checks on accelerometer and magnetometer measurements [] Error handling for sensor initializations [] Range checks on gyro measurements [] Range checks on barometer measurements [x] Finalize median filter class [] Finalize low-pass filter class [] Investigate computing vertical speed with baro. </p>
+<p>sensor [] Implement "Altimeter()" object for computing altitude, temperature, and vertical speed </p>
+
 </div>
 </div>
-<a id="a67788fa0b8a9f47b255c1891cd744a70"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a67788fa0b8a9f47b255c1891cd744a70">&#9670;&nbsp;</a></span>SENSOR_I2C</h2>
+<a id="a80aa342992beb6ef7366b09f1fb4d5ad"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a80aa342992beb6ef7366b09f1fb4d5ad">&#9670;&nbsp;</a></span>prev2</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname"><a class="el" href="class_b_m_p388_baro.html">BMP388Baro</a> baro&amp; SENSOR_I2C</td>
+          <td class="memname">unsigned long prev2 = 0</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>DEV'S TO-DO ITEMS [] Range checks on accelerometer and magnetometer measurements [] Error handling for sensor initializations [] Range checks on gyro measurements [] Range checks on barometer measurements [x] Finalize median filter class [] Finalize low-pass filter class [] Investigate computing vertical speed with baro. </p>
-<p>sensor [] Implement "Altimeter()" object for computing altitude, temperature, and vertical speed </p>
+</div>
+</div>
+<a id="a48d9522e58fa05906c6dba23e5745a72"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a48d9522e58fa05906c6dba23e5745a72">&#9670;&nbsp;</a></span>v</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">float v = 0.0f</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
 
 </div>
 </div>

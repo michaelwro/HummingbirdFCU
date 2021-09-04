@@ -97,7 +97,7 @@ $(function() {
 <div class="line"><a name="l00029"></a><span class="lineno">   29</span>&#160;<span class="keyword">public</span> Adafruit_BMP3XX</div>
 <div class="line"><a name="l00030"></a><span class="lineno">   30</span>&#160;{</div>
 <div class="line"><a name="l00031"></a><span class="lineno">   31</span>&#160;<span class="keyword">public</span>:</div>
-<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <a class="code" href="class_b_m_p388_baro.html#a0c19332a6c4daa4243cd3da04f378968">BMP388Baro</a>(TwoWire *wireInput = &amp;<a class="code" href="main_8cpp.html#a67788fa0b8a9f47b255c1891cd744a70">SENSOR_I2C</a>);</div>
+<div class="line"><a name="l00032"></a><span class="lineno">   32</span>&#160;    <a class="code" href="class_b_m_p388_baro.html#a0c19332a6c4daa4243cd3da04f378968">BMP388Baro</a>(TwoWire *wireInput = &amp;<a class="code" href="hummingbird__config_8h.html#af96e35c605829940b0c3e416bb054134">SENSOR_I2C</a>);</div>
 <div class="line"><a name="l00033"></a><span class="lineno">   33</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="class_b_m_p388_baro.html#a2e506e5099c8c7d189a1a9ef031b0fc4">Initialize</a>(uint8_t presOS=BMP3_NO_OVERSAMPLING, uint8_t tempOS=BMP3_NO_OVERSAMPLING, </div>
 <div class="line"><a name="l00034"></a><span class="lineno">   34</span>&#160;                    uint8_t iirCoef=BMP3_IIR_FILTER_COEFF_3, uint8_t odr=BMP3_ODR_50_HZ);</div>
 <div class="line"><a name="l00035"></a><span class="lineno">   35</span>&#160;    <span class="keywordtype">bool</span> <a class="code" href="class_b_m_p388_baro.html#a7244ed408900dd6f694a667f7183bbf4">ReadSensor</a>();</div>
@@ -124,7 +124,7 @@ $(function() {
 <div class="ttc" id="aclass_b_m_p388_baro_html_af65156677c772f03ab0bf84be7de289e"><div class="ttname"><a href="class_b_m_p388_baro.html#af65156677c772f03ab0bf84be7de289e">BMP388Baro::GetTemperature</a></div><div class="ttdeci">float GetTemperature()</div><div class="ttdoc">Return atmospheric temperature in [C].</div><div class="ttdef"><b>Definition:</b> bmp388_barometer.cpp:160</div></div>
 <div class="ttc" id="adebugging_8h_html"><div class="ttname"><a href="debugging_8h.html">debugging.h</a></div></div>
 <div class="ttc" id="ahummingbird__config_8h_html"><div class="ttname"><a href="hummingbird__config_8h.html">hummingbird_config.h</a></div></div>
-<div class="ttc" id="amain_8cpp_html_a67788fa0b8a9f47b255c1891cd744a70"><div class="ttname"><a href="main_8cpp.html#a67788fa0b8a9f47b255c1891cd744a70">SENSOR_I2C</a></div><div class="ttdeci">BMP388Baro baro &amp; SENSOR_I2C</div><div class="ttdoc">DEV'S TO-DO ITEMS [] Range checks on accelerometer and magnetometer measurements [] Error handling fo...</div><div class="ttdef"><b>Definition:</b> main.cpp:50</div></div>
+<div class="ttc" id="ahummingbird__config_8h_html_af96e35c605829940b0c3e416bb054134"><div class="ttname"><a href="hummingbird__config_8h.html#af96e35c605829940b0c3e416bb054134">SENSOR_I2C</a></div><div class="ttdeci">#define SENSOR_I2C</div><div class="ttdoc">UBER-EXTREME CAUTION SHOULD BE USED CHANGING PARAMETERS IN THIS FILE.</div><div class="ttdef"><b>Definition:</b> hummingbird_config.h:26</div></div>
 </div><!-- fragment --></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

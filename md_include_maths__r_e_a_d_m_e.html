@@ -67,7 +67,7 @@ $(function() {
 <div class="title">HUMMINGBIRD FCU MATH FUNCTIONS </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><h1><a class="anchor" id="autotoc_md28"></a>
+<div class="textblock"><h1><a class="anchor" id="autotoc_md30"></a>
 &lt;tt&gt;math_functs.h&lt;/tt&gt;</h1>
 <p>Extra math functions such as:</p>
 <ul>
@@ -76,10 +76,10 @@ $(function() {
 <li><a href="https://github.com/ArduPilot/ardupilot/blob/00cfc1932fe98452ede016ea9f9f799d10ea9fb8/libraries/AP_Math/AP_Math.cpp#L71">Safe square root (template)</a></li>
 <li><a href="https://github.com/ArduPilot/ardupilot/blob/00cfc1932fe98452ede016ea9f9f799d10ea9fb8/libraries/AP_Math/AP_Math.cpp#L50">Safe arcsine (template)</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md29"></a>
+<h1><a class="anchor" id="autotoc_md31"></a>
 &lt;tt&gt;matrices_h&lt;/tt&gt;</h1>
 <p>A matrix object is definied by it's rows and columns. When a matrix object is created, the array is allocated on the heap (RAM2 for Teensy 4.1) with the C++ 'new' keyword as an array of pointers. See <a href="https://www.techiedelight.com/dynamic-memory-allocation-in-c-for-2d-3d-array/">this resource</a> to learn more.</p>
-<h1><a class="anchor" id="autotoc_md30"></a>
+<h1><a class="anchor" id="autotoc_md32"></a>
 &lt;tt&gt;matrix_math.h&lt;/tt&gt;</h1>
 <p>USES SINGLE-PRECISION FLOATS!</p><ul>
 <li>The library assumes the 2D array is one long dynamic array in memory (row major). The array indexing may be a bit strange, but since we allocated one long array in memory, it sould help a bit with cache performance. Seebelow for an example of this.</li>
@@ -119,13 +119,13 @@ $(function() {
 <div class="line">        *(A + i*cols + j) = 0.0f;  <span class="comment">// Row-major</span></div>
 <div class="line">    }</div>
 <div class="line">}</div>
-</div><!-- fragment --><h2><a class="anchor" id="autotoc_md31"></a>
+</div><!-- fragment --><h2><a class="anchor" id="autotoc_md33"></a>
 Resources</h2>
 <ul>
 <li><a href="https://www.techiedelight.com/dynamic-memory-allocation-in-c-for-2d-3d-array/">https://www.techiedelight.com/dynamic-memory-allocation-in-c-for-2d-3d-array/</a></li>
 <li><a href="https://eli.thegreenplace.net/2015/memory-layout-of-multi-dimensional-arrays">https://eli.thegreenplace.net/2015/memory-layout-of-multi-dimensional-arrays</a></li>
 </ul>
-<h1><a class="anchor" id="autotoc_md32"></a>
+<h1><a class="anchor" id="autotoc_md34"></a>
 &lt;tt&gt;vectors.h&lt;/tt&gt;</h1>
 <p>A vector object is definied by it's rows/length. When a vector object is created, the array is allocated on the heap (RAM2 for Teensy 4.1) with the C++ 'new' keyword. See <a href="https://www.techiedelight.com/dynamic-memory-allocation-in-c-for-2d-3d-array/">this resource</a> to learn more.</p>
 <p>How to Allocate and Access a 1D Array (vector):</p>

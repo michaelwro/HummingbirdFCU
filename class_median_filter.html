@@ -79,9 +79,15 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a76d1adaf4154d071d57934c77ea78d01"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_median_filter.html#a76d1adaf4154d071d57934c77ea78d01">MedianFilter</a> (size_t windowWidth=3)</td></tr>
 <tr class="memdesc:a76d1adaf4154d071d57934c77ea78d01"><td class="mdescLeft">&#160;</td><td class="mdescRight">A simple median filter implementation.  <a href="class_median_filter.html#a76d1adaf4154d071d57934c77ea78d01">More...</a><br /></td></tr>
 <tr class="separator:a76d1adaf4154d071d57934c77ea78d01"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a838fccf9ad8a1cb7180c2fce2ce669f9"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_median_filter.html#a838fccf9ad8a1cb7180c2fce2ce669f9">MedianFilter</a> (size_t windowWidth, float initVal)</td></tr>
+<tr class="memdesc:a838fccf9ad8a1cb7180c2fce2ce669f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructs the median filter class.  <a href="class_median_filter.html#a838fccf9ad8a1cb7180c2fce2ce669f9">More...</a><br /></td></tr>
+<tr class="separator:a838fccf9ad8a1cb7180c2fce2ce669f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1e139bf5e65463c5a618031067e66c43"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_median_filter.html#a1e139bf5e65463c5a618031067e66c43">~MedianFilter</a> ()</td></tr>
 <tr class="memdesc:a1e139bf5e65463c5a618031067e66c43"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return pointer to median filter past values/window.  <a href="class_median_filter.html#a1e139bf5e65463c5a618031067e66c43">More...</a><br /></td></tr>
 <tr class="separator:a1e139bf5e65463c5a618031067e66c43"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a690e4b1752c34b5c790ee83b1120c03f"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_median_filter.html#a690e4b1752c34b5c790ee83b1120c03f">Fill</a> (float val)</td></tr>
+<tr class="memdesc:a690e4b1752c34b5c790ee83b1120c03f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fill median filter array with a certain value.  <a href="class_median_filter.html#a690e4b1752c34b5c790ee83b1120c03f">More...</a><br /></td></tr>
+<tr class="separator:a690e4b1752c34b5c790ee83b1120c03f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3c5d9710fea99b19f27015acfb0a7a0a"><td class="memItemLeft" align="right" valign="top">size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class_median_filter.html#a3c5d9710fea99b19f27015acfb0a7a0a">GetWindowWidth</a> ()</td></tr>
 <tr class="memdesc:a3c5d9710fea99b19f27015acfb0a7a0a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return median filter window width.  <a href="class_median_filter.html#a3c5d9710fea99b19f27015acfb0a7a0a">More...</a><br /></td></tr>
 <tr class="separator:a3c5d9710fea99b19f27015acfb0a7a0a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -100,7 +106,7 @@ Private Attributes</h2></td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a76d1adaf4154d071d57934c77ea78d01"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a76d1adaf4154d071d57934c77ea78d01">&#9670;&nbsp;</a></span>MedianFilter()</h2>
+<h2 class="memtitle"><span class="permalink"><a href="#a76d1adaf4154d071d57934c77ea78d01">&#9670;&nbsp;</a></span>MedianFilter() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -120,6 +126,44 @@ Private Attributes</h2></td></tr>
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">windowWidth</td><td>Number of elements to use to compute the median, number of past data points to store. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
+<a id="a838fccf9ad8a1cb7180c2fce2ce669f9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a838fccf9ad8a1cb7180c2fce2ce669f9">&#9670;&nbsp;</a></span>MedianFilter() <span class="overload">[2/2]</span></h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">MedianFilter::MedianFilter </td>
+          <td>(</td>
+          <td class="paramtype">size_t&#160;</td>
+          <td class="paramname"><em>windowWidth</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>initVal</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Constructs the median filter class. </p>
+<p>Specify the window size upon class initialization.</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">windowWidth</td><td>Number of elements to use to compute the median, number of past data points to store. </td></tr>
+    <tr><td class="paramname">initVal</td><td>Initial value to fill the median filter array with. </td></tr>
   </table>
   </dd>
 </dl>
@@ -147,6 +191,33 @@ Private Attributes</h2></td></tr>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
+<a id="a690e4b1752c34b5c790ee83b1120c03f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a690e4b1752c34b5c790ee83b1120c03f">&#9670;&nbsp;</a></span>Fill()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void MedianFilter::Fill </td>
+          <td>(</td>
+          <td class="paramtype">float&#160;</td>
+          <td class="paramname"><em>val</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>Fill median filter array with a certain value. </p>
+<p>Use this to initialize the filter!</p>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">val</td><td>Value to fill the array with. </td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 <a id="a0b900a526b02fc09a51dda5f16733308"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a0b900a526b02fc09a51dda5f16733308">&#9670;&nbsp;</a></span>Filter()</h2>
 

@@ -37,6 +37,7 @@
 #include "filters/median_filter.h"
 #include "filters/low_pass_filter.h"
 #include "sensor_systems/inertial_nav_system.h"
+#include "sensor_systems/battery_monitor.h"
 
 
 
@@ -51,9 +52,11 @@
 
 
 unsigned long prev = 0;
+unsigned long prev2 = 0;
 unsigned long now = 0;
 
-
+MedianFilter Filt(20, 500.0f);
+float v = 0.0f;
 
 void setup()
 {
@@ -83,10 +86,10 @@ void setup()
     // }
 
 
-    if (!INS.Initialize())
-    {
-        DEBUG_PORT.println("Could not init. INS...");
-    }
+    // if (!INS.Initialize())
+    // {
+    //     DEBUG_PORT.println("Could not init. INS...");
+    // }
 
 
     // if (!Compass.Initialize())
@@ -129,8 +132,6 @@ void setup()
 
 
 
-
-
     #ifdef DEBUG
         DEBUG_PORT.println("SETUP LOOP COMPLETE!");
     #endif
@@ -144,49 +145,21 @@ void loop()
 {
 
     now = millis();
-    if (now - prev >= 20)
+    if (now - prev >= 10)
     {
-        if (!INS.Update())
-        {
-            DEBUG_PORT.println("ERROR READING INS!");
-            return;
-        }
-
-        // float x = mag.GetMx();
-        // float y = mag.GetMy();
-        // float z = mag.GetMz();
-        // DEBUG_PORT.print(x, 2); DEBUG_PORT.print(",");
-        // DEBUG_PORT.print(y, 2); DEBUG_PORT.print(",");
-        // DEBUG_PORT.println(z, 2);
-
-        float ax = INS.Accel.vec[0];
-        float ay = INS.Accel.vec[1];
-        float az = INS.Accel.vec[2];
-        float gx = INS.Gyro.vec[0];
-        float gy = INS.Gyro.vec[1];
-        float gz = INS.Gyro.vec[2];
-        float roll = INS.GetAccelRoll() * RAD2DEG;
-        float pitch = INS.GetAccelPitch() * RAD2DEG;
-
-        // DEBUG_PRINT("Accel: ");
-        // DEBUG_PRINTF(ax, 4);
-        // DEBUG_PRINT(",");
-        // DEBUG_PRINTF(ay, 4);
-        // DEBUG_PRINT(",");
-        // DEBUG_PRINTF(az, 4);
-        // DEBUG_PRINT("   Gyro: ");
-        // DEBUG_PRINTF(gx*RAD2DEG, 3);
-        // DEBUG_PRINT(",");
-        // DEBUG_PRINTF(gy*RAD2DEG, 3);
-        // DEBUG_PRINT(",");
-        // DEBUG_PRINTLNF(gz*RAD2DEG, 3);
-
-        DEBUG_PRINT("Roll: ");
-        DEBUG_PRINTF(roll, 3);
-        DEBUG_PRINT("  Pitch: ");
-        DEBUG_PRINTLNF(pitch, 3);
+        BattMonitor.Update();;
+        v = Filt.Filter(BattMonitor.GetVoltage());
         prev = now;
     }
+
+    if (now - prev2 >= 500)
+    {
+        DEBUG_PRINT("Reading: ");
+        DEBUG_PRINTLNF(v, 2);
+        prev2 = now;
+    }
+
+
 
 
 

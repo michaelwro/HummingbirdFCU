@@ -78,13 +78,13 @@ bool InertialNavSystem::Initialize()
 
     /* Compute initial gyro turn-on biases */
     #ifdef INS_DEBUG
-    DEBUG_PRINTLN("INERTIALNAVSYSTEM::Initialize: Measuring gyro turn-on biases.");
+    DEBUG_PRINTLN("INERTIALNAVSYSTEM::Initialize: Measuring gyro turn-on biases (rad/s)...");
     #endif
 
     if (!MeasureInitGyroBiases(initBiasTS))
     {
         #ifdef INS_DEBUG
-        DEBUG_PRINTLN("INERTIALNAVSYSTEM::Initialize ERROR: Error computing gyro turn-on biases.");
+        DEBUG_PRINTLN("INERTIALNAVSYSTEM::Initialize ERROR: Error computing gyro turn-on biases...");
         #endif
         return false;
     }
@@ -98,7 +98,7 @@ bool InertialNavSystem::Initialize()
 
     /* Compute initial accelerometer turn-on biases */
     #ifdef INS_DEBUG
-    DEBUG_PRINTLN("INERTIALNAVSYSTEM::Initialize: Measuring accelerometer turn-on biases... ");
+    DEBUG_PRINTLN("INERTIALNAVSYSTEM::Initialize: Measuring accelerometer turn-on biases (g)...");
     #endif
 
     if (!MeasureInitAccelBiases(initBiasTS))
@@ -110,9 +110,9 @@ bool InertialNavSystem::Initialize()
     }
 
     #ifdef INS_DEBUG
-    DEBUG_PRINT("    BAX: "); DEBUG_PRINTLNF(AccelTOBias.vec[0], 4);
-    DEBUG_PRINT("    BAY: "); DEBUG_PRINTLNF(AccelTOBias.vec[1], 4);
-    DEBUG_PRINT("    BAZ: "); DEBUG_PRINTLNF(AccelTOBias.vec[2], 4);
+    DEBUG_PRINT("    BAX0: "); DEBUG_PRINTLNF(AccelTOBias.vec[0], 4);
+    DEBUG_PRINT("    BAY0: "); DEBUG_PRINTLNF(AccelTOBias.vec[1], 4);
+    DEBUG_PRINT("    BAZ0: "); DEBUG_PRINTLNF(AccelTOBias.vec[2], 4);
     #endif
 
     return true;

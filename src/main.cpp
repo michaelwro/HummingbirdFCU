@@ -30,7 +30,7 @@
 #include "debugging.h"
 #include "sensor_drivers/fxos8700_accelmag.h"
 #include "sensor_drivers/fxas21002_gyro.h"
-#include "sensor_drivers/bmp388_barometer.h"
+// #include "sensor_drivers/bmp388_barometer.h"
 #include "maths/math_functs.h"
 #include "maths/matrices.h"
 #include "maths/vectors.h"
@@ -40,15 +40,11 @@
 
 
 
-#include "TinyGPS++.h"
-#include "sensor_systems/gnss_computer.h"
+// #include "TinyGPS++.h"
+// #include "sensor_systems/gnss_computer.h"
 
 // #include "gravity_computer.h"
 
-
-
-BMP388Baro baro(&SENSOR_I2C);
-Conversions cvt;
 
 
 
@@ -80,17 +76,17 @@ void setup()
     digitalWrite(RED_LED, HIGH);  // Start off LOW
     digitalWrite(GRN_LED, LOW);  // digitalWrite(GRN_LED, LOW);
 
-    if (!baro.Initialize(BMP3_NO_OVERSAMPLING, BMP3_NO_OVERSAMPLING, BMP3_IIR_FILTER_COEFF_3, BMP3_ODR_100_HZ))
-    {
-        DEBUG_PORT.println("ERROR INIT. SENSOR!");
-        return;
-    }
-
-
-    // if (!INS.Initialize())
+    // if (!baro.Initialize(BMP3_NO_OVERSAMPLING, BMP3_NO_OVERSAMPLING, BMP3_IIR_FILTER_COEFF_3, BMP3_ODR_100_HZ))
     // {
-    //     DEBUG_PORT.println("Could not init. INS...");
+    //     DEBUG_PORT.println("ERROR INIT. SENSOR!");
+    //     return;
     // }
+
+
+    if (!INS.Initialize())
+    {
+        DEBUG_PORT.println("Could not init. INS...");
+    }
 
 
     // if (!Compass.Initialize())
@@ -136,7 +132,7 @@ void setup()
 
 
     #ifdef DEBUG
-        DEBUG_PORT.println("DONE!");
+        DEBUG_PORT.println("SETUP LOOP COMPLETE!");
     #endif
 
     digitalWrite(RED_LED, LOW);
@@ -148,11 +144,11 @@ void loop()
 {
 
     now = millis();
-    if (now - prev >= 10)
+    if (now - prev >= 20)
     {
-        if (!baro.ReadSensor())
+        if (!INS.Update())
         {
-            DEBUG_PORT.println("ERROR READING SENSOR!");
+            DEBUG_PORT.println("ERROR READING INS!");
             return;
         }
 
@@ -163,12 +159,32 @@ void loop()
         // DEBUG_PORT.print(y, 2); DEBUG_PORT.print(",");
         // DEBUG_PORT.println(z, 2);
 
-        float p = baro.GetPressure();
-        float t = baro.GetTemperature();
-        // DEBUG_PORT.print("");
-        DEBUG_PORT.println(p, 3);
-        // DEBUG_PORT.print(",");
-        // DEBUG_PORT.println(cvt.C2F(t), 3);
+        float ax = INS.Accel.vec[0];
+        float ay = INS.Accel.vec[1];
+        float az = INS.Accel.vec[2];
+        float gx = INS.Gyro.vec[0];
+        float gy = INS.Gyro.vec[1];
+        float gz = INS.Gyro.vec[2];
+        float roll = INS.GetAccelRoll() * RAD2DEG;
+        float pitch = INS.GetAccelPitch() * RAD2DEG;
+
+        // DEBUG_PRINT("Accel: ");
+        // DEBUG_PRINTF(ax, 4);
+        // DEBUG_PRINT(",");
+        // DEBUG_PRINTF(ay, 4);
+        // DEBUG_PRINT(",");
+        // DEBUG_PRINTF(az, 4);
+        // DEBUG_PRINT("   Gyro: ");
+        // DEBUG_PRINTF(gx*RAD2DEG, 3);
+        // DEBUG_PRINT(",");
+        // DEBUG_PRINTF(gy*RAD2DEG, 3);
+        // DEBUG_PRINT(",");
+        // DEBUG_PRINTLNF(gz*RAD2DEG, 3);
+
+        DEBUG_PRINT("Roll: ");
+        DEBUG_PRINTF(roll, 3);
+        DEBUG_PRINT("  Pitch: ");
+        DEBUG_PRINTLNF(pitch, 3);
         prev = now;
     }
 

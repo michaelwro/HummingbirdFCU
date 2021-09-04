@@ -70,6 +70,15 @@
 
 /**
  * ====================================
+ * VCC INPUT VOLTAGE ANALOG PIN
+ * ====================================
+ * This is the pin that is connected to the HFCU's voltage divider circuit to 
+ * read input voltage.
+ */
+#define VCC_PIN 22
+
+/**
+ * ====================================
  * RGB LED PIN DEFINITIONS
  * ====================================
  * Found in hummingbird_config.h

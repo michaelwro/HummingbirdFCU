@@ -19,7 +19,7 @@ class MedianFilter
 {
 public:
     MedianFilter(size_t windowWidth = 3);
-    MedianFilter(size_t windowWidth = 3, float initVal = 0.0f);
+    MedianFilter(size_t windowWidth, float initVal);
     ~MedianFilter();
     void Fill(float val);
     size_t GetWindowWidth();

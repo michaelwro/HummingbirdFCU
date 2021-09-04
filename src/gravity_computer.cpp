@@ -15,9 +15,9 @@
  * and altitude above mean sea level. Down is positive!
  */
 GravityComputer::GravityComputer()
-: GravSmoother(5)
+: GravSmoother(5, CONSTS_GRAV)
 {
-    this->_grav = GravSmoother.Filter(CONSTS_GRAV);  // Fill with this to begin
+    this->_grav = CONSTS_GRAV;
     this->errCount = 0;
 }
 
@@ -42,6 +42,10 @@ bool GravityComputer::Update(float lat_rad, float lon_rad, float alt_msl)
         this->errCount++;
         return false;
     }
+
+    // Smooth out sharp changes
+    this->_grav = GravSmoother.Filter(this->_grav);
+
     return true;
 }
 
@@ -132,9 +136,6 @@ bool GravityComputer::_ComputeGravity(float lat, float lon, float alt)
         #endif
         return false;
     }
-
-    // Smooth out sharp changes
-    this->_grav = GravSmoother.Filter(this->_grav);
 
     return true;
 }

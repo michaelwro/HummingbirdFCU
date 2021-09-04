@@ -24,6 +24,7 @@
 
 
 BaroAltimeter::BaroAltimeter()
+: _PresFastFilter(7, 101325.0f)
 {
     // Set default values for variables or zero them
     this->isConnected = false;

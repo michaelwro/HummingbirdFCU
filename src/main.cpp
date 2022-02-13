@@ -30,7 +30,7 @@
 #include "debugging.h"
 #include "sensor_drivers/fxos8700_accelmag.h"
 #include "sensor_drivers/fxas21002_gyro.h"
-// #include "sensor_drivers/bmp388_barometer.h"
+#include "sensor_drivers/bmp388_barometer.h"
 #include "maths/math_functs.h"
 #include "maths/matrices.h"
 #include "maths/vectors.h"
@@ -39,6 +39,7 @@
 #include "sensor_systems/inertial_nav_system.h"
 #include "sensor_systems/battery_monitor.h"
 
+#include "filters/derivative_filter.h"
 
 
 // #include "TinyGPS++.h"
@@ -55,8 +56,10 @@ unsigned long prev = 0;
 unsigned long prev2 = 0;
 unsigned long now = 0;
 
-MedianFilter Filt(20, 500.0f);
-float v = 0.0f;
+DerivativeFilter dfilt;
+LowPassFilter lpf;
+BMP388Baro baro(&SENSOR_I2C);
+float h_prev;
 
 void setup()
 {
@@ -79,11 +82,13 @@ void setup()
     digitalWrite(RED_LED, HIGH);  // Start off LOW
     digitalWrite(GRN_LED, LOW);  // digitalWrite(GRN_LED, LOW);
 
-    // if (!baro.Initialize(BMP3_NO_OVERSAMPLING, BMP3_NO_OVERSAMPLING, BMP3_IIR_FILTER_COEFF_3, BMP3_ODR_100_HZ))
-    // {
-    //     DEBUG_PORT.println("ERROR INIT. SENSOR!");
-    //     return;
-    // }
+    if (!baro.Initialize(BMP3_NO_OVERSAMPLING, BMP3_NO_OVERSAMPLING, BMP3_IIR_FILTER_COEFF_3, BMP3_ODR_100_HZ))
+    {
+        DEBUG_PORT.println("ERROR INIT. SENSOR!");
+        return;
+    }
+
+    lpf.SetSmoothingFactor(0.2f);
 
 
     // if (!INS.Initialize())
@@ -147,18 +152,25 @@ void loop()
     now = millis();
     if (now - prev >= 10)
     {
-        BattMonitor.Update();;
-        v = Filt.Filter(BattMonitor.GetVoltage());
+        if (!baro.ReadSensor())
+        {
+            DEBUG_PRINTLN("ERROR READING SENSOR!");
+            return;
+        }
+
+        float p = baro.GetPressure();
+        float h = ((287.0f * 300.0f) / 9.81f) * logf(101325.0f / p);
+        // float dh = 1e6f * ((h - h_prev) / (float)(now - prev));
+        float dh = dfilt.Filter(h, micros()) * 1e6f;  // [cm/s]
+        float dh_filt = lpf.Filter(dh);
+
+        // DEBUG_PRINTF(dh, 6);
+        // DEBUG_PRINT(",");
+        DEBUG_PRINTLNF(dh_filt, 6);
+        // h_prev = h;
         prev = now;
-    }
 
-    if (now - prev2 >= 500)
-    {
-        DEBUG_PRINT("Reading: ");
-        DEBUG_PRINTLNF(v, 2);
-        prev2 = now;
     }
-
 
 
 

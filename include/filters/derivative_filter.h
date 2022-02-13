@@ -16,6 +16,7 @@
 #include <Arduino.h>
 #include <math.h>
 #include "hummingbird_config.h"
+#include "debugging.h"
 
 
 

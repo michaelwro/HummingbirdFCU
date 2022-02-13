@@ -48,26 +48,40 @@ float DerivativeFilter::Filter(float val, uint32_t timestamp)
     size_t i;
     float derivative;
 
+    // DerivativeFilter::update
     // If the current and prev. timestamps are equal, skip and return the previous slope.
     if (this->sampleIdx == 0)
-        i = 0;
+    {
+        i = 6;
+    }
     else
+    {
         i = this->sampleIdx - 1;
+    }
     
-    if (this->timestamps[i] == timestamp)  // return prev. derivative value
-        return this->prevDeriv;
+    if (this->timestamps[i] == timestamp)
+    {
+        return this->prevDeriv;  // return prev. derivative value
+    }
 
-    // Check if we have filled the buffer yet. If not, we cannot compute the derivative! Return zero.
-    if (this->timestamps[6] == this->timestamps[5])
-        return 0.0f;
-
+    // FilterWithBuffer::apply
     // Add value and timestamp to their arrays
     this->timestamps[this->sampleIdx] = timestamp;
     this->samples[this->sampleIdx++] = val;
-    
+
     // wrap index if necessary
     if (this->sampleIdx >= 7)
+    {
         this->sampleIdx = 0;
+    }
+
+    // DerivativeFilter::slope
+    // Check if we have filled the buffer yet. If not, we cannot compute the derivative! Return zero.
+    if (this->timestamps[6] == this->timestamps[5])
+    {
+        return 0.0f;
+    }
+
     
     // compute the derivative
     // macro modified from Ardupilot's source code in DerivativeFilter.cpp
@@ -79,7 +93,9 @@ float DerivativeFilter::Filter(float val, uint32_t timestamp)
 
     // check for numerical errors
     if (isnan(derivative) || isinf(derivative))
-        return 0.0f;
+    {
+        derivative = 0.0f;
+    }
     
     // replace last result
     this->prevDeriv = derivative;
